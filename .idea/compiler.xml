@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="tsp-cup-2019" target="1.5" />
+      <module name="tsp-cup-2019" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
