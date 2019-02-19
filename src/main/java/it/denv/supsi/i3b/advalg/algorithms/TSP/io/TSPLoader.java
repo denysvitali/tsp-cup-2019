@@ -7,6 +7,7 @@ import it.denv.supsi.i3b.advalg.algorithms.ProblemType;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class TSPLoader {
 	private String path;
@@ -26,13 +27,6 @@ public class TSPLoader {
 		}
 
 		return tspData;
-	}
-
-	private void parseKVTag(String tag) throws IOException {
-		parseTag(tag);
-		skipWhiteSpace(fis);
-		assert(fis.read() == ':');
-		skipWhiteSpace(fis);
 	}
 
 	private boolean parseTag(String tag) throws IOException {
@@ -67,36 +61,27 @@ public class TSPLoader {
 		int c = -2;
 
 		// KV Section
-		
+		HashMap<String, String> hm = new HashMap<>();
+		KV k;
+		do {
+			k = parseKVLine(fis);
+			if(k != null) {
+				hm.put(k.getKey(), k.getValue());
+			}
 
-		// NAME Parsing
-		parseKVTag("NAME");
-		data.name = getString(fis);
-		assert(fis.read() == '\n');
+		} while(k != null);
 
-		// TYPE Parsing
-		parseKVTag("TYPE");
-		data.type = ProblemType.valueOf(getString(fis));
-		assert(fis.read() == '\n');
-
-		// COMMENT parsing
-		parseKVTag("COMMENT");
-		data.comment = getString(fis);
-		assert(fis.read() == '\n');
-
-		parseKVTag("DIMENSION");
-		data.dimension = getInt(fis);
-		assert(fis.read() == '\n');
-
-		parseKVTag("EDGE_WEIGHT_TYPE");
-		data.ewt = EdgeWeightType.valueOf(
-				getString(fis)
+		data.name = hm.getOrDefault("NAME", "Unnamed");
+		data.comment = hm.getOrDefault("COMMENT", "");
+		data.type = ProblemType.valueOf(hm.get("TYPE"));
+		data.ewt = EdgeWeightType.valueOf(hm.get("EDGE_WEIGHT_TYPE"));
+		data.best_known = Integer.valueOf(
+				hm.getOrDefault("BEST_KNOWN", "-1")
 		);
-		assert(fis.read() == '\n');
-
-		parseKVTag("BEST_KNOWN");
-		data.best_known = getInt(fis);
-		assert(fis.read() == '\n');
+		data.dimension = Integer.valueOf(hm.getOrDefault(
+				"DIMENSION",
+				"-1"
+		));
 
 		parseTag("NODE_COORD_SECTION");
 		assert(fis.read() == '\n');
@@ -107,6 +92,29 @@ public class TSPLoader {
 		}
 
 		return data;
+	}
+
+	private KV parseKVLine(BufferedInputStream fis) throws IOException {
+		skipWhiteSpace(fis);
+		String key = getStringTill(fis, ':');
+		key = key.trim();
+		if(fis.read() != ':'){
+			fis.reset();
+			return null;
+		}
+		skipWhiteSpace(fis);
+		String value = getStringTill(fis, '\n');
+
+		if(fis.read() != '\n'){
+			fis.reset();
+			return null;
+		}
+
+		if(key.length() != 0 && value.length() == 0){
+			return null;
+		}
+
+		return new KV(key, value);
 	}
 
 	private Coordinate parseCoordLine(BufferedInputStream fis) throws IOException {
@@ -140,21 +148,43 @@ public class TSPLoader {
 			fis.mark(1);
 			c = fis.read();
 		}
+
+		// Scientific notation
+		if(c == 'e' || c == 'E'){
+			sb.append((char) c);
+			fis.mark(1);
+			c = fis.read();
+			if(c == '+' || c == '-') {
+				fis.mark(1);
+				c = fis.read();
+				while(isNumeric(c)) {
+					sb.append((char) c);
+					fis.mark(1);
+					c = fis.read();
+				}
+			} else {
+				fis.reset();
+			}
+		}
 		fis.reset();
 		return Double.valueOf(sb.toString());
 	}
 
-	private String getString(BufferedInputStream fis) throws IOException {
+	private String getStringTill(BufferedInputStream fis, char e) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		fis.mark(1);
 		int c = fis.read();
-		while(c != '\n' && c != -1){
+		while(c != e && c!= '\n' && c != -1){
 			sb.append((char) c);
 			fis.mark(1);
 			c = fis.read();
 		}
 		fis.reset();
 		return sb.toString();
+	}
+
+	private String getString(BufferedInputStream fis) throws IOException {
+		return getStringTill(fis, '\n');
 	}
 
 	private static boolean isNumeric(int c){

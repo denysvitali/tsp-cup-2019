@@ -18,4 +18,32 @@ public class TSPData {
 	protected TSPData(){
 
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public ProblemType getType() {
+		return type;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public int getDimension() {
+		return dimension;
+	}
+
+	public EdgeWeightType getEwt() {
+		return ewt;
+	}
+
+	public int getBestKnown() {
+		return best_known;
+	}
+
+	public ArrayList<Coordinate> getCoordinates() {
+		return coordinates;
+	}
 }
