@@ -20,6 +20,14 @@ public class FileParsing {
 
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
-		System.out.println(data);
+	}
+
+	@Test
+	public void parseTest2() throws IOException {
+		String filePath = FileParsing.getTestFile("/problems/d198.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
 	}
 }
