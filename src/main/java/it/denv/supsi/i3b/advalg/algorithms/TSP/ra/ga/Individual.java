@@ -11,8 +11,20 @@ public class Individual {
 		this.tspData = tspData;
 	}
 
-	public double getFitness(){
-		return 0;
+	public int getFitness(){
+		int startNode = tspData.getStartNode();
+		int distance = 0;
+		int[][] distMat = tspData.getDistances();
+
+
+		for(int i=0; i<genes.length; i++){
+			distance += distMat[startNode-1][genes[i]-1];
+			startNode = genes[i];
+		}
+
+		distance += distMat[startNode-1][tspData.getStartNode()-1];
+
+		return distance;
 	}
 
 	public int[] getGenes() {

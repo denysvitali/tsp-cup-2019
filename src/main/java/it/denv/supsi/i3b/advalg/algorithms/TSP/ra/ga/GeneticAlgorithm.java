@@ -6,6 +6,9 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class GeneticAlgorithm extends RoutingAlgorithm {
 
@@ -23,6 +26,8 @@ public class GeneticAlgorithm extends RoutingAlgorithm {
 		*/
 
 		this.startNode = startNode;
+		data.setStartNode(startNode);
+
 		genes_size = data.getDimension() - 1;
 
 		assert(genes_size > 0);
@@ -34,10 +39,24 @@ public class GeneticAlgorithm extends RoutingAlgorithm {
 				.toArray();
 		population = new Population(genes_size, initial_genes, data);
 
-		while(population.getFittest().getFitness() >= sigma){
+		while(population.getFittest().getFitness() - data.getBestKnown() >= sigma){
 			population = new Population(population);
 			System.out.println(population);
 		}
+
+		Individual fittest = population.getFittest();
+		int[] finalPath = new int[genes_size+2];
+		System.arraycopy(fittest.getGenes(), 0, finalPath, 1,
+				genes_size);
+
+		finalPath[0] = startNode;
+		finalPath[genes_size+1] = startNode;
+
+
+		String arrayOutput = Arrays.stream(finalPath)
+			.mapToObj(Integer::toString)
+				.collect(Collectors.joining(", "));
+		System.out.println("Final Path: " + arrayOutput);
 
 		System.out.println("End. " + population);
 

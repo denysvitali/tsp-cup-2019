@@ -10,23 +10,22 @@ import java.util.stream.Collectors;
 public class Population {
 	private int size;
 	private int generation = 0;
-	private int permutations = 2;
+	private int permutations = 20;
 	private PermutationPolicy firstPermutation = PermutationPolicy.PERMUTE_ALL;
 
-	private int bestSize = 10;
+	private int bestSize = 5;
 	private ArrayList<Individual> population = new ArrayList<>();
-	private TSPData tspData;
 
 	public Population(int size, int[] initial_genes, TSPData tspData) {
 		this.size = size;
-		this.tspData = tspData;
 		this.generation = 1;
 		assert (size >= 1);
 
 		for (int i = 0; i < size; i++) {
 			Individual individual = new Individual(tspData);
-			int genes[] = performPermutations(initial_genes, firstPermutation);
+			int[] genes = performPermutations(initial_genes, firstPermutation);
 			individual.setGenes(genes);
+			population.add(individual);
 		}
 	}
 
@@ -116,7 +115,7 @@ public class Population {
 	@Override
 	public String toString() {
 		return String.format(
-				"Population (S: %d, G: %d, Fittest: %.2f)",
+				"Population (S: %d, G: %d, Fittest: %d)",
 				size, generation, getFittest().getFitness()
 		);
 	}

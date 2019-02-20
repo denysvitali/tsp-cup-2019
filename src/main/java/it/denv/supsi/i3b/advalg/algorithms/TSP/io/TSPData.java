@@ -14,7 +14,8 @@ public class TSPData {
 	protected EdgeWeightType ewt;
 	protected int best_known = 0;
 	protected ArrayList<Coordinate> coordinates = new ArrayList<>();
-	protected double[][] distances;
+	protected int[][] distances;
+	protected int startNode = -1;
 
 	protected TSPData(){
 
@@ -48,11 +49,19 @@ public class TSPData {
 		return coordinates;
 	}
 
-	public void setDistances(double[][] distances) {
+	public void setDistances(int[][] distances) {
 		this.distances = distances;
 	}
 
-	public double[][] getDistances() {
+	public int[][] getDistances() {
 		return distances;
+	}
+
+	public void setStartNode(int startNode) {
+		this.startNode = startNode;
+	}
+
+	public int getStartNode() {
+		return startNode;
 	}
 }

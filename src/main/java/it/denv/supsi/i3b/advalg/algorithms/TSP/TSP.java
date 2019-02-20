@@ -15,9 +15,9 @@ public class TSP {
 	}
 
 	public Route run(TSPData data, RoutingAlgorithm ra){
-		Route r = new Route(data.getCoordinates(), 10);
-		double[][] distances = calculateDistances(data);
+		int[][] distances = calculateDistances(data);
 		data.setDistances(distances);
+		//printDistanceMatrix(data.getCoordinates().size(), distances);
 
 		return ra.route(1, data);
 	}
@@ -33,11 +33,11 @@ public class TSP {
 
 	}
 
-	private double[][] calculateDistances(TSPData data) {
+	private int[][] calculateDistances(TSPData data) {
 		int size = data.getCoordinates().size();
-		double[][] distances = new double[size][size];
-		for(int i=0; i<size/2; i++){
-			for(int j=0; j<size/2; j++){
+		int[][] distances = new int[size][size];
+		for(int i=0; i<size; i++){
+			for(int j=0; j<=i; j++){
 				if(i == j){
 					distances[i][j] = 0;
 					distances[j][i] = 0;
@@ -45,15 +45,27 @@ public class TSP {
 					Coordinate a = data.getCoordinates().get(i);
 					Coordinate b = data.getCoordinates().get(j);
 
-					double distance = Math.sqrt(
+					int distance = (int) (Math.sqrt(
 							Math.pow(a.getX() - b.getX(), 2) +
 							Math.pow(a.getY() - b.getY(), 2)
-					);
+					) + 0.5);
+
 					distances[i][j] = distance;
 					distances[j][i] = distance;
 				}
 			}
 		}
 		return distances;
+	}
+
+	// Thanks @MrRobospoccio
+
+	public static void printDistanceMatrix(int size, int[][] distMatrix){
+		for(int i = 0; i < size; i++){
+			for (int j = 0; j < size; j++){
+				System.out.print(distMatrix[i][j] + "\t");
+			}
+			System.out.println(" ");
+		}
 	}
 }
