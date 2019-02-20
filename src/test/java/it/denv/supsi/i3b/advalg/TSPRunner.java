@@ -1,10 +1,10 @@
 package it.denv.supsi.i3b.advalg;
 
-import it.denv.supsi.i3b.advalg.algorithms.EdgeWeightType;
-import it.denv.supsi.i3b.advalg.algorithms.ProblemType;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.TSP;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ga.GeneticAlgorithm;
+import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -26,7 +26,12 @@ public class TSPRunner {
 		TSPData data = loader.load();
 
 		TSP tsp = new TSP();
-		tsp.run(data);
+		Route r = tsp.run(data, new GeneticAlgorithm());
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
 	}
 
 	@Test
@@ -38,6 +43,18 @@ public class TSPRunner {
 		TSPData data = loader.load();
 
 		TSP tsp = new TSP();
-		tsp.run(data);
+		Route r = tsp.run(data, new GeneticAlgorithm());
+	}
+
+	@Test
+	public void eil76() throws IOException {
+		String filePath = TSPRunner.getTestFile("/problems/eil76.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		tsp.run(data, new GeneticAlgorithm());
 	}
 }

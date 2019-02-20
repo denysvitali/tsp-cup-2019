@@ -56,4 +56,24 @@ public class FileParsing {
 		assertEquals(551.2, data.getCoordinates().get(1).getX());
 		assertEquals(996.4, data.getCoordinates().get(1).getY());
 	}
+
+	@Test
+	public void parseTest3() throws IOException {
+		String filePath = FileParsing.getTestFile("/problems/eil76.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		assertEquals("eil76", data.getName());
+		assertNotNull(data.getCoordinates());
+		assertEquals(76, data.getDimension());
+		assertEquals(538, data.getBestKnown());
+		assertEquals(ProblemType.TSP, data.getType());
+		assertEquals("76-city problem (Christofides/Eilon)", data.getComment());
+		assertEquals(data.getDimension(), data.getCoordinates().size());
+
+		assertEquals(36, data.getCoordinates().get(1).getX());
+		assertEquals(26, data.getCoordinates().get(1).getY());
+	}
 }

@@ -18,4 +18,8 @@ public class Coordinate {
 	public double getY() {
 		return y;
 	}
+
+	public int getNumber() {
+		return number;
+	}
 }
