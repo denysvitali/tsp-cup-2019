@@ -9,17 +9,24 @@ import java.util.stream.Collectors;
 public class Population {
 	private int size;
 	private int generation = 0;
-	private double mutation_prob = 0.12;
-	private double crossover_prob = 0.80;
-	private double fittest_perc = 0.3;
+	private double mutation_prob = 0.1;
+	private double crossover_prob = 0.9;
+	private double fittest_perc = 0.2;
+	private int[] initial_genes;
+	private int pop_size;
+
+	private TSPData data;
 
 	private PermutationPolicy firstPermutation = PermutationPolicy.PERMUTE_FIXED;
 
 	private ArrayList<Individual> population = new ArrayList<>();
 
 	public Population(int size, int[] initial_genes, TSPData tspData) {
-		this.size = size;
+		this.pop_size = size;
+		this.initial_genes = initial_genes;
+		this.size = initial_genes.length;
 		this.generation = 1;
+		this.data = tspData;
 		assert (size >= 1);
 
 		Individual ind1 = new Individual(tspData);
@@ -27,11 +34,16 @@ public class Population {
 		population.add(ind1);
 
 		for (int i = 1; i < size; i++) {
-			Individual individual = new Individual(tspData);
-			int[] genes = performPermutations(initial_genes, firstPermutation);
-			individual.setGenes(genes);
-			population.add(individual);
+			population.add(generateRandomIndividual());
 		}
+	}
+
+	private Individual generateRandomIndividual() {
+		Individual individual = new Individual(data);
+		int[] genes = performPermutations(initial_genes, firstPermutation);
+		individual.setGenes(genes);
+
+		return individual;
 	}
 
 	public Population(Population pop) {
@@ -63,6 +75,14 @@ public class Population {
 			population.add(individual);
 		}
 
+		for(int i=0; i<crossOverItems.size() - 1; i+=2){
+			Individual individual = getOffspring(
+					bestIndividuals.get(i),
+					bestIndividuals.get(i+1)
+			);
+			population.add(individual);
+		}
+
 
 		// Mutation
 
@@ -70,8 +90,7 @@ public class Population {
 
 			double rand = Math.random();
 			if(rand < mutation_prob){
-				Individual individual =
-						population.get(i);
+				Individual individual = population.get(i);
 
 				int[] genes = individual.getGenes();
 
@@ -80,10 +99,6 @@ public class Population {
 				for (int j = 0; j < perm_perc * genes.length; j++) {
 					int a = (int) (Math.random() * size);
 					int b = (int) (Math.random() * size);
-
-					while (a == b) {
-						b = (int) (Math.random() * size);
-					}
 
 					int tmp_g = genes[a];
 					genes[a] = genes[b];
@@ -95,7 +110,17 @@ public class Population {
 			}
 		}
 
+		this.initial_genes = pop.initial_genes;
+		this.data = pop.data;
+		this.pop_size = pop.pop_size;
+
 		population.addAll(bestIndividuals);
+
+		int missing = (pop_size - population.size());
+
+		for(int i=0; i<missing; i++) {
+			population.add(generateRandomIndividual());
+		}
 	}
 
 	private Individual getOffspring(Individual p1, Individual p2) {
@@ -105,8 +130,8 @@ public class Population {
 		int p3_genes[] = new int[p1_genes.length];
 
 		// OffSpring Start
-		int o_s = (int) (Math.random() * p1_genes.length * 0.8);
-		int o_e = (int) (o_s + ((Math.random() * 0.2)+0.1) * p1_genes.length) % p1_genes.length;
+		int o_s = (int) (Math.random() * p1_genes.length);
+		int o_e = (int) (o_s + Math.random() * (p1_genes.length - o_s)) % p1_genes.length;
 
 		if(o_e < o_s){
 			o_e = p1_genes.length;
@@ -167,7 +192,7 @@ public class Population {
 				break;
 			case PERMUTE_FIXED:
 				double perm_perc = Math.random() * crossover_prob;
-				nperms = (int) (crossover_prob * ig.length);
+				nperms = (int) (Math.random() * ig.length);
 				break;
 			default:
 				nperms = 0;
@@ -178,10 +203,6 @@ public class Population {
 		for(int i=0; i<nperms; i++){
 			int a = (int) (Math.random() * ig.length);
 			int b = (int) (Math.random() * ig.length);
-
-			while(a == b){
-				b = (int) (Math.random() * ig.length);
-			}
 
 			int v = newgenes[a];
 			newgenes[a] = newgenes[b];
@@ -219,8 +240,8 @@ public class Population {
 	@Override
 	public String toString() {
 		return String.format(
-				"Population (S: %d, G: %d, Fittest: %d)",
-				size, generation, getFittest().getFitness()
+				"Population (S: %d, Genes Size: %d, G: %d, Fittest: %d)",
+				population.size(), size, generation, getFittest().getFitness()
 		);
 	}
 }

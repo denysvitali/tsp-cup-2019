@@ -17,6 +17,7 @@ public class GeneticAlgorithm extends RoutingAlgorithm {
 	private int genes_size = -1;
 	private int[] initial_genes;
 	private Population population;
+	private int population_initial_size = 500;
 	private int startNode = -1;
 
 	@Override
@@ -31,11 +32,14 @@ public class GeneticAlgorithm extends RoutingAlgorithm {
 
 		genes_size = data.getDimension() - 1;
 
+		population_initial_size = data.getDimension() * 5;
+
 		assert(genes_size > 0);
 
 		NearestNeighbour rnn = new NearestNeighbour();
 
 		ArrayList<Route> routes = new ArrayList<>();
+
 		for(int i=0; i<data.getDimension(); i++){
 			Route route = rnn.route(i+1, data);
 			routes.add(route);
@@ -47,17 +51,17 @@ public class GeneticAlgorithm extends RoutingAlgorithm {
 						.findFirst()
 						.get();
 
+		//Route route = rnn.route(startNode, data);
+
 		System.out.println("RNN Length: " + route.getLength());
 
 		initial_genes = route.getCoords().stream()
 				.filter(e -> e.getNumber() != route.getStartNode())
 				.mapToInt(Coordinate::getNumber).toArray();
-		/*initial_genes = data.getCoordinates()
-				.stream()
-				.mapToInt(Coordinate::getNumber)
-				.filter(i -> i != startNode)
-				.toArray();*/
-		population = new Population(genes_size, initial_genes, data);
+
+		data.setStartNode(route.getStartNode());
+
+		population = new Population(population_initial_size, initial_genes, data);
 		System.out.println(population + ", " + population.getRate(data.getBestKnown()));
 
 		int i = 0;
