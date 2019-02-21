@@ -135,6 +135,13 @@ public class TSPLoader {
 		StringBuilder sb = new StringBuilder();
 		int c = fis.read();
 		boolean commaAlreadySeen = false;
+
+		if(isSign(c)){
+			sb.append((char) c);
+			fis.mark(1);
+			c = fis.read();
+		}
+
 		while(isNumeric(c) || isComma(c)){
 			if(isComma(c)){
 				if(commaAlreadySeen) {
@@ -168,6 +175,10 @@ public class TSPLoader {
 		}
 		fis.reset();
 		return Double.valueOf(sb.toString());
+	}
+
+	private boolean isSign(int c) {
+		return c == '+' || c == '-';
 	}
 
 	private String getStringTill(BufferedInputStream fis, char e) throws IOException {

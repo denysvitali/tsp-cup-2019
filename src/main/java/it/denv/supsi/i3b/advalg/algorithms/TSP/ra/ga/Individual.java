@@ -6,12 +6,25 @@ public class Individual {
 	private int[] genes;
 
 	private TSPData tspData;
+	private int fitness = -1;
 
 	public Individual(TSPData tspData){
 		this.tspData = tspData;
 	}
 
+	public Individual(Individual individual) {
+		this.genes = new int[individual.getGenes().length];
+		System.arraycopy(individual.getGenes(), 0, genes, 0,
+				individual.getGenes().length);
+		this.tspData = individual.tspData;
+	}
+
 	public int getFitness(){
+		if(fitness != -1)
+		{
+			return fitness;
+		}
+
 		int startNode = tspData.getStartNode();
 		int distance = 0;
 		int[][] distMat = tspData.getDistances();
@@ -24,8 +37,10 @@ public class Individual {
 
 		distance += distMat[startNode-1][tspData.getStartNode()-1];
 
+		fitness = distance;
 		return distance;
 	}
+
 
 	public int[] getGenes() {
 		return genes;
@@ -33,5 +48,11 @@ public class Individual {
 
 	public void setGenes(int[] genes) {
 		this.genes = genes;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Individual (Fit: %d)",
+				getFitness());
 	}
 }

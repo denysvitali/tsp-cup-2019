@@ -2,13 +2,15 @@ package it.denv.supsi.i3b.advalg;
 
 import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 
-import java.util.List;
+import java.util.LinkedList;
 
 public class Route {
-	private List<Coordinate> coords;
+	private LinkedList<Coordinate> coords;
 	private int length;
+	private int startNode;
 
-	public Route(List<Coordinate> coords, int length){
+	public Route(int startNode, LinkedList<Coordinate> coords, int length){
+		this.startNode = startNode;
 		this.coords = coords;
 		this.length = length;
 	}
@@ -17,7 +19,11 @@ public class Route {
 		return length;
 	}
 
-	public List<Coordinate> getCoords() {
+	public LinkedList<Coordinate> getCoords() {
 		return coords;
+	}
+
+	public int getStartNode() {
+		return startNode;
 	}
 }

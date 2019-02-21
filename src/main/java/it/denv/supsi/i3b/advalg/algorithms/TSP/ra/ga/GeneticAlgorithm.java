@@ -4,18 +4,19 @@ import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.nn.NearestNeighbour;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.rnn.RandomNearestNeighbour;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class GeneticAlgorithm extends RoutingAlgorithm {
 
 	private int genes_size = -1;
 	private int[] initial_genes;
 	private Population population;
-	private double sigma = 100.0;
 	private int startNode = -1;
 
 	@Override
@@ -32,16 +33,41 @@ public class GeneticAlgorithm extends RoutingAlgorithm {
 
 		assert(genes_size > 0);
 
-		initial_genes = data.getCoordinates()
+		NearestNeighbour rnn = new NearestNeighbour();
+
+		ArrayList<Route> routes = new ArrayList<>();
+		for(int i=0; i<data.getDimension(); i++){
+			Route route = rnn.route(i+1, data);
+			routes.add(route);
+		}
+
+		Route route = routes
+						.stream()
+						.sorted(Comparator.comparing(Route::getLength))
+						.findFirst()
+						.get();
+
+		System.out.println("RNN Length: " + route.getLength());
+
+		initial_genes = route.getCoords().stream()
+				.filter(e -> e.getNumber() != route.getStartNode())
+				.mapToInt(Coordinate::getNumber).toArray();
+		/*initial_genes = data.getCoordinates()
 				.stream()
 				.mapToInt(Coordinate::getNumber)
 				.filter(i -> i != startNode)
-				.toArray();
+				.toArray();*/
 		population = new Population(genes_size, initial_genes, data);
+		System.out.println(population + ", " + population.getRate(data.getBestKnown()));
 
-		while(population.getFittest().getFitness() - data.getBestKnown() >= sigma){
+		int i = 0;
+		while(population.getRate(data.getBestKnown()) > 0.1){
 			population = new Population(population);
-			System.out.println(population);
+
+			if(i%10 == 0){
+				System.out.println(population + ", " + population.getRate(data.getBestKnown()));
+			}
+			i++;
 		}
 
 		Individual fittest = population.getFittest();

@@ -57,4 +57,16 @@ public class TSPRunner {
 		TSP tsp = new TSP();
 		tsp.run(data, new GeneticAlgorithm());
 	}
+
+	@Test
+	public void lin318() throws IOException {
+		String filePath = TSPRunner.getTestFile("/problems/lin318.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		tsp.run(data, new GeneticAlgorithm());
+	}
 }
