@@ -123,11 +123,8 @@ public class Population {
 		}
 	}
 
-	private Individual getOffspring(Individual p1, Individual p2) {
+	public static Individual getOffspring(Individual p1, Individual p2){
 		int p1_genes[] = p1.getGenes();
-		int p2_genes[] = p2.getGenes();
-
-		int p3_genes[] = new int[p1_genes.length];
 
 		// OffSpring Start
 		int o_s = (int) (Math.random() * p1_genes.length);
@@ -141,16 +138,19 @@ public class Population {
 		assert(o_e < p1_genes.length+1);
 		assert(o_s >= 0);
 
+		return getOffspring(p1, p2, o_s, o_e);
+	}
+
+	public static Individual getOffspring(Individual p1, Individual p2,
+										  int o_s,
+										  int o_e) {
+		int p1_genes[] = p1.getGenes();
+		int p2_genes[] = p2.getGenes();
+
+		int p3_genes[] = new int[p1_genes.length];
+
 		// Merge the genes
 		int p2_offset = 0;
-
-		/*int[] p1_part_genes = new int[o_e - o_s];
-		System.arraycopy(p1_genes, o_s, p1_part_genes, 0, o_e - o_s);
-
-		if(p1_part_genes.length > 2){
-			p1_part_genes = performPermutations(p1_part_genes,
-					PermutationPolicy.PERMUTE_ALL);
-		}*/
 
 		for(int i=0; i < p1_genes.length; i++){
 			if(i >= o_s && i < o_e) {
@@ -172,7 +172,7 @@ public class Population {
 		return i;
 	}
 
-	private boolean in_subarray(int element, int[] p1_genes, int o_s, int o_e) {
+	private static boolean in_subarray(int element, int[] p1_genes, int o_s, int o_e) {
 		for(int i=o_s; i<o_e; i++){
 			if(element == p1_genes[i]){
 				return true;
