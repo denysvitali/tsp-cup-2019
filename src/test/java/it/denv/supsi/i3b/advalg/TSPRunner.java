@@ -56,6 +56,8 @@ public class TSPRunner {
 		System.out.println(
 				GnuPlotUtils.getPlotCommand(path)
 		);
+
+		System.out.println("Route length: " + r.getLength());
 	}
 
 	@Test
