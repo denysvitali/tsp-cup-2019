@@ -53,7 +53,7 @@ public class NearestNeighbour extends RoutingAlgorithm {
 		return new Route(startNode, coords, length);
 	}
 
-	private Edge getCandidate(){
+	protected ArrayList<Edge> getCandidates(){
 		int a;
 		if(tour.size() == 0){
 			a = startNode-1;
@@ -75,16 +75,15 @@ public class NearestNeighbour extends RoutingAlgorithm {
 			}
 		}
 
-		if(candidates.size() == 0){
-			return null;
-		}
-
 		candidates.sort(Edge::compare);
-		return candidates.get(0);
+		return candidates;
+	}
+
+	protected Edge getCandidate(){
+		return getCandidates().get(0);
 	}
 
 	private boolean visited(int a) {
-
 		if(tour.size() == 0){
 			return false;
 		}
@@ -93,11 +92,7 @@ public class NearestNeighbour extends RoutingAlgorithm {
 			return true;
 		}
 
-		if(tour.getLast().getSecond() == a){
-			return true;
-		}
-
-		return false;
+		return tour.getLast().getSecond() == a;
 
 	}
 }

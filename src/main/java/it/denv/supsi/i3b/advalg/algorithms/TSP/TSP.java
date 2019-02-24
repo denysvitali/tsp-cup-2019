@@ -19,7 +19,8 @@ public class TSP {
 		data.setDistances(distances);
 		//printDistanceMatrix(data.getCoordinates().size(), distances);
 
-		return ra.route(1, data);
+		data.setStartNode(1);
+		return ra.route(data.getStartNode(), data);
 	}
 
 	public String writeRoute(Route r) throws IOException {

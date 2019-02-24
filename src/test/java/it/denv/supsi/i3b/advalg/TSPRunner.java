@@ -3,7 +3,10 @@ package it.denv.supsi.i3b.advalg;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.TSP;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ga.GeneticAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.nn.rnn.RandomNearestNeighbour;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.to.TwoOpt;
 import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +30,27 @@ public class TSPRunner {
 
 		TSP tsp = new TSP();
 		Route r = tsp.run(data, new GeneticAlgorithm());
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+	}
+
+	@Test
+	public void ch130TwoOpt() throws IOException {
+		String filePath = TSPRunner.getTestFile("/problems/ch130.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+			(new CompositeRoutingAlgorithm())
+					.startWith(new RandomNearestNeighbour())
+					.add(new TwoOpt())
+			);
 		String path = tsp.writeRoute(r);
 
 		System.out.println(
@@ -69,4 +93,6 @@ public class TSPRunner {
 		TSP tsp = new TSP();
 		tsp.run(data, new GeneticAlgorithm());
 	}
+
+
 }

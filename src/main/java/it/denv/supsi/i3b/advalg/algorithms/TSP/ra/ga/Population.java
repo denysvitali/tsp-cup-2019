@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 public class Population {
 	private int size;
 	private int generation = 0;
-	private double mutation_prob = 0.1;
-	private double crossover_prob = 0.9;
-	private double fittest_perc = 0.2;
+	private double mutation_prob = 0.8;
+	private double crossover_prob = 0.8;
+	private double fittest_perc = 0.5;
 	private int[] initial_genes;
 	private int pop_size;
 
@@ -54,43 +54,42 @@ public class Population {
 		int bestSize = (int) (pop.size * fittest_perc);
 
 
-		ArrayList<Individual> bestIndividuals = pop.getFittest(bestSize);
+		ArrayList<Individual> parentsCandidates = pop.getFittest(bestSize);
 
 		// Select Crossover Population
 		ArrayList<Individual> crossOverItems = new ArrayList<>();
+		ArrayList<Individual> nonCrossOverItems = new ArrayList<>();
 
-		for(Individual bi : bestIndividuals){
+		for(Individual bi : parentsCandidates){
 			if(Math.random() < crossover_prob){
 				crossOverItems.add(bi);
+			} else {
+				nonCrossOverItems.add(bi);
 			}
 		}
+
+		ArrayList<Individual> mutatedIndividuals = new ArrayList<>();
+		ArrayList<Individual> unmutatedIndividuals = new ArrayList<>();
+		ArrayList<Individual> crossOverIndividuals = new ArrayList<>();
 
 
 		// Crossover / Offspring
 		for(int i=0; i<crossOverItems.size() - 1; i+=2){
 			Individual individual = getOffspring(
-					bestIndividuals.get(i),
-					bestIndividuals.get(i+1)
+					parentsCandidates.get(i),
+					parentsCandidates.get(i+1)
 			);
-			population.add(individual);
-		}
-
-		for(int i=0; i<crossOverItems.size() - 1; i+=2){
-			Individual individual = getOffspring(
-					bestIndividuals.get(i),
-					bestIndividuals.get(i+1)
-			);
-			population.add(individual);
+			crossOverIndividuals.add(individual);
 		}
 
 
 		// Mutation
 
-		for (int i = 0; i < population.size(); i++) {
+		for (int i = 0; i < crossOverIndividuals.size(); i++) {
 
 			double rand = Math.random();
 			if(rand < mutation_prob){
-				Individual individual = population.get(i);
+				Individual individual = crossOverIndividuals.get(i);
 
 				int[] genes = individual.getGenes();
 
@@ -106,21 +105,23 @@ public class Population {
 				}
 
 				individual.setGenes(genes);
-				population.add(individual);
+				mutatedIndividuals.add(individual);
+			} else {
+				unmutatedIndividuals.add(crossOverIndividuals.get(i));
 			}
 		}
+
+		// Add new children
+		population.addAll(mutatedIndividuals);
+		population.addAll(unmutatedIndividuals);
+
+		// Add parents that didn't cross over
+		population.addAll(crossOverItems);
+		population.addAll(nonCrossOverItems);
 
 		this.initial_genes = pop.initial_genes;
 		this.data = pop.data;
 		this.pop_size = pop.pop_size;
-
-		population.addAll(bestIndividuals);
-
-		int missing = (pop_size - population.size());
-
-		for(int i=0; i<missing; i++) {
-			population.add(generateRandomIndividual());
-		}
 	}
 
 	public static Individual getOffspring(Individual p1, Individual p2){

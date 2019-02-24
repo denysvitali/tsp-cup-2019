@@ -5,7 +5,6 @@ import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.nn.NearestNeighbour;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.rnn.RandomNearestNeighbour;
 
 import java.util.ArrayList;
 import java.util.Arrays;
