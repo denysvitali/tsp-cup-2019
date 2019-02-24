@@ -12,8 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TSPRunner {
 	private static String getTestFile(String fileName){
@@ -58,6 +57,8 @@ public class TSPRunner {
 		);
 
 		System.out.println("Route length: " + r.getLength());
+
+		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
 	@Test
