@@ -23,6 +23,10 @@ public class Route {
 		return coords;
 	}
 
+	public int[] getPath() {
+		return coords.stream().mapToInt(Coordinate::getNumber).toArray();
+	}
+
 	public int getStartNode() {
 		return startNode;
 	}

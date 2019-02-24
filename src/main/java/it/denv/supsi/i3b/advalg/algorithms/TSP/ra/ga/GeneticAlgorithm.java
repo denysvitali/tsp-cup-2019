@@ -30,7 +30,6 @@ public class GeneticAlgorithm extends RoutingAlgorithm {
 		data.setStartNode(startNode);
 
 		genes_size = data.getDimension() - 1;
-
 		population_initial_size = data.getDimension() * 5;
 
 		assert(genes_size > 0);

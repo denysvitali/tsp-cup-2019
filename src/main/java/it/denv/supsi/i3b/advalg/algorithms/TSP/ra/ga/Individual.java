@@ -20,8 +20,7 @@ public class Individual {
 	}
 
 	public int getFitness(){
-		if(fitness != -1)
-		{
+		if(fitness != -1) {
 			return fitness;
 		}
 
