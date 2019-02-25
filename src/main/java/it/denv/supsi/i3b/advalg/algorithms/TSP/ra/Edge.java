@@ -1,7 +1,5 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra;
 
-import java.util.Comparator;
-
 public class Edge {
 	private int first;
 	private int second;

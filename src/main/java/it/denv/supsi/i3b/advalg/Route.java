@@ -30,4 +30,8 @@ public class Route {
 	public int getStartNode() {
 		return startNode;
 	}
+
+	public double compareTo(int bestKnown) {
+		return this.length * 1.0 / bestKnown - 1;
+	}
 }

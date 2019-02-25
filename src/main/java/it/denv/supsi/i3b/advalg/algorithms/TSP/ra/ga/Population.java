@@ -235,7 +235,7 @@ public class Population {
 	}
 
 	public double getRate(int bestKnown){
-		return 1-(bestKnown * 1.0 /getFittest().getFitness());
+		return (getFittest().getFitness() * 1.0 / bestKnown) - 1;
 	}
 
 	@Override

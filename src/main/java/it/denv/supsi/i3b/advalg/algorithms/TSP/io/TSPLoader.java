@@ -162,6 +162,7 @@ public class TSPLoader {
 			fis.mark(1);
 			c = fis.read();
 			if(c == '+' || c == '-') {
+				sb.append(c);
 				fis.mark(1);
 				c = fis.read();
 				while(isNumeric(c)) {

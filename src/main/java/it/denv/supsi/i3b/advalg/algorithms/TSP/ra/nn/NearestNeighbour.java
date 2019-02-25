@@ -80,7 +80,12 @@ public class NearestNeighbour extends RoutingAlgorithm {
 	}
 
 	protected Edge getCandidate(){
-		return getCandidates().get(0);
+		ArrayList<Edge> candidates = getCandidates();
+		if(candidates.size() == 0){
+			return null;
+		}
+
+		return candidates.get(0);
 	}
 
 	private boolean visited(int a) {
@@ -93,6 +98,5 @@ public class NearestNeighbour extends RoutingAlgorithm {
 		}
 
 		return tour.getLast().getSecond() == a;
-
 	}
 }

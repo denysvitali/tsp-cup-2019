@@ -1,10 +1,7 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.to;
 
-import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -31,13 +28,13 @@ public class SwappablePath {
 		}
 
 		LinkedList<Integer> reverseMe = new LinkedList<>();
-		for(int j=i; j<k; j++){
+		for(int j=i; j<=k; j++){
 			reverseMe.add(path.get(j));
 		}
 		Collections.reverse(reverseMe);
 		newRoute.addAll(reverseMe);
 
-		for(int j=k; j<path.size(); j++){
+		for(int j=k+1; j<path.size(); j++){
 			newRoute.add(path.get(j));
 		}
 
@@ -52,8 +49,11 @@ public class SwappablePath {
 		int[][] distances = data.getDistances();
 
 		int distance = 0;
-		for(int i = 0; i<path.size()-1; i+=2){
-			distance += distances[path.get(i) - 1][path.get(i+1) - 1];
+		for(int i = 0; i+1<path.size(); i++){
+			int a = path.get(i) - 1;
+			int b = path.get(i+1) - 1;
+
+			distance += distances[a][b];
 		}
 		return distance;
 	}

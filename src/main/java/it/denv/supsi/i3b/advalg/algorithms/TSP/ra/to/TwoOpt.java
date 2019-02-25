@@ -24,23 +24,37 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 	}
 
 	private Route improve(Route r){
+		/*
+			procedure 2-opt
+				(1) Let T be the current tour.
+				(2) Perform the following until failure is obtained.
+				(2.1) For every node i = 1, 2, . . . , n:
+				Examine all 2-opt moves involving the edge between i and its successor in the
+				tour. If it is possible to decrease the tour length this way, then choose the
+				best such 2-opt move and update T .
+				(2.2) If no improving move could be found, then declare failure.
+			end of 2-opt
+		 */
+
 		int[] path = r.getPath();
-
-
 		int bestLength = r.getLength();
-		boolean improvement = true;
 
 		SwappablePath sp = new SwappablePath(path);
 		SwappablePath newsp;
-		int swappableNodes = path.length -2;
+		int swappableNodes = path.length - 1;
 
-		for(int i=1; i< swappableNodes - 1; i++){
-			for(int k=i; k < swappableNodes - 1; k++){
-				newsp = sp.swap(i, k);
-				int distance = newsp.calulateDistance(data);
-				if(distance < bestLength){
-					bestLength = distance;
-					sp = newsp;
+		boolean improvement = true;
+		while(improvement) {
+			improvement = false;
+			for (int i = 1; i < swappableNodes - 1; i++) {
+				for (int k = i + 1; k < swappableNodes; k++) {
+					newsp = sp.swap(i, k);
+					int distance = newsp.calulateDistance(data);
+					if (distance < bestLength) {
+						improvement = true;
+						bestLength = distance;
+						sp = newsp;
+					}
 				}
 			}
 		}
