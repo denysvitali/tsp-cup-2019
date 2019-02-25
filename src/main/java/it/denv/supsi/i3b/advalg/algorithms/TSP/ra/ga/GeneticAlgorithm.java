@@ -24,13 +24,15 @@ public class GeneticAlgorithm implements IntermediateRoutingAlgorithm {
 				.filter(e -> e.getNumber() != route.getStartNode())
 				.mapToInt(Coordinate::getNumber).toArray();
 
+		this.genes_size = initial_genes.length;
+
 		data.setStartNode(route.getStartNode());
 
 		population = new Population(population_initial_size, initial_genes, data);
 		System.out.println(population + ", " + population.getRate(data.getBestKnown()));
 
 		int i = 0;
-		while(population.getRate(data.getBestKnown()) > 0.1){
+		while(population.getRate(data.getBestKnown()) > 0.02){
 			population = new Population(population);
 
 			if(i%10 == 0){
@@ -55,6 +57,6 @@ public class GeneticAlgorithm implements IntermediateRoutingAlgorithm {
 
 		System.out.println("End. " + population);
 
-		return null;
+		return route;
 	}
 }

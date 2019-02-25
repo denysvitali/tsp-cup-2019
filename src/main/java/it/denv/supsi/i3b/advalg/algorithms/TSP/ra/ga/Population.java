@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 public class Population {
 	private int size;
 	private int generation = 0;
-	private double mutation_prob = 0.8;
-	private double crossover_prob = 0.8;
+	private double mutation_prob = 0.12;
+	private double crossover_prob = 0.9;
 	private double fittest_perc = 0.5;
 	private int[] initial_genes;
 	private int pop_size;
@@ -50,8 +50,11 @@ public class Population {
 		this.size = pop.size;
 		this.generation = pop.generation + 1;
 
-
 		int bestSize = (int) (pop.size * fittest_perc);
+
+		if(bestSize < 1){
+			bestSize = 1;
+		}
 
 
 		ArrayList<Individual> parentsCandidates = pop.getFittest(bestSize);
@@ -79,25 +82,35 @@ public class Population {
 					parentsCandidates.get(i),
 					parentsCandidates.get(i+1)
 			);
+			Individual individual2 = getOffspring(
+					parentsCandidates.get(i+1),
+					parentsCandidates.get(i)
+			);
 			crossOverIndividuals.add(individual);
+			crossOverIndividuals.add(individual2);
 		}
 
 
+		ArrayList<Individual> mutationCandidates = new ArrayList<>();
+		mutationCandidates.addAll(crossOverIndividuals);
+		mutationCandidates.addAll(parentsCandidates);
+
 		// Mutation
 
-		for (int i = 0; i < crossOverIndividuals.size(); i++) {
+		for (int i = 0; i < mutationCandidates.size(); i++) {
 
 			double rand = Math.random();
 			if(rand < mutation_prob){
-				Individual individual = crossOverIndividuals.get(i);
+				Individual individual = mutationCandidates.get(i);
 
 				int[] genes = individual.getGenes();
+				for(int j=0; j<Math.random()*genes.length; j++) {
+					int a = (int) (Math.random() * genes.length);
+					int b = (int) (Math.random() * genes.length);
 
-				double perm_perc = Math.random() * crossover_prob;
-
-				for (int j = 0; j < perm_perc * genes.length; j++) {
-					int a = (int) (Math.random() * size);
-					int b = (int) (Math.random() * size);
+					while (a == b) {
+						b = (int) (Math.random() * genes.length);
+					}
 
 					int tmp_g = genes[a];
 					genes[a] = genes[b];
@@ -106,8 +119,6 @@ public class Population {
 
 				individual.setGenes(genes);
 				mutatedIndividuals.add(individual);
-			} else {
-				unmutatedIndividuals.add(crossOverIndividuals.get(i));
 			}
 		}
 
@@ -125,7 +136,7 @@ public class Population {
 	}
 
 	public static Individual getOffspring(Individual p1, Individual p2){
-		int p1_genes[] = p1.getGenes();
+		int[] p1_genes = p1.getGenes();
 
 		// OffSpring Start
 		int o_s = (int) (Math.random() * p1_genes.length);
@@ -145,10 +156,10 @@ public class Population {
 	public static Individual getOffspring(Individual p1, Individual p2,
 										  int o_s,
 										  int o_e) {
-		int p1_genes[] = p1.getGenes();
-		int p2_genes[] = p2.getGenes();
+		int[] p1_genes = p1.getGenes();
+		int[] p2_genes = p2.getGenes();
 
-		int p3_genes[] = new int[p1_genes.length];
+		int[] p3_genes = new int[p1_genes.length];
 
 		// Merge the genes
 		int p2_offset = 0;

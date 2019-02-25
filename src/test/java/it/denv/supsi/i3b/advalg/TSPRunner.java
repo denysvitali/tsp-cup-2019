@@ -33,9 +33,9 @@ public class TSPRunner {
 		TSP tsp = new TSP();
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new NearestNeighbour())
+						.startWith(new RandomNearestNeighbour())
 						.add(new TwoOpt())
-						//.add(new GeneticAlgorithm())
+						.add(new GeneticAlgorithm())
 		);
 
 		double v = r.compareTo(data.getBestKnown());
