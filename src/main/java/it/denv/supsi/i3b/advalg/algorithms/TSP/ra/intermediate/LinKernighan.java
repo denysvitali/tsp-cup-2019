@@ -1,4 +1,4 @@
-package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.lk;
+package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;

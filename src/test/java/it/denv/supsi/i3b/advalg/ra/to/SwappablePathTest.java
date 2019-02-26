@@ -1,6 +1,6 @@
 package it.denv.supsi.i3b.advalg.ra.to;
 
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.to.SwappablePath;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

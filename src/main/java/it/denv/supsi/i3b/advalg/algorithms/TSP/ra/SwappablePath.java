@@ -1,5 +1,6 @@
-package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.to;
+package it.denv.supsi.i3b.advalg.algorithms.TSP.ra;
 
+import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 
 import java.util.Collections;
@@ -56,5 +57,16 @@ public class SwappablePath {
 			distance += distances[a][b];
 		}
 		return distance;
+	}
+
+	public Route toRoute(Route referenceRoute, TSPData data) {
+		Route newRoute = new Route(referenceRoute.getStartNode(),
+				referenceRoute.getCoords(),
+				-1
+				);
+		newRoute.setPath(this.path.stream().mapToInt(Integer::intValue).toArray());
+		newRoute.setLength(this.calulateDistance(data));
+
+		return newRoute;
 	}
 }

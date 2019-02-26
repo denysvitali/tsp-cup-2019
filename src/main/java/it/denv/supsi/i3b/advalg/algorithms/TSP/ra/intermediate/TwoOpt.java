@@ -1,14 +1,11 @@
-package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.to;
+package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IntermediateRoutingAlgorithm;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.nn.rnn.RandomNearestNeighbour;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
@@ -16,11 +13,19 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 
 	private TSPData data = null;
 
+	public TwoOpt(TSPData data){
+		this.data = data;
+	}
+
 	@Override
 	public Route route(Route route, TSPData data) {
 		// Given a Route, calculate a better route
 		this.data = data;
 		return improve(route);
+	}
+
+	public void setData(TSPData data){
+		this.data = data;
 	}
 
 	private Route improve(Route r){
@@ -40,8 +45,25 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 		int bestLength = r.getLength();
 
 		SwappablePath sp = new SwappablePath(path);
+
+		sp = improveSP(sp);
+
+		LinkedList<Coordinate> coordinates =
+				sp.getPath().stream()
+						.map(e-> data.getCoordinates().get(e-1))
+						.collect(Collectors.toCollection(LinkedList::new));
+
+		return new Route(
+				data.getStartNode(),
+				coordinates,
+				bestLength);
+
+	}
+
+	public SwappablePath improveSP(SwappablePath sp){
 		SwappablePath newsp;
-		int swappableNodes = path.length - 1;
+		int bestLength = sp.calulateDistance(data);
+		int swappableNodes = sp.getPath().size() - 1;
 
 		boolean improvement = true;
 		while(improvement) {
@@ -59,15 +81,6 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 			}
 		}
 
-		LinkedList<Coordinate> coordinates =
-				sp.getPath().stream()
-						.map(e-> data.getCoordinates().get(e-1))
-						.collect(Collectors.toCollection(LinkedList::new));
-
-		return new Route(
-				data.getStartNode(),
-				coordinates,
-				bestLength);
-
+		return sp;
 	}
 }

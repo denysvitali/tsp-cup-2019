@@ -1,17 +1,20 @@
-package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ga;
+package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic;
 
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 public class Population {
 	private int size;
 	private int generation = 0;
-	private double mutation_prob = 0.12;
-	private double crossover_prob = 0.9;
-	private double fittest_perc = 0.5;
+	private double mutation_prob = 0.6;
+	private double crossover_prob = 0.7;
+	private double fittest_perc = 0.3;
 	private int[] initial_genes;
 	private int pop_size;
 
@@ -49,6 +52,7 @@ public class Population {
 	public Population(Population pop) {
 		this.size = pop.size;
 		this.generation = pop.generation + 1;
+		this.data = pop.data;
 
 		int bestSize = (int) (pop.size * fittest_perc);
 
@@ -58,6 +62,32 @@ public class Population {
 
 
 		ArrayList<Individual> parentsCandidates = pop.getFittest(bestSize);
+
+		// Improve parents w/ 2-Opt
+
+		TwoOpt to = new TwoOpt(data);
+
+		for(Individual ind : parentsCandidates){
+			LinkedList<Integer> optimizedGenes = new LinkedList<>();
+			int[] genes = ind.getGenes();
+			optimizedGenes.add(data.getStartNode());
+			for(int i=0; i<genes.length; i++){
+				optimizedGenes.add(genes[i]);
+			}
+			optimizedGenes.add(data.getStartNode());
+
+			SwappablePath sp = new SwappablePath(optimizedGenes
+					.stream()
+					.mapToInt(Integer::intValue)
+					.toArray());
+			sp = to.improveSP(sp);
+
+			int[] newGenes = sp.getPath().stream().mapToInt(Integer::intValue)
+					.filter(i -> i!=data.getStartNode()).toArray();
+			ind.setGenes(newGenes);
+		}
+
+
 
 		// Select Crossover Population
 		ArrayList<Individual> crossOverItems = new ArrayList<>();
@@ -117,6 +147,15 @@ public class Population {
 					genes[b] = tmp_g;
 				}
 
+				TwoOpt two = new TwoOpt(data);
+				LinkedList<Integer> path = new LinkedList<>();
+
+				path.add(data.getStartNode());
+				for(int j=0; j<genes.length; j++){
+					path.add(genes[j]);
+				}
+				path.add(data.getStartNode());
+
 				individual.setGenes(genes);
 				mutatedIndividuals.add(individual);
 			}
@@ -131,7 +170,6 @@ public class Population {
 		population.addAll(nonCrossOverItems);
 
 		this.initial_genes = pop.initial_genes;
-		this.data = pop.data;
 		this.pop_size = pop.pop_size;
 	}
 

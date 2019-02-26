@@ -1,7 +1,6 @@
-package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.nn.rnn;
+package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial;
 
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.nn.NearestNeighbour;
 
 import java.util.ArrayList;
 

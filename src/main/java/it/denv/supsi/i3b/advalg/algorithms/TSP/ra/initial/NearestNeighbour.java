@@ -1,4 +1,4 @@
-package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.nn;
+package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.Coordinate;

@@ -1,4 +1,4 @@
-package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ga;
+package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic;
 
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 

@@ -5,10 +5,10 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPSolution;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ga.GeneticAlgorithm;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.nn.NearestNeighbour;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.nn.rnn.RandomNearestNeighbour;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.to.TwoOpt;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.GeneticAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
 import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +34,7 @@ public class TSPRunner {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour())
-						.add(new TwoOpt())
+						.add(new TwoOpt(data))
 						.add(new GeneticAlgorithm())
 		);
 
@@ -65,21 +65,15 @@ public class TSPRunner {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour())
-				.add(new TwoOpt())
+				.add(new TwoOpt(data))
 				//.add(new GeneticAlgorithm())
 		);
 
 		String path = tsp.writeRoute(r);
 
 		TSPSolution sol = new TSPSolution(data, r);
-		/*File sol_f = File.createTempFile("sol_", ".opt.tour");
-		sol.write(sol_f);*/
 
-		//checkTour(filePath, sol_f, r.getLength());
-
-		System.out.println(
-				GnuPlotUtils.getPlotCommand(path)
-		);
+		GnuPlotUtils.plot(path);
 	}
 
 	private void checkTour(String filePath, File sol_f, int length) throws IOException {
@@ -113,8 +107,35 @@ public class TSPRunner {
 		Route r = tsp.run(data,
 			(new CompositeRoutingAlgorithm())
 					.startWith(new RandomNearestNeighbour())
-					.add(new TwoOpt())
+					.add(new TwoOpt(data))
 					.add(new GeneticAlgorithm())
+		);
+
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+
+		System.out.println("Route length: " + r.getLength());
+
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void ch130SimulatedAnnealing() throws IOException {
+		String filePath = TSPRunner.getTestFile("/problems/ch130.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour())
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing())
 		);
 
 		String path = tsp.writeRoute(r);
@@ -140,7 +161,7 @@ public class TSPRunner {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour())
-						.add(new TwoOpt())
+						.add(new TwoOpt(data))
 						//.add(new GeneticAlgorithm())
 		);
 
