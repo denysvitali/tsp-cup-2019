@@ -45,8 +45,9 @@ public class Route {
 	}
 
 	public ArrayList<Coordinate> getCoords(){
+		ArrayList<Coordinate> coords = new ArrayList<>(data.getCoordinates().values());
 		return Arrays.stream(path)
-				.mapToObj(i -> data.getCoordinates().get(i))
+				.mapToObj(coords::get)
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
 

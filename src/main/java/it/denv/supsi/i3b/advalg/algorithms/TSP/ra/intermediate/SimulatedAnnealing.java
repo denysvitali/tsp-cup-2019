@@ -24,7 +24,7 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 		TwoOpt twoOpt = new TwoOpt(data);
 
 		double start = System.currentTimeMillis();
-		double end = start + 1000 * 60 * 3;
+		double max_runtime = 1000 * 60 * 3;
 
 		while(temperature > 0.001){
 			for(int i=0; i<r; i++){
@@ -50,7 +50,11 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 				}
 			}
 
-			temperature = START_TEMPERATURE * (1 - System.currentTimeMillis()/end);
+			double now = System.currentTimeMillis();
+
+			System.out.println("Spent " + (now - start) + "ms");
+
+			temperature = START_TEMPERATURE * (1 - (now-start)/max_runtime);
 			System.out.println("Temperature is " + temperature);
 		}
 
