@@ -21,13 +21,15 @@ public class GeneticAlgorithm implements IntermediateRoutingAlgorithm {
 	public Route route(Route route, TSPData data) {
 		this.startNode = route.getStartNode();
 
-		initial_genes = route.getCoords().stream()
-				.filter(e -> e.getNumber() != startNode)
-				.mapToInt(Coordinate::getNumber).toArray();
+		// Initial Genes: Path w/o Starting & Ending Node
+		System.arraycopy(route.getPath(), 1,
+				initial_genes,
+				0,
+				route.getPath().length - 2
+		);
 
+		initial_genes = route.getPath();
 		this.genes_size = initial_genes.length;
-
-		data.setStartNode(route.getStartNode());
 
 		population_initial_size = data.getDimension() * 3;
 		population = new Population(population_initial_size, initial_genes, data);
@@ -55,16 +57,6 @@ public class GeneticAlgorithm implements IntermediateRoutingAlgorithm {
 
 		System.out.println("Final Path: " + arrayOutput);
 
-		LinkedList<Coordinate> coords = new LinkedList<>();
-
-		for(int k = 0; k<finalPath.length; k++){
-
-		}
-
-		route = new Route(startNode, coords, fittest.getFitness());
-
-		System.out.println("End. " + population);
-
-		return route;
+		return new Route(finalPath, data);
 	}
 }

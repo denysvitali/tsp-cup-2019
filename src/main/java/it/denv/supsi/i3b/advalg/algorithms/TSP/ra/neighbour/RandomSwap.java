@@ -32,6 +32,6 @@ public class RandomSwap implements NeighbourAlgorithm {
 			path[b] = v1;
 		}
 
-		return new Route(path, route);
+		return new Route(path, r.getData());
 	}
 }

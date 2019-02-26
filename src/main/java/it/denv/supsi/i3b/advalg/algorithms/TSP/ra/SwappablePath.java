@@ -45,26 +45,25 @@ public class SwappablePath {
 	public LinkedList<Integer> getPath(){
 		return this.path;
 	}
+	public int[] getPathArr(){
+		return this.path.stream().mapToInt(Integer::intValue).toArray();
+	}
 
 	public int calulateDistance(TSPData data) {
 		int[][] distances = data.getDistances();
 
 		int distance = 0;
 		for(int i = 0; i+1<path.size(); i++){
-			int a = path.get(i) - 1;
-			int b = path.get(i+1) - 1;
+			int a = path.get(i);
+			int b = path.get(i+1);
 
 			distance += distances[a][b];
 		}
 		return distance;
 	}
 
-	public Route toRoute(Route referenceRoute, TSPData data) {
-		Route newRoute = new Route(referenceRoute.getStartNode(),
-				referenceRoute.getCoords(),
-				-1
-				);
-		newRoute.setPath(this.path.stream().mapToInt(Integer::intValue).toArray());
+	public Route toRoute(TSPData data) {
+		Route newRoute = new Route(getPathArr(), data);
 		newRoute.setLength(this.calulateDistance(data));
 
 		return newRoute;

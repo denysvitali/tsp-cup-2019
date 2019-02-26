@@ -39,18 +39,23 @@ public class NearestNeighbour extends RoutingAlgorithm {
 		arr.add(startNode-1);
 
 
-		int length = tour.stream().map(Edge::getWeight).reduce(Integer::sum)
+		int length = tour
+				.stream()
+				.map(Edge::getWeight)
+				.reduce(Integer::sum)
 				.orElse(0);
-
-		LinkedList<Coordinate> coords =
-				arr.stream().map(e->
-						data.getCoordinates().get(e)
-				).collect(Collectors.toCollection(LinkedList::new));
 
 		// Cleanup
 		tour = new LinkedList<>();
 		this.startNode = -1;
-		return new Route(startNode, coords, length);
+
+		Route r = new Route(arr
+				.stream()
+				.mapToInt(Integer::intValue)
+				.toArray(),
+				data);
+		r.setLength(length);
+		return r;
 	}
 
 	protected ArrayList<Edge> getCandidates(){

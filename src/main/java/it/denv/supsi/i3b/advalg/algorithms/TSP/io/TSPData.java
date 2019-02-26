@@ -4,7 +4,7 @@ import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.EdgeWeightType;
 import it.denv.supsi.i3b.advalg.algorithms.ProblemType;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TSPData {
 	protected String name;
@@ -13,7 +13,7 @@ public class TSPData {
 	protected int dimension;
 	protected EdgeWeightType ewt;
 	protected int best_known = 0;
-	protected ArrayList<Coordinate> coordinates = new ArrayList<>();
+	protected HashMap<Integer, Coordinate> coordinates = new HashMap<>();
 	protected int[][] distances;
 	protected int startNode = -1;
 
@@ -45,7 +45,7 @@ public class TSPData {
 		return best_known;
 	}
 
-	public ArrayList<Coordinate> getCoordinates() {
+	public HashMap<Integer, Coordinate> getCoordinates() {
 		return coordinates;
 	}
 

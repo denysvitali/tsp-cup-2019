@@ -28,7 +28,7 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 		this.data = data;
 	}
 
-	private Route improve(Route r){
+	public Route improve(Route r){
 		/*
 			procedure 2-opt
 				(1) Let T be the current tour.
@@ -46,21 +46,11 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 
 		SwappablePath sp = new SwappablePath(path);
 
-		sp = improveSP(sp);
-
-		LinkedList<Coordinate> coordinates =
-				sp.getPath().stream()
-						.map(e-> data.getCoordinates().get(e-1))
-						.collect(Collectors.toCollection(LinkedList::new));
-
-		return new Route(
-				data.getStartNode(),
-				coordinates,
-				bestLength);
-
+		Route nr = improveSP(sp);
+		return nr;
 	}
 
-	public SwappablePath improveSP(SwappablePath sp){
+	public Route improveSP(SwappablePath sp){
 		SwappablePath newsp;
 		int bestLength = sp.calulateDistance(data);
 		int swappableNodes = sp.getPath().size() - 1;
@@ -81,6 +71,6 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 			}
 		}
 
-		return sp;
+		return new Route(sp.getPathArr(), bestLength, data);
 	}
 }

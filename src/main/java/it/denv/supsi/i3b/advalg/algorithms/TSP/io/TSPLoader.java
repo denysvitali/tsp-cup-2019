@@ -88,7 +88,7 @@ public class TSPLoader {
 
 		while(!parseTag("EOF")){
 			Coordinate coord = parseCoordLine(fis);
-			data.coordinates.add(coord);
+			data.coordinates.put(coord.getNumber(), coord);
 		}
 
 		return data;

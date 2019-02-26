@@ -8,6 +8,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class TSP {
 	public TSP(){
@@ -37,14 +38,17 @@ public class TSP {
 	private int[][] calculateDistances(TSPData data) {
 		int size = data.getCoordinates().size();
 		int[][] distances = new int[size][size];
+
+		ArrayList<Coordinate> values = new ArrayList<>(data.getCoordinates().values());
+
 		for(int i=0; i<size; i++){
 			for(int j=0; j<=i; j++){
 				if(i == j){
 					distances[i][j] = 0;
 					distances[j][i] = 0;
 				} else {
-					Coordinate a = data.getCoordinates().get(i);
-					Coordinate b = data.getCoordinates().get(j);
+					Coordinate a = values.get(i);
+					Coordinate b = values.get(j);
 
 					int distance = (int) (Math.sqrt(
 							Math.pow(a.getX() - b.getX(), 2) +

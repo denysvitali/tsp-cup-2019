@@ -1,10 +1,12 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic;
 
+import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
@@ -80,10 +82,12 @@ public class Population {
 					.stream()
 					.mapToInt(Integer::intValue)
 					.toArray());
-			sp = to.improveSP(sp);
+			Route nr = to.improveSP(sp);
 
-			int[] newGenes = sp.getPath().stream().mapToInt(Integer::intValue)
-					.filter(i -> i!=data.getStartNode()).toArray();
+			int startNode = nr.getStartNode();
+
+			int[] newGenes = Arrays.stream(nr.getPath())
+					.filter(i -> i!=startNode).toArray();
 			ind.setGenes(newGenes);
 		}
 

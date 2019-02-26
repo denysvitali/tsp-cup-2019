@@ -4,44 +4,36 @@ import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Route {
-	private LinkedList<Coordinate> coords;
+	private int[] path;
+	private TSPData data;
 	private int length;
-	private int startNode;
 
-	public Route(int startNode, LinkedList<Coordinate> coords, int length){
-		this.startNode = startNode;
-		this.coords = coords;
+	public Route(int[] path, TSPData data){
+		this.path = path;
+		this.data = data;
+	}
+
+	public Route(int[] path, int length, TSPData data){
+		this.path = path;
 		this.length = length;
+		this.data = data;
 	}
 
 	public int getLength() {
 		return length;
 	}
 
-	public LinkedList<Coordinate> getCoords() {
-		return coords;
-	}
-
 	public int[] getPath() {
-		return coords.stream().mapToInt(Coordinate::getNumber).toArray();
+		return path;
 	}
 
 	public void setPath(int[] new_path){
-		LinkedList<Coordinate> coordinates = new LinkedList<>();
-		LinkedList<Coordinate> sorted_coords = coords.stream()
-				.sorted(Comparator.comparing(Coordinate::getNumber))
-				.collect(Collectors.toCollection(LinkedList::new));
-
-		for (int value : new_path) {
-			coordinates.add(sorted_coords.get(value - 1));
-		}
-
-		coords = coordinates;
+		path = new_path;
 	}
 
 	public SwappablePath getSP(){
@@ -49,7 +41,13 @@ public class Route {
 	}
 
 	public int getStartNode() {
-		return startNode;
+		return path[0];
+	}
+
+	public ArrayList<Coordinate> getCoords(){
+		return Arrays.stream(path)
+				.mapToObj(i -> data.getCoordinates().get(i))
+				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	public double compareTo(int bestKnown) {
@@ -58,5 +56,9 @@ public class Route {
 
 	public void setLength(int length){
 		this.length = length;
+	}
+
+	public TSPData getData() {
+		return data;
 	}
 }
