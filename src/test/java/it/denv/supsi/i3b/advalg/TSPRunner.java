@@ -5,7 +5,9 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPSolution;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.candidate.NearestNeighborCandidator;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.ThreeOpt;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.GeneticAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
@@ -145,6 +147,69 @@ public class TSPRunner {
 		);
 
 		System.out.println("Route length: " + r.getLength());
+
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void pcb442SimAn() throws IOException {
+		String filePath = TSPRunner.getTestFile("/problems/pcb442.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour())
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing())
+		);
+
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+
+		System.out.println("Route length: " + r.getLength() + "\t"
+				+ (1 - r.getLength() * 1.0 / data.getBestKnown()));
+
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void pcb442_3opt() throws IOException {
+		String filePath = TSPRunner.getTestFile("/problems/pcb442.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour())
+						.add(new ThreeOpt(data)
+								.addCandidator(
+										new NearestNeighborCandidator(10, data)
+								)
+								.addCandidator(
+										new NearestNeighborCandidator(10, data)
+								)
+						)
+						.add(new SimulatedAnnealing())
+		);
+
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+
+		System.out.println("Route length: " + r.getLength() + "\t"
+				+ (1 - r.getLength() * 1.0 / data.getBestKnown()));
 
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}

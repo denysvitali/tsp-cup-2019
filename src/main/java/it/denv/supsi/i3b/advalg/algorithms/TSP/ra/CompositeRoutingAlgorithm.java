@@ -15,10 +15,19 @@ public class CompositeRoutingAlgorithm extends RoutingAlgorithm {
 					"algorithm must be selected first.");
 		}
 
+		System.out.println("First routing w/ " + sa);
+		long s1 = System.currentTimeMillis();
 		Route r = sa.route(startNode, data);
+		long s2 = System.currentTimeMillis();
+
+		System.out.println("Spent " + (s2-s1) + " ms");
 
 		for(IntermediateRoutingAlgorithm ia : ias){
+			s1 = System.currentTimeMillis();
+			System.out.println("Intermediate Routing w/ " + ia);
 			r = ia.route(r, data);
+			s2 = System.currentTimeMillis();
+			System.out.println("Spent " + (s2-s1) + " ms");
 		}
 
 		return r;

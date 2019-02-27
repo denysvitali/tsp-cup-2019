@@ -3,8 +3,12 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.io;
 import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.EdgeWeightType;
 import it.denv.supsi.i3b.advalg.algorithms.ProblemType;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class TSPData {
 	protected String name;
@@ -14,6 +18,10 @@ public class TSPData {
 	protected EdgeWeightType ewt;
 	protected int best_known = 0;
 	protected HashMap<Integer, Coordinate> coordinates = new HashMap<>();
+	protected HashMap<Integer, TreeSet<Edge>> nearest = new HashMap<>();
+	protected ArrayList<Edge> edges = new ArrayList<>();
+
+
 	protected int[][] distances;
 	protected int startNode = -1;
 
@@ -63,5 +71,21 @@ public class TSPData {
 
 	public int getStartNode() {
 		return startNode;
+	}
+
+	public TreeSet<Edge> getNearest(int startNode) {
+		return nearest.get(startNode);
+	}
+
+	public void setNearest(HashMap<Integer, TreeSet<Edge>> nearest) {
+		this.nearest = nearest;
+	}
+
+	public ArrayList<Edge> getEdges() {
+		return this.edges;
+	}
+
+	public void setEdges(ArrayList<Edge> edges) {
+		this.edges = edges;
 	}
 }

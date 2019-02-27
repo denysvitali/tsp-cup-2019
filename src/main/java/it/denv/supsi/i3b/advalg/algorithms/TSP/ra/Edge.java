@@ -1,6 +1,6 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra;
 
-public class Edge {
+public class Edge implements Comparable<Edge> {
 	private int first;
 	private int second;
 	private int weight;
@@ -23,10 +23,11 @@ public class Edge {
 		return weight;
 	}
 
-	public static int compare(Edge o1, Edge o2) {
-		if(o1.weight < o2.weight){
+	@Override
+	public int compareTo(Edge o) {
+		if(this.weight < o.weight){
 			return -1;
-		} else if(o1.weight > o2.weight){
+		} else if(this.weight > o.weight){
 			return 1;
 		}
 		return 0;

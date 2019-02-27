@@ -3,12 +3,16 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP;
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class TSP {
 	public TSP(){
@@ -18,6 +22,32 @@ public class TSP {
 	public Route run(TSPData data, RoutingAlgorithm ra){
 		int[][] distances = calculateDistances(data);
 		data.setDistances(distances);
+
+		// Calculate HM<Integer, TS>
+		HashMap<Integer, TreeSet<Edge>> nearest = new HashMap<>();
+		ArrayList<Edge> edges = new ArrayList<>();
+
+		long s1 = System.currentTimeMillis();
+
+		for(int i=0; i<distances.length; i++){
+			TreeSet<Edge> ts = new TreeSet<>();
+			for(int j=0; j<distances.length; j++){
+				if(i == j){
+					continue;
+				}
+				Edge e = new Edge(i, j, distances[i][j]);
+				ts.add(e);
+				edges.add(e);
+			}
+			nearest.put(i, ts);
+		}
+
+		long s2 = System.currentTimeMillis();
+
+		System.out.println("Computed HM<I, TS<Edge>> in " + (s2-s1) + " ms");
+
+		data.setNearest(nearest);
+		data.setEdges(edges);
 		//printDistanceMatrix(data.getCoordinates().size(), distances);
 
 		data.setStartNode(1);

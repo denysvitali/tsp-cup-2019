@@ -8,6 +8,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class NearestNeighbour extends RoutingAlgorithm {
@@ -66,22 +67,16 @@ public class NearestNeighbour extends RoutingAlgorithm {
 			a = tour.getLast().getSecond();
 		}
 
-		int[][] dimensions = data.getDistances();
-		ArrayList<Edge> candidates = new ArrayList<>();
+		TreeSet<Edge> candidates = data.getNearest(a);
+		ArrayList<Edge> finalCandidates = new ArrayList<>();
 
-
-		for(int i=0; i<dimensions.length; i++){
-			if(i == a){
-				continue;
-			}
-
-			if(!visited(i)){
-				candidates.add(new Edge(a, i, dimensions[a][i]));
+		for(Edge c : candidates){
+			if(!visited(c.getSecond())){
+				finalCandidates.add(c);
 			}
 		}
 
-		candidates.sort(Edge::compare);
-		return candidates;
+		return finalCandidates;
 	}
 
 	protected Edge getCandidate(){

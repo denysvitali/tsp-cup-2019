@@ -61,11 +61,4 @@ public class SwappablePath {
 		}
 		return distance;
 	}
-
-	public Route toRoute(TSPData data) {
-		Route newRoute = new Route(getPathArr(), data);
-		newRoute.setLength(this.calulateDistance(data));
-
-		return newRoute;
-	}
 }

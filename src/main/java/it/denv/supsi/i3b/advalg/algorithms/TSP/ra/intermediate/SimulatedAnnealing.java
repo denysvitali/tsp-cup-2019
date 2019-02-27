@@ -20,7 +20,6 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 		Route current = route;
 		Route candidate = null;
 
-		int best_length = Integer.MAX_VALUE;
 		TwoOpt twoOpt = new TwoOpt(data);
 
 		double start = System.currentTimeMillis();
