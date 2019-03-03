@@ -16,7 +16,7 @@ public class KruskalMST implements SpanningTreeSearch {
 			3. 	Repeat step#2 until there are (V-1) edges in the spanning tree.
 		 */
 
-		ArrayList<Edge> edges = data.getEdges();
+		ArrayList<Edge<Integer>> edges = data.getEdges();
 
 		return new SpanningTree();
 	}

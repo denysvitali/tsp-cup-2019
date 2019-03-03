@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class ThreeOpt implements IntermediateRoutingAlgorithm  {
 
 	private TSPData data = null;
-	private ArrayList<Candidator> candidators = new ArrayList<>();
+	private ArrayList<Candidator<Integer>> candidators = new ArrayList<>();
 
 	public ThreeOpt(TSPData data){
 		this.data = data;
@@ -31,7 +31,7 @@ public class ThreeOpt implements IntermediateRoutingAlgorithm  {
 		return improve(route);
 	}
 
-	public ThreeOpt addCandidator(Candidator c){
+	public ThreeOpt addCandidator(Candidator<Integer> c){
 		candidators.add(c);
 		return this;
 	}
@@ -46,7 +46,7 @@ public class ThreeOpt implements IntermediateRoutingAlgorithm  {
 		/*
 		procedure 3-opt
 		(1) Let T be the current tour.
-		(2) For every node i ∈ V compute a set of nodes N (i)
+		(2) For every node i ∈ V compute a set of sizeNodes N (i)
 			(possible choices are discussed below).
 		(3) Perform the following until failure is obtained.
 			(3.1) For every node i = 1, 2, . . . , n:
@@ -66,8 +66,8 @@ public class ThreeOpt implements IntermediateRoutingAlgorithm  {
 
 			for(Integer i: r.getPath()){
 				// Get Candidates
-				ArrayList<Edge> candidates = new ArrayList<>();
-				for(Candidator c : candidators){
+				ArrayList<Edge<Integer>> candidates = new ArrayList<>();
+				for(Candidator<Integer> c : candidators){
 					candidates.addAll(c.getCandidates(i)
 							.stream()
 							.limit(50)

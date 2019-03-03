@@ -30,11 +30,11 @@ public class Individual {
 
 
 		for(int i=0; i<genes.length; i++){
-			distance += distMat[startNode-1][genes[i]-1];
+			distance += distMat[startNode][genes[i]];
 			startNode = genes[i];
 		}
 
-		distance += distMat[startNode-1][tspData.getStartNode()-1];
+		distance += distMat[startNode][tspData.getStartNode()];
 
 		fitness = distance;
 		return distance;

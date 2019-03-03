@@ -20,13 +20,10 @@ import java.util.Scanner;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TSPRunner {
-	private static String getTestFile(String fileName){
-		return TSPRunner.class.getResource(fileName).getFile();
-	}
 
 	@Test
 	public void ch130() throws IOException {
-		String filePath = TSPRunner.getTestFile("/problems/ch130.tsp");
+		String filePath = Utils.getTestFile("/problems/ch130.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
@@ -49,15 +46,13 @@ public class TSPRunner {
 		sol.write(sol_f);
 
 		System.out.println("Length: " + r.getLength() + ", V: " + v);
-
-		checkTour(filePath, sol_f, r.getLength());
-
+		Utils.checkTour(filePath, sol_f, r.getLength());
 		GnuPlotUtils.plot(path);
 	}
 
 	@Test
 	public void c1() throws IOException {
-		String filePath = TSPRunner.getTestFile("/problems/c1.tsp");
+		String filePath = Utils.getTestFile("/problems/c1.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
@@ -78,28 +73,9 @@ public class TSPRunner {
 		GnuPlotUtils.plot(path);
 	}
 
-	private void checkTour(String filePath, File sol_f, int length) throws IOException {
-		Process p = Runtime.getRuntime().exec(new String[]{
-				"python",
-				getTestFile("/tourCheckv3.py"),
-				filePath,
-				sol_f.getPath(),
-				String.valueOf(length)
-		});
-
-		p.onExit().thenRun(()->{
-			Scanner sc = new Scanner(
-					p.getInputStream()
-			);
-
-			String result = sc.nextLine();
-			assertEquals("Tour is correct", result);
-		}).join();
-	}
-
 	@Test
 	public void ch130TwoOpt() throws IOException {
-		String filePath = TSPRunner.getTestFile("/problems/ch130.tsp");
+		String filePath = Utils.getTestFile("/problems/ch130.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
@@ -126,7 +102,7 @@ public class TSPRunner {
 
 	@Test
 	public void ch130SimulatedAnnealing() throws IOException {
-		String filePath = TSPRunner.getTestFile("/problems/ch130.tsp");
+		String filePath = Utils.getTestFile("/problems/ch130.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
@@ -153,7 +129,7 @@ public class TSPRunner {
 
 	@Test
 	public void pcb442SimAn() throws IOException {
-		String filePath = TSPRunner.getTestFile("/problems/pcb442.tsp");
+		String filePath = Utils.getTestFile("/problems/pcb442.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
@@ -181,7 +157,7 @@ public class TSPRunner {
 
 	@Test
 	public void pcb442_3opt() throws IOException {
-		String filePath = TSPRunner.getTestFile("/problems/pcb442.tsp");
+		String filePath = Utils.getTestFile("/problems/pcb442.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
@@ -216,7 +192,7 @@ public class TSPRunner {
 
 	@Test
 	public void eil76_1() throws IOException {
-		String filePath = TSPRunner.getTestFile("/problems/eil76.tsp");
+		String filePath = Utils.getTestFile("/problems/eil76.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
@@ -227,7 +203,7 @@ public class TSPRunner {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour())
 						.add(new TwoOpt(data))
-						//.add(new GeneticAlgorithm())
+						.add(new GeneticAlgorithm())
 		);
 
 		String path = tsp.writeRoute(r);
@@ -236,14 +212,13 @@ public class TSPRunner {
 				GnuPlotUtils.getPlotCommand(path)
 		);
 
-		System.out.println("Route length: " + r.getLength());
-
+		Utils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
 	@Test
 	public void d198() throws IOException {
-		String filePath = TSPRunner.getTestFile("/problems/d198.tsp");
+		String filePath = Utils.getTestFile("/problems/d198.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
@@ -255,7 +230,7 @@ public class TSPRunner {
 
 	@Test
 	public void eil76() throws IOException {
-		String filePath = TSPRunner.getTestFile("/problems/eil76.tsp");
+		String filePath = Utils.getTestFile("/problems/eil76.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
@@ -267,7 +242,7 @@ public class TSPRunner {
 
 	@Test
 	public void lin318() throws IOException {
-		String filePath = TSPRunner.getTestFile("/problems/lin318.tsp");
+		String filePath = Utils.getTestFile("/problems/lin318.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);

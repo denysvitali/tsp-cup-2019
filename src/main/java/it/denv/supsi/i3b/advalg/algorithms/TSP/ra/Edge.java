@@ -1,11 +1,11 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra;
 
-public class Edge implements Comparable<Edge> {
+public class Edge<T extends Comparable<T>> implements Comparable<Edge<T>> {
 	private int first;
 	private int second;
-	private int weight;
+	private T weight;
 
-	public Edge(int first, int second, int weight){
+	public Edge(int first, int second, T weight){
 		this.first = first;
 		this.second = second;
 		this.weight = weight;
@@ -19,17 +19,12 @@ public class Edge implements Comparable<Edge> {
 		return second;
 	}
 
-	public int getWeight() {
+	public T getWeight() {
 		return weight;
 	}
 
 	@Override
-	public int compareTo(Edge o) {
-		if(this.weight < o.weight){
-			return -1;
-		} else if(this.weight > o.weight){
-			return 1;
-		}
-		return 0;
+	public int compareTo(Edge<T> o) {
+		return this.weight.compareTo(o.weight);
 	}
 }

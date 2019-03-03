@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class Route {
 	private int[] path;
 	private TSPData data;
-	private int length;
+	private int length = -1;
 
 	public Route(int[] path, TSPData data){
 		this.path = path;
@@ -25,11 +25,19 @@ public class Route {
 	}
 
 	public int getLength() {
+		if(length == -1){
+			calculateLength();
+		}
+
 		return length;
 	}
 
 	public int[] getPath() {
 		return path;
+	}
+
+	private void calculateLength(){
+		length = getSP().calulateDistance(data);
 	}
 
 	public void setPath(int[] new_path){

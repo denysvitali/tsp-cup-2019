@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class NearestNeighbour extends RoutingAlgorithm {
 	private TSPData data;
-	private LinkedList<Edge> tour = new LinkedList<>();
+	private LinkedList<Edge<Integer>> tour = new LinkedList<>();
 	private int startNode = -1;
 
 	@Override
@@ -21,7 +21,7 @@ public class NearestNeighbour extends RoutingAlgorithm {
 		this.data = data;
 		this.startNode = startNode;
 
-		Edge candidate = getCandidate();
+		Edge<Integer> candidate = getCandidate();
 		do {
 			tour.add(candidate);
 			candidate = getCandidate();
@@ -30,7 +30,7 @@ public class NearestNeighbour extends RoutingAlgorithm {
 
 		int last = tour.getLast().getSecond();
 
-		tour.add(new Edge(last, startNode,
+		tour.add(new Edge<>(last, startNode,
 				data.getDistances()[last][startNode-1]));
 
 		ArrayList<Integer> arr = tour.stream()
@@ -59,7 +59,7 @@ public class NearestNeighbour extends RoutingAlgorithm {
 		return r;
 	}
 
-	protected ArrayList<Edge> getCandidates(){
+	protected ArrayList<Edge<Integer>> getCandidates(){
 		int a;
 		if(tour.size() == 0){
 			a = startNode-1;
@@ -67,8 +67,8 @@ public class NearestNeighbour extends RoutingAlgorithm {
 			a = tour.getLast().getSecond();
 		}
 
-		TreeSet<Edge> candidates = data.getNearest(a);
-		ArrayList<Edge> finalCandidates = new ArrayList<>();
+		TreeSet<Edge<Integer>> candidates = data.getNearest(a);
+		ArrayList<Edge<Integer>> finalCandidates = new ArrayList<>();
 
 		for(Edge c : candidates){
 			if(!visited(c.getSecond())){
@@ -79,8 +79,8 @@ public class NearestNeighbour extends RoutingAlgorithm {
 		return finalCandidates;
 	}
 
-	protected Edge getCandidate(){
-		ArrayList<Edge> candidates = getCandidates();
+	protected Edge<Integer> getCandidate(){
+		ArrayList<Edge<Integer>> candidates = getCandidates();
 		if(candidates.size() == 0){
 			return null;
 		}

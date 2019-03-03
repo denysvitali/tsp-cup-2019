@@ -24,13 +24,13 @@ public class TSP {
 		data.setDistances(distances);
 
 		// Calculate HM<Integer, TS>
-		HashMap<Integer, TreeSet<Edge>> nearest = new HashMap<>();
-		ArrayList<Edge> edges = new ArrayList<>();
+		HashMap<Integer, TreeSet<Edge<Integer>>> nearest = new HashMap<>();
+		ArrayList<Edge<Integer>> edges = new ArrayList<>();
 
 		long s1 = System.currentTimeMillis();
 
 		for(int i=0; i<distances.length; i++){
-			TreeSet<Edge> ts = new TreeSet<>();
+			TreeSet<Edge<Integer>> ts = new TreeSet<>();
 			for(int j=0; j<distances.length; j++){
 				if(i == j){
 					continue;

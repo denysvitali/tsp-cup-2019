@@ -21,6 +21,8 @@ public class GeneticAlgorithm implements IntermediateRoutingAlgorithm {
 	public Route route(Route route, TSPData data) {
 		this.startNode = route.getStartNode();
 
+		initial_genes = new int[route.getPath().length - 2];
+
 		// Initial Genes: Path w/o Starting & Ending Node
 		System.arraycopy(route.getPath(), 1,
 				initial_genes,
@@ -28,7 +30,6 @@ public class GeneticAlgorithm implements IntermediateRoutingAlgorithm {
 				route.getPath().length - 2
 		);
 
-		initial_genes = route.getPath();
 		this.genes_size = initial_genes.length;
 
 		population_initial_size = data.getDimension() * 3;

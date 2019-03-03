@@ -14,11 +14,13 @@ public class SwappablePathTest {
 
 		SwappablePath sp2 = sp.swap(3, 6);
 
-		int finalPath[] = sp2.getPath().stream().mapToInt(Integer::intValue)
-				.toArray();
-
 		assertArrayEquals(new int[]{
 				0, 1, 2, 6, 5, 4, 3, 7, 0
-		}, finalPath);
+		}, sp2.getPathArr());
+
+		sp2 = sp2.swap(3, 6);
+		assertArrayEquals(new int[]{
+				0, 1, 2, 3, 4, 5, 6, 7, 0
+		}, sp2.getPathArr());
 	}
 }

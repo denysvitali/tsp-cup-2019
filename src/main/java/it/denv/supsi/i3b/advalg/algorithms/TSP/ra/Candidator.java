@@ -2,7 +2,7 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra;
 
 import java.util.ArrayList;
 
-public interface Candidator {
+public interface Candidator<T extends Comparable<T>> {
 	void computeCandidates();
-	ArrayList<Edge> getCandidates(int startNode);
+	ArrayList<Edge<T>> getCandidates(int startNode);
 }

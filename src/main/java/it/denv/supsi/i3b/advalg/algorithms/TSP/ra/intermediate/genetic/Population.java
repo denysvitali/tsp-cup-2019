@@ -19,6 +19,7 @@ public class Population {
 	private double fittest_perc = 0.3;
 	private int[] initial_genes;
 	private int pop_size;
+	private Individual best;
 
 	private TSPData data;
 
@@ -41,6 +42,8 @@ public class Population {
 		for (int i = 1; i < size; i++) {
 			population.add(generateRandomIndividual());
 		}
+
+		best = getFittest();
 	}
 
 	private Individual generateRandomIndividual() {
@@ -55,6 +58,7 @@ public class Population {
 		this.size = pop.size;
 		this.generation = pop.generation + 1;
 		this.data = pop.data;
+		this.best = pop.best;
 
 		int bestSize = (int) (pop.size * fittest_perc);
 
@@ -64,6 +68,12 @@ public class Population {
 
 
 		ArrayList<Individual> parentsCandidates = pop.getFittest(bestSize);
+
+		for(Individual i : parentsCandidates){
+			if(i.getFitness() < best.getFitness()){
+				best = i;
+			}
+		}
 
 		// Improve parents w/ 2-Opt
 

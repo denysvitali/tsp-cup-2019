@@ -7,8 +7,8 @@ import java.util.ArrayList;
 public class RandomNearestNeighbour extends NearestNeighbour {
 
 	@Override
-	protected Edge getCandidate(){
-		ArrayList<Edge> candidates = getCandidates();
+	protected Edge<Integer> getCandidate(){
+		ArrayList<Edge<Integer>> candidates = getCandidates();
 		if(candidates.size() == 0){
 			return null;
 		}
