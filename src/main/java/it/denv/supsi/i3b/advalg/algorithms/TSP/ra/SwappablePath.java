@@ -42,6 +42,22 @@ public class SwappablePath {
 		return new SwappablePath(newRoute);
 	}
 
+	public SwappablePath tswap(int i, int k){
+		int[] path = this.path.stream().mapToInt(Integer::valueOf).toArray();
+
+		int i_v = path[i];
+		int j_v = path[i + 1];
+
+		int k_v = path[k];
+		int l_v = path[k+1];
+
+		path[i+1] = k_v;
+		path[k+1] = i_v;
+
+
+		return new SwappablePath(path);
+	}
+
 	public LinkedList<Integer> getPath(){
 		return this.path;
 	}

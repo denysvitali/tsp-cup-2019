@@ -6,6 +6,8 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPSolution;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.candidate.NearestNeighborCandidator;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AntColonyOptimization;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.ThreeOpt;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.GeneticAlgorithm;
@@ -99,6 +101,55 @@ public class TSPRunner {
 
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
+
+	@Test
+	public void eil76NN() throws IOException {
+		String filePath = Utils.getTestFile("/problems/eil76.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour())
+		);
+
+		String path = tsp.writeRoute(r);
+
+		GnuPlotUtils.plot(path);
+
+		System.out.println("Route length: " + r.getLength());
+
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void eil76ACO() throws IOException {
+		String filePath = Utils.getTestFile("/problems/eil76.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(
+								new AntColonyOptimization(3, data)
+								.setSolutionImprover(new TwoOpt(data)))
+		);
+
+		String path = tsp.writeRoute(r);
+
+		GnuPlotUtils.plot(path);
+
+		System.out.println("Route length: " + r.getLength());
+
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
 
 	@Test
 	public void ch130SimulatedAnnealing() throws IOException {

@@ -29,6 +29,12 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 	}
 
 	public Route improve(Route r){
+
+		/*
+			In a 2-opt Algorithm, when removing 2 edges, there is only
+			2^2 - 1 alternative solution.
+		 */
+
 		/*
 			procedure 2-opt
 				(1) Let T be the current tour.
