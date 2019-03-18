@@ -1,43 +1,51 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial;
 
 import it.denv.supsi.i3b.advalg.Route;
-import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Candidator;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.candidators.NNCandidator;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class NearestNeighbour extends RoutingAlgorithm {
-	private TSPData data;
+	protected TSPData data;
 	private LinkedList<Edge<Integer>> tour = new LinkedList<>();
 	private int startNode = -1;
+	protected Candidator<Integer> candidator;
+
+	public NearestNeighbour(TSPData data) {
+		this.data = data;
+		this.candidator = new NNCandidator(3, data);
+	}
 
 	@Override
 	public Route route(int startNode, TSPData data) {
 		this.data = data;
 		this.startNode = startNode;
 
-		Edge<Integer> candidate = getCandidate();
+		ArrayList<Edge<Integer>> candidates = candidator.getCandidates(startNode);
 		do {
+			Edge<Integer> candidate = candidates.get(0);
 			tour.add(candidate);
-			candidate = getCandidate();
+			candidator.addVisited(candidate);
+			candidates = candidator.getCandidates(candidate.getSecond());
 		}
-		while(candidate != null);
+		while (candidates.size() != 0);
 
 		int last = tour.getLast().getSecond();
 
 		tour.add(new Edge<>(last, startNode,
-				data.getDistances()[last][startNode-1]));
+				data.getDistances()[last][startNode - 1]));
 
 		ArrayList<Integer> arr = tour.stream()
 				.map(Edge::getFirst)
 				.collect(Collectors.toCollection(ArrayList::new));
 
-		arr.add(startNode-1);
+		arr.add(startNode - 1);
 
 
 		int length = tour
@@ -59,41 +67,12 @@ public class NearestNeighbour extends RoutingAlgorithm {
 		return r;
 	}
 
-	protected ArrayList<Edge<Integer>> getCandidates(){
-		int a;
-		if(tour.size() == 0){
-			a = startNode-1;
-		} else {
-			a = tour.getLast().getSecond();
-		}
-
-		TreeSet<Edge<Integer>> candidates = data.getNearest(a);
-		ArrayList<Edge<Integer>> finalCandidates = new ArrayList<>();
-
-		for(Edge c : candidates){
-			if(!visited(c.getSecond())){
-				finalCandidates.add(c);
-			}
-		}
-
-		return finalCandidates;
-	}
-
-	protected Edge<Integer> getCandidate(){
-		ArrayList<Edge<Integer>> candidates = getCandidates();
-		if(candidates.size() == 0){
-			return null;
-		}
-
-		return candidates.get(0);
-	}
-
 	private boolean visited(int a) {
-		if(tour.size() == 0){
+		if (tour.size() == 0) {
 			return false;
 		}
 
-		if(tour.stream().map(Edge::getFirst).anyMatch(e->e == a)) {
+		if (tour.stream().map(Edge::getFirst).anyMatch(e -> e == a)) {
 			return true;
 		}
 

@@ -4,6 +4,7 @@ import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class AntColony {
@@ -13,9 +14,12 @@ public class AntColony {
 	private double[][] pheromoneValues;
 	private double[][] initialPheromoneValues;
 
+	private HashMap<Integer, double[][]> deltaT = new HashMap<>();
+	private HashMap<Integer, double[][]> T = new HashMap<>();
+
 
 	// Decay Parameter:
-	public final double ALPHA = 0.1; // 0 < a < 1
+	public final double ALPHA = 0.3; // 0 < a < 1
 	// Relative importance of pheromone vs. distance
 	public final double BETA = 0.3; // Must be >0
 	// Probability of a biased exploration
@@ -23,8 +27,26 @@ public class AntColony {
 
 	// Local Trail Decay
 	public final double PL = 0.1;
+	public final double PHI = 0.2;
 
-	private double iPV = 1;
+	public final double Q = 1.0;
+
+
+	/*
+		Gamma = 1 is a parameter introduced in Botee and Bonabeau's study:
+		refer to "Evolving Ant Colony Optimization" (page 152).
+
+		Used for \Delta T_{i,j}(t):
+			\frac{Q}{(L_+)^\gamma}\quad \text{if } (i, j} \in T_+,\\
+			0 \quad \text{otherwise.}
+	 */
+	public final double GAMMA = 1.0;
+
+	// Global Trail Decay
+	private final double RHO_G = 0.2; // 0 <= RHO_G <= 1
+
+	private double iPV = 1000.0;
+	private int time = 0;
 
 	public AntColony(int nrAnts, TSPData data){
 		assert(BETA > 0);
@@ -35,7 +57,7 @@ public class AntColony {
 			this.ants.add(new Ant(this));
 		}
 
-		iPV = iPV / data.getBestKnown();
+		//iPV = iPV / data.getBestKnown();
 
 		pheromoneValues = new double[data.getDimension()][data.getDimension()];
 		initialPheromoneValues = new double[data.getDimension()][data.getDimension()];
@@ -49,6 +71,12 @@ public class AntColony {
 				pheromoneValues[j][i] = iPV;
 			}
 		}
+
+		T.put(0, pheromoneValues);
+	}
+
+	public int getTime() {
+		return time;
 	}
 
 	public double getiPV() {
@@ -73,18 +101,20 @@ public class AntColony {
 
 	public void updatePheronome(){
 		for(int i=0; i<sizeNodes(); i++){
-			for(int j=0; j<i; j++){
+			for(int j=0; j<i; j++) {
 				double sumDeltaTk = 0.0;
 
-				for(Ant ant : ants){
-					if(ant.hasArc(i, j)){
-						sumDeltaTk += 1/ant.pathLength();
+				for (Ant ant : ants) {
+					if (ant.hasArc(i, j)) {
+						sumDeltaTk += 1 / ant.pathLength();
 					}
 				}
 
 				pheromoneValues[i][j] =
-						(1-ALPHA) * pheromoneValues[i][j] +
+						(1 - ALPHA) * pheromoneValues[i][j] +
 								sumDeltaTk;
+
+				pheromoneValues[j][i] = pheromoneValues[i][j];
 			}
 		}
 	}
@@ -130,11 +160,39 @@ public class AntColony {
 		int[] p = route.getPath();
 
 		for(int i = 0; i<p.length-1; i++){
-			pheromoneValues[p[i]][p[i+1]] -= 0.1;
+			double[][] deltaTij = getDeltaT(getTime());
+			double[][] T = getT(getTime() + 1);
+
+			int i_e = p[i];
+			int j_e = p[i+1];
+
+			T[i_e][j_e] =
+					(1-PHI) * T[i_e][j_e]
+					+ RHO_G * deltaTij[i_e][j_e];
 		}
+	}
+
+	public double[][] getT(int time) {
+		if(!T.containsKey(time)){
+			T.put(time, new double[sizeNodes()][sizeNodes()]);
+		}
+
+		return T.get(time);
 	}
 
 	public TSPData getData() {
 		return data;
+	}
+
+	public double[][] getDeltaT(int time) {
+		if(!deltaT.containsKey(time)){
+			deltaT.put(time, new double[sizeNodes()][sizeNodes()]);
+		}
+
+		return deltaT.get(time);
+	}
+
+	public void doTime() {
+		this.time++;
 	}
 }

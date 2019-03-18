@@ -5,4 +5,5 @@ import java.util.ArrayList;
 public interface Candidator<T extends Comparable<T>> {
 	void computeCandidates();
 	ArrayList<Edge<T>> getCandidates(int startNode);
+	void addVisited(Edge<T> candidate);
 }

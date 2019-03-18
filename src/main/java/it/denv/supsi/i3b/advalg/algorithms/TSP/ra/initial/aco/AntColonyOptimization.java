@@ -29,7 +29,7 @@ public class AntColonyOptimization extends RoutingAlgorithm {
 		Route bestIteration = null;
 
 		//long target = System.currentTimeMillis() + 1000 * 60 * 1;
-		long target = System.currentTimeMillis() + 1000 * 15;
+		long target = System.currentTimeMillis() + 1000 * 60 * 3;
 
 		while(System.currentTimeMillis() < target){
 			bestIteration = null;
@@ -55,13 +55,28 @@ public class AntColonyOptimization extends RoutingAlgorithm {
 				}
 			}
 
+			ac.doTime();
+
 			if(antsCompleted == 3){
 				antsCompleted = 0;
 				globalAntsCompleted += 3;
 
 				if(ira != null) {
-					bestIteration = ira.route(
+					Route improvedRoute = ira.route(
 							bestIteration, ac.getData());
+					if(improvedRoute.getLength() < bestIteration.getLength()){
+						bestIteration = improvedRoute;
+					}
+				}
+
+				double[][] deltaT = this.ac.getDeltaT(this.ac.getTime());
+				int[] path = bestIteration.getPath();
+				double L = bestIteration.getLength();
+				double Q = ac.Q;
+				double GAMMA = ac.GAMMA;
+
+				for(int i = 0; i < path.length-1; i++){
+					deltaT[path[i]][path[i+1]] = Q / Math.pow(L, GAMMA);
 				}
 
 				if (bestRoute == null) {

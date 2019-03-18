@@ -1,77 +1,73 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra;
 
-import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 
-import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 public class SwappablePath {
-	private LinkedList<Integer> path = new LinkedList<>();
+	private int[] path;
 
 	public SwappablePath(int[] path){
-		for(int i = 0; i< path.length; i++){
-			this.path.add(i, path[i]);
-		}
-	}
-
-	public SwappablePath(LinkedList<Integer> path){
 		this.path = path;
 	}
 
-	public SwappablePath swap(int i, int k){
-		assert(i != 0);
-		assert(k != path.size());
-
-		LinkedList<Integer> newRoute = new LinkedList<>();
-		for(int j=0; j<i; j++){
-			newRoute.add(path.get(j));
+	private SwappablePath(List<Integer> path){
+		this.path = new int[path.size()];
+		for(int i=0; i<path.size(); i++){
+			this.path[i] = path.get(i);
 		}
-
-		LinkedList<Integer> reverseMe = new LinkedList<>();
-		for(int j=i; j<=k; j++){
-			reverseMe.add(path.get(j));
-		}
-		Collections.reverse(reverseMe);
-		newRoute.addAll(reverseMe);
-
-		for(int j=k+1; j<path.size(); j++){
-			newRoute.add(path.get(j));
-		}
-
-		return new SwappablePath(newRoute);
 	}
 
-	public SwappablePath tswap(int i, int k){
-		int[] path = this.path.stream().mapToInt(Integer::valueOf).toArray();
+	public SwappablePath twoOptSwap(int i, int k){
+		/*
+		2optSwap(route, i, k) {
+			1. take route[0] to route[i-1] and add them in order to new_route
+			2. take route[i] to route[k] and add them in reverse order to new_route
+			3. take route[k+1] to end and add them in order to new_route
+			return new_route;
+		}
+		*/
 
-		int i_v = path[i];
-		int j_v = path[i + 1];
+		assert(i != 0);
+		assert(k != this.path.length-1);
 
-		int k_v = path[k];
-		int l_v = path[k+1];
+		int[] np = new int[this.path.length];
 
-		path[i+1] = k_v;
-		path[k+1] = i_v;
+		for(int j=0; j<i; j++){
+			np[j] = path[j];
+		}
 
+		for(int j=i; j<=k; j++){
+			np[k-j + i] = path[j];
+		}
 
-		return new SwappablePath(path);
+		for(int j=k+1; j<this.path.length; j++){
+			np[j] = path[j];
+		}
+
+		return new SwappablePath(np);
 	}
 
 	public LinkedList<Integer> getPath(){
-		return this.path;
+		LinkedList<Integer> ll = new LinkedList<>();
+		for (int value : path) {
+			ll.add(value);
+		}
+
+		return ll;
 	}
 	public int[] getPathArr(){
-		return this.path.stream().mapToInt(Integer::intValue).toArray();
+		return path;
 	}
 
 	public int calulateDistance(TSPData data) {
 		int[][] distances = data.getDistances();
 
 		int distance = 0;
-		for(int i = 0; i+1<path.size(); i++){
-			int a = path.get(i);
-			int b = path.get(i+1);
+		for(int i = 0; i+1<path.length; i++){
+			int a = path[i];
+			int b = path[i+1];
 
 			distance += distances[a][b];
 		}

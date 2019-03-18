@@ -1,13 +1,9 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate;
 
 import it.denv.supsi.i3b.advalg.Route;
-import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IntermediateRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
-
-import java.util.LinkedList;
-import java.util.stream.Collectors;
 
 public class TwoOpt implements IntermediateRoutingAlgorithm  {
 
@@ -56,14 +52,14 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 	public Route improveSP(SwappablePath sp){
 		SwappablePath newsp;
 		int bestLength = sp.calulateDistance(data);
-		int swappableNodes = sp.getPath().size() - 1;
+		int swappableNodes = sp.getPathArr().length - 1;
 
 		boolean improvement = true;
 		while(improvement) {
 			improvement = false;
 			for (int i = 1; i < swappableNodes - 1; i++) {
 				for (int k = i + 1; k < swappableNodes; k++) {
-					newsp = sp.swap(i, k);
+					newsp = sp.twoOptSwap(i, k);
 					int distance = newsp.calulateDistance(data);
 					if (distance < bestLength) {
 						improvement = true;

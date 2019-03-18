@@ -103,6 +103,12 @@ public class Ant {
 		tabuList.add(j);
 		unvisitedNodes.remove(j);
 		currentNode = j;
+
+		probs = new double[ac.sizeNodes()][ac.sizeNodes()];
+
+		for(int k=0; k<ac.sizeNodes(); k++){
+			probs[k][k] = NOT_CALCULATED;
+		}
 	}
 
 	public int[] getVisitableNodes(){
@@ -156,22 +162,29 @@ public class Ant {
 
 		for(int k=0; k<ac.sizeNodes(); k++){
 			if(visitableNodesI.contains(k) && k != i){
+
+
 				double probN =
-					ac.getPheromone(i, k) *
+					ac.getT(ac.getTime())[i][k] *
 					Math.pow(ac.getN(i, k), ac.getBeta());
 				summedProb += probN;
 				probs[i][k] = probN;
 			} else {
 				probs[i][k] = 0;
 			}
+			probs[k][i] = probs[i][k];
 		}
 
 		// Calculate final vals
 		for(int k=0; k<ac.sizeNodes(); k++) {
 			if (visitableNodesI.contains(k) && k != i) {
+				System.out.println("1: " + probs[i][k]);
 				probs[i][k] = probs[i][k] / summedProb;
+				System.out.println("2: " + probs[i][k]);
 			}
 		}
+
+		System.out.println("-----");
 
 		probs[i][i] = 0;
 	}

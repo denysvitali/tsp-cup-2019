@@ -49,8 +49,8 @@ public class ThreeOpt implements IntermediateRoutingAlgorithm  {
 		int n = m+1;
 
 		/*paths[0] = new SwappablePath(op)
-				.swap(i,k)
-				.swap()
+				.twoOptSwap(i,k)
+				.twoOptSwap()
 				.getPathArr();
 
 		 */

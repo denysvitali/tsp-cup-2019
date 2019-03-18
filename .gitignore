@@ -86,3 +86,5 @@ fabric.properties
 target/
 
 .attach*
+
+*.log

@@ -31,7 +31,7 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 
 				Route n = na.computeNeighbour(current);
 
-				// 2. candidate = local_opt(n)
+				// 2. candidators = local_opt(n)
 
 				candidate = twoOpt.improve(n);
 
