@@ -29,9 +29,6 @@ public class SwappablePath {
 		}
 		*/
 
-		assert(i != 0);
-		assert(k != this.path.length-1);
-
 		int[] np = new int[this.path.length];
 
 		for(int j=0; j<i; j++){

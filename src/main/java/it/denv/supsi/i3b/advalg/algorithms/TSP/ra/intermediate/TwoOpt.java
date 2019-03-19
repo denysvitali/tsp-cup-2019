@@ -52,24 +52,46 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 	public Route improveSP(SwappablePath sp){
 		SwappablePath newsp;
 		int bestLength = sp.calulateDistance(data);
-		int swappableNodes = sp.getPathArr().length - 1;
+		int[] msp = sp.getPathArr();
+		int sp_size = sp.getPathArr().length;
+		int[][] d = data.getDistances();
 
-		boolean improvement = true;
-		while(improvement) {
-			improvement = false;
-			for (int i = 1; i < swappableNodes - 1; i++) {
-				for (int k = i + 1; k < swappableNodes; k++) {
-					newsp = sp.twoOptSwap(i, k);
-					int distance = newsp.calulateDistance(data);
-					if (distance < bestLength) {
-						improvement = true;
-						bestLength = distance;
-						sp = newsp;
+
+		/*
+			Source:
+			- https://on-demand.gputechconf.com/gtc/2014/presentations/S4534-high-speed-2-opt-tsp-solver.pdf
+			- http://olab.is.s.u-tokyo.ac.jp/~kamil.rocki/logo.pdf
+		 */
+
+		SwappablePath best = sp;
+
+		boolean swapped;
+		do {
+			swapped = false;
+			for(int i=1; i < sp_size - 2; i++) {
+				for(int j = i + 2; j < sp_size - 1; j++){
+
+					int d1 = d[msp[i]][msp[j+1]] + d[msp[i-1]][msp[j]];
+					int d2 = d[msp[i]][msp[i-1]] + d[msp[j+1]][msp[j]];
+
+					if(d1 < d2){
+						sp = sp.twoOptSwap(i, j);
+						msp = sp.getPathArr();
+						swapped = true;
+
+						int mRouteLength = sp.calulateDistance(data);
+						if(mRouteLength < bestLength){
+							bestLength = mRouteLength;
+							best = sp;
+						} else {
+							swapped = false;
+						}
 					}
 				}
 			}
-		}
 
-		return new Route(sp.getPathArr(), bestLength, data);
+		} while(swapped);
+
+		return new Route(best.getPathArr(), bestLength, data);
 	}
 }
