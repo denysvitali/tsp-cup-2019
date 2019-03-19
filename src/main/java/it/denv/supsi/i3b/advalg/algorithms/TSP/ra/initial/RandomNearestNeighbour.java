@@ -7,6 +7,6 @@ public class RandomNearestNeighbour extends NearestNeighbour {
 
 	public RandomNearestNeighbour(TSPData data) {
 		super(data);
-		this.candidator = new RNNCandidator(3, data);
+		this.candidator = new RNNCandidator(10, data);
 	}
 }

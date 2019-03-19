@@ -26,6 +26,7 @@ public class NearestNeighbour extends RoutingAlgorithm {
 	public Route route(int startNode, TSPData data) {
 		this.data = data;
 		this.startNode = startNode;
+		this.candidator.setStartNode(startNode);
 
 		ArrayList<Edge<Integer>> candidates = candidator.getCandidates(startNode);
 		do {
@@ -45,7 +46,7 @@ public class NearestNeighbour extends RoutingAlgorithm {
 				.map(Edge::getFirst)
 				.collect(Collectors.toCollection(ArrayList::new));
 
-		arr.add(startNode - 1);
+		arr.add(startNode);
 
 
 		int length = tour

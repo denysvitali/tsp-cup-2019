@@ -6,6 +6,8 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Route {
@@ -69,5 +71,19 @@ public class Route {
 
 	public TSPData getData() {
 		return data;
+	}
+
+	public boolean isValid() {
+		Set<Integer> cities = new HashSet<>();
+
+		for (int i=0; i<path.length-1; i++) {
+			if(cities.contains(path[i])){
+				return false;
+			}
+			cities.add(path[i]);
+		}
+
+		return path[0] == path[path.length-1];
+
 	}
 }

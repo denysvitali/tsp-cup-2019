@@ -138,9 +138,10 @@ public class TSPRunner {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
-						.add(new TwoOpt(data)
-						)
+						.add(new TwoOpt(data))
 		);
+
+		assertTrue(r.isValid());
 
 		String path = tsp.writeRoute(r);
 
@@ -163,9 +164,35 @@ public class TSPRunner {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
-						.add(new TwoOpt(data)
-						)
 		);
+
+		assertTrue(r.isValid());
+
+		String path = tsp.writeRoute(r);
+
+		GnuPlotUtils.plot(path);
+
+		System.out.println("Route length: " + r.getLength());
+		Utils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void eil76RNN2OPT() throws IOException {
+		String filePath = Utils.getTestFile("/problems/eil76.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(data))
+						.add(new TwoOpt(data))
+		);
+
+		assertTrue(r.isValid());
 
 		String path = tsp.writeRoute(r);
 

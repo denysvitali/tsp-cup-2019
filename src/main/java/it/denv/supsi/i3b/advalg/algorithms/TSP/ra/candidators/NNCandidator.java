@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class NNCandidator implements Candidator<Integer> {
 
 	private int size;
+	private int startNode;
 	private TSPData data;
 	private TreeSet<Integer> tabuList = new TreeSet<>();
 	private TreeSet<Integer> unvisitedNodes = new TreeSet<>();
@@ -19,7 +20,9 @@ public class NNCandidator implements Candidator<Integer> {
 		this.size = size;
 		this.data = data;
 		for(int i = 0; i < data.getDimension(); i++){
-			unvisitedNodes.add(i);
+			if(data.getStartNode() != i){
+				unvisitedNodes.add(i);
+			}
 		}
 	}
 
@@ -31,6 +34,7 @@ public class NNCandidator implements Candidator<Integer> {
 	@Override
 	public ArrayList<Edge<Integer>> getCandidates(int startNode) {
 		return unvisitedNodes.stream()
+				.filter(e->e!=startNode)
 				.map(e -> new Edge<>(startNode, e, data.getDistances()[startNode][e]))
 				.sorted()
 				.limit(size)
@@ -41,5 +45,11 @@ public class NNCandidator implements Candidator<Integer> {
 	public void addVisited(Edge<Integer> candidate) {
 		tabuList.add(candidate.getFirst());
 		unvisitedNodes.remove(candidate.getFirst());
+	}
+
+	@Override
+	public void setStartNode(int startNode) {
+		this.startNode = startNode;
+		this.unvisitedNodes.remove(startNode);
 	}
 }

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 public class RNNCandidator implements Candidator<Integer> {
 
 	private int size;
+	private int startNode;
 	private TSPData data;
 	private TreeSet<Integer> tabuList = new TreeSet<>();
 	private TreeSet<Integer> unvisitedNodes = new TreeSet<>();
@@ -32,6 +33,7 @@ public class RNNCandidator implements Candidator<Integer> {
 	@Override
 	public ArrayList<Edge<Integer>> getCandidates(int startNode) {
 		ArrayList<Edge<Integer>> result = unvisitedNodes.stream()
+				.filter(e->e!=startNode)
 				.map(e -> new Edge<>(startNode, e, data.getDistances()[startNode][e]))
 				.sorted()
 				.limit(size)
@@ -44,5 +46,10 @@ public class RNNCandidator implements Candidator<Integer> {
 	public void addVisited(Edge<Integer> candidate) {
 		tabuList.add(candidate.getFirst());
 		unvisitedNodes.remove(candidate.getFirst());
+	}
+
+	@Override
+	public void setStartNode(int startNode) {
+		this.startNode = startNode;
 	}
 }
