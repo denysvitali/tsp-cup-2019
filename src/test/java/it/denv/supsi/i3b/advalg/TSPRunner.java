@@ -204,6 +204,33 @@ public class TSPRunner {
 	}
 
 	@Test
+	public void eil76RNN2OPTGA() throws IOException {
+		String filePath = Utils.getTestFile("/problems/eil76.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(data))
+						.add(new TwoOpt(data))
+						.add(new GeneticAlgorithm())
+		);
+
+		assertTrue(r.isValid());
+
+		String path = tsp.writeRoute(r);
+
+		GnuPlotUtils.plot(path);
+
+		System.out.println("Route length: " + r.getLength());
+		Utils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
 	public void pr439NNTwoOpt() throws IOException {
 		String filePath = Utils.getTestFile("/problems/pr439.tsp");
 		assertNotNull(filePath);
@@ -227,6 +254,32 @@ public class TSPRunner {
 		Utils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
+
+	@Test
+	public void pr439NNTwoOptGA() throws IOException {
+		String filePath = Utils.getTestFile("/problems/pr439.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+						.add(new TwoOpt(data))
+						.add(new GeneticAlgorithm())
+		);
+
+		String path = tsp.writeRoute(r);
+
+		GnuPlotUtils.plot(path);
+
+		System.out.println("Route length: " + r.getLength());
+		Utils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
 
 	@Test
 	public void u1060NNTwoOpt() throws IOException {
