@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 public class NearestNeighbour extends RoutingAlgorithm {
 	protected TSPData data;
 	private LinkedList<Edge<Integer>> tour = new LinkedList<>();
-	private int startNode = -1;
 	protected Candidator<Integer> candidator;
 
 	public NearestNeighbour(TSPData data) {
@@ -25,7 +24,6 @@ public class NearestNeighbour extends RoutingAlgorithm {
 	@Override
 	public Route route(int startNode, TSPData data) {
 		this.data = data;
-		this.startNode = startNode;
 		this.candidator.setStartNode(startNode);
 
 		ArrayList<Edge<Integer>> candidates = candidator.getCandidates(startNode);
@@ -57,7 +55,6 @@ public class NearestNeighbour extends RoutingAlgorithm {
 
 		// Cleanup
 		tour = new LinkedList<>();
-		this.startNode = -1;
 
 		Route r = new Route(arr
 				.stream()

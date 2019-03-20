@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 public class Population {
 	private int size;
 	private int generation = 0;
-	private double mutation_prob = 0.6;
-	private double crossover_prob = 0.7;
-	private double fittest_perc = 0.3;
+	private double mutation_prob = 0.9;
+	private double crossover_prob = 0.99;
+	private double fittest_perc = 0.02;
 	private int[] initial_genes;
 	private int pop_size;
 	private Individual best;
@@ -66,7 +66,6 @@ public class Population {
 			bestSize = 1;
 		}
 
-
 		ArrayList<Individual> parentsCandidates = pop.getFittest(bestSize);
 
 		for(Individual i : parentsCandidates){
@@ -83,8 +82,8 @@ public class Population {
 			LinkedList<Integer> optimizedGenes = new LinkedList<>();
 			int[] genes = ind.getGenes();
 			optimizedGenes.add(data.getStartNode());
-			for(int i=0; i<genes.length; i++){
-				optimizedGenes.add(genes[i]);
+			for (int gene : genes) {
+				optimizedGenes.add(gene);
 			}
 			optimizedGenes.add(data.getStartNode());
 
@@ -141,14 +140,14 @@ public class Population {
 
 		// Mutation
 
-		for (int i = 0; i < mutationCandidates.size(); i++) {
+		for (Individual mutationCandidate : mutationCandidates) {
 
 			double rand = Math.random();
-			if(rand < mutation_prob){
-				Individual individual = mutationCandidates.get(i);
+			if (rand < mutation_prob) {
+				Individual individual = mutationCandidate;
 
 				int[] genes = individual.getGenes();
-				for(int j=0; j<Math.random()*genes.length; j++) {
+				for (int j = 0; j < Math.random() * genes.length; j++) {
 					int a = (int) (Math.random() * genes.length);
 					int b = (int) (Math.random() * genes.length);
 
@@ -161,17 +160,19 @@ public class Population {
 					genes[b] = tmp_g;
 				}
 
-				TwoOpt two = new TwoOpt(data);
 				LinkedList<Integer> path = new LinkedList<>();
 
 				path.add(data.getStartNode());
-				for(int j=0; j<genes.length; j++){
+				for (int j = 0; j < genes.length; j++) {
 					path.add(genes[j]);
 				}
 				path.add(data.getStartNode());
 
 				individual.setGenes(genes);
 				mutatedIndividuals.add(individual);
+			}
+			else {
+				unmutatedIndividuals.add(mutationCandidate);
 			}
 		}
 
