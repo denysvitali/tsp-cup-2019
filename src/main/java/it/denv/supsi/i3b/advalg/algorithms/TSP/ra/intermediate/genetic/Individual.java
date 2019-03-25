@@ -7,6 +7,7 @@ public class Individual {
 
 	private TSPData tspData;
 	private int fitness = -1;
+	private double prob = -1;
 
 	public Individual(TSPData tspData){
 		this.tspData = tspData;
@@ -40,6 +41,14 @@ public class Individual {
 		return distance;
 	}
 
+
+	public double getProb() {
+		return prob;
+	}
+
+	public void setProb(double prob) {
+		this.prob = prob;
+	}
 
 	public int[] getGenes() {
 		return genes;

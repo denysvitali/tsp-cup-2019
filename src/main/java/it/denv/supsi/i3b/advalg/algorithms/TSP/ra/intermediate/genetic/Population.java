@@ -5,19 +5,19 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Population {
 	private int size;
 	private int generation = 0;
-	private double mutation_prob = 0.9;
+	private double mutation_prob = 0.88;
 	private double crossover_prob = 0.99;
-	private double fittest_perc = 0.02;
+	private double fittest_perc = 0.12;
 	private int[] initial_genes;
+
+	private int parents = 20;
+
 	private int pop_size;
 	private Individual best;
 
@@ -66,9 +66,13 @@ public class Population {
 			bestSize = 1;
 		}
 
-		ArrayList<Individual> parentsCandidates = pop.getFittest(bestSize);
+		ArrayList<Individual> parentsCandidates = new ArrayList<>();
 
-		for(Individual i : parentsCandidates){
+		for(int i=0; i<bestSize; i++){
+			parentsCandidates.add(pop.getProbabilisticParent());
+		}
+
+		for(Individual i : pop.getPopulation()){
 			if(i.getFitness() < best.getFitness()){
 				best = i;
 			}
@@ -91,12 +95,10 @@ public class Population {
 					.stream()
 					.mapToInt(Integer::intValue)
 					.toArray());
-			Route nr = to.improveSP(sp);
 
-			int startNode = nr.getStartNode();
-
-			int[] newGenes = Arrays.stream(nr.getPath())
-					.filter(i -> i!=startNode).toArray();
+			int[] newGenes = new int[data.getDimension()-1];
+			System.arraycopy(to.improveSP(sp),
+					1, newGenes, 0, data.getDimension() - 1);
 			ind.setGenes(newGenes);
 		}
 
@@ -144,9 +146,7 @@ public class Population {
 
 			double rand = Math.random();
 			if (rand < mutation_prob) {
-				Individual individual = mutationCandidate;
-
-				int[] genes = individual.getGenes();
+				int[] genes = mutationCandidate.getGenes();
 				for (int j = 0; j < Math.random() * genes.length; j++) {
 					int a = (int) (Math.random() * genes.length);
 					int b = (int) (Math.random() * genes.length);
@@ -160,16 +160,7 @@ public class Population {
 					genes[b] = tmp_g;
 				}
 
-				LinkedList<Integer> path = new LinkedList<>();
-
-				path.add(data.getStartNode());
-				for (int j = 0; j < genes.length; j++) {
-					path.add(genes[j]);
-				}
-				path.add(data.getStartNode());
-
-				individual.setGenes(genes);
-				mutatedIndividuals.add(individual);
+				mutatedIndividuals.add(mutationCandidate);
 			}
 			else {
 				unmutatedIndividuals.add(mutationCandidate);
@@ -186,6 +177,34 @@ public class Population {
 
 		this.initial_genes = pop.initial_genes;
 		this.pop_size = pop.pop_size;
+	}
+
+	private Individual getProbabilisticParent() {
+		double sum = 0.0;
+		for(int i=0; i<population.size(); i++){
+			sum += population.get(i).getFitness();
+		}
+
+		double sum_tmp = 0.0;
+		double random = Math.random();
+
+		for(Individual i : population){
+			i.setProb(1 - (i.getFitness() / sum));
+		}
+
+		for(Individual i : population){
+			sum_tmp += i.getProb();
+
+			if(sum_tmp >= random){
+				return i;
+			}
+		}
+
+		return null;
+	}
+
+	private ArrayList<Individual> getPopulation() {
+		return population;
 	}
 
 	public static Individual getOffspring(Individual p1, Individual p2){
@@ -299,14 +318,18 @@ public class Population {
 	}
 
 	public double getRate(int bestKnown){
-		return (getFittest().getFitness() * 1.0 / bestKnown) - 1;
+		return ((best.getFitness() * 1.0 / bestKnown) - 1) * 100;
 	}
 
 	@Override
 	public String toString() {
 		return String.format(
-				"Population (S: %d, Genes Size: %d, G: %d, Fittest: %d)",
-				population.size(), size, generation, getFittest().getFitness()
+				"Population (S: %d, Genes Size: %d, G: %d, Fittest: %d, OB: %d, BK: %d)",
+				population.size(), size,
+				generation,
+				getFittest().getFitness(),
+				best.getFitness(),
+				data.getBestKnown()
 		);
 	}
 }
