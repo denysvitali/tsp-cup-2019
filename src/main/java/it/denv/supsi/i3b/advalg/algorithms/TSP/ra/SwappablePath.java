@@ -3,20 +3,12 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class SwappablePath {
 	private int[] path;
 
 	public SwappablePath(int[] path){
 		this.path = path;
-	}
-
-	private SwappablePath(List<Integer> path){
-		this.path = new int[path.size()];
-		for(int i=0; i<path.size(); i++){
-			this.path[i] = path.get(i);
-		}
 	}
 
 	public SwappablePath twoOptSwap(int i, int k){
