@@ -46,11 +46,10 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 		int[] path = r.getPath();
 
 		SwappablePath sp = new SwappablePath(path);
-		return improveSP(sp);
+		return new Route(improveSP(sp), data);
 	}
 
-	public Route improveSP(SwappablePath sp){
-		SwappablePath newsp;
+	public int[] improveSP(SwappablePath sp){
 		int bestLength = sp.calulateDistance(data);
 		int[] msp = sp.getPathArr();
 		int sp_size = sp.getPathArr().length;
@@ -92,6 +91,6 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 
 		} while(swapped);
 
-		return new Route(best.getPathArr(), bestLength, data);
+		return best.getPathArr();
 	}
 }
