@@ -3,7 +3,7 @@ package it.denv.supsi.i3b.advalg.utils;
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 
-public class RoueUtils {
+public class RouteUtils {
 	public static void computePerformance(Route r, TSPData d){
 		double perf = 1 - d.getBestKnown() * 1.0 / r.getLength();
 

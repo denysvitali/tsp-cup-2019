@@ -13,18 +13,6 @@ public class Utils {
 		return TSPRunner.class.getResource(fileName).getFile();
 	}
 
-	public static void computePerformance(Route r, TSPData d){
-		double perf = 1 - d.getBestKnown() * 1.0 / r.getLength();
-
-		System.out.println(String.format(
-				"Our path: %d \t Best: %d \t Perf: %f",
-				r.getLength(),
-				d.getBestKnown(),
-				perf * 100
-				)
-		);
-	}
-
 	public static void checkTour(String filePath, File sol_f, int length) throws IOException {
 		Process p = Runtime.getRuntime().exec(new String[]{
 				"python",

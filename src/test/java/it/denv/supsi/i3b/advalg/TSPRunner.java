@@ -14,6 +14,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.GeneticAl
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
 import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
+import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -72,7 +73,7 @@ public class TSPRunner {
 		GnuPlotUtils.plot(path);
 
 		System.out.println("Route length: " + r.getLength());
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
@@ -122,7 +123,7 @@ public class TSPRunner {
 		GnuPlotUtils.plot(path);
 
 		System.out.println("Route length: " + r.getLength());
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
@@ -148,7 +149,7 @@ public class TSPRunner {
 		GnuPlotUtils.plot(path);
 
 		System.out.println("Route length: " + r.getLength());
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
@@ -173,7 +174,7 @@ public class TSPRunner {
 		GnuPlotUtils.plot(path);
 
 		System.out.println("Route length: " + r.getLength());
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
@@ -199,7 +200,7 @@ public class TSPRunner {
 		GnuPlotUtils.plot(path);
 
 		System.out.println("Route length: " + r.getLength());
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
@@ -226,7 +227,7 @@ public class TSPRunner {
 		GnuPlotUtils.plot(path);
 
 		System.out.println("Route length: " + r.getLength());
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
@@ -251,7 +252,7 @@ public class TSPRunner {
 		GnuPlotUtils.plot(path);
 
 		System.out.println("Route length: " + r.getLength());
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
@@ -276,7 +277,55 @@ public class TSPRunner {
 		GnuPlotUtils.plot(path);
 
 		System.out.println("Route length: " + r.getLength());
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void pr439NN_SA() throws IOException {
+		String filePath = Utils.getTestFile("/problems/pr439.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+						.add(new SimulatedAnnealing())
+		);
+
+		String path = tsp.writeRoute(r);
+
+		GnuPlotUtils.plot(path);
+
+		System.out.println("Route length: " + r.getLength());
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void fl1577_NN_SA() throws IOException {
+		String filePath = Utils.getTestFile("/problems/fl1577.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+						.add(new SimulatedAnnealing())
+		);
+
+		String path = tsp.writeRoute(r);
+
+		GnuPlotUtils.plot(path);
+
+		System.out.println("Route length: " + r.getLength());
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
@@ -300,7 +349,7 @@ public class TSPRunner {
 		GnuPlotUtils.plot(path);
 
 		System.out.println("Route length: " + r.getLength());
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
@@ -323,7 +372,51 @@ public class TSPRunner {
 		String path = tsp.writeRoute(r);
 		GnuPlotUtils.plot(path);
 		System.out.println("Route length: " + r.getLength());
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void eil76GA() throws IOException {
+		String filePath = Utils.getTestFile("/problems/eil76.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+						.add(new GeneticAlgorithm())
+		);
+
+		String path = tsp.writeRoute(r);
+		GnuPlotUtils.plot(path);
+		System.out.println("Route length: " + r.getLength());
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void u1060GA() throws IOException {
+		String filePath = Utils.getTestFile("/problems/u1060.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+						.add(new GeneticAlgorithm())
+		);
+
+		String path = tsp.writeRoute(r);
+		GnuPlotUtils.plot(path);
+		System.out.println("Route length: " + r.getLength());
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
@@ -366,7 +459,7 @@ public class TSPRunner {
 		TSP tsp = new TSP();
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new RandomNearestNeighbour(data))
+						.startWith(new NearestNeighbour(data))
 						.add(new TwoOpt(data))
 						.add(new SimulatedAnnealing())
 		);
@@ -440,9 +533,60 @@ public class TSPRunner {
 				GnuPlotUtils.getPlotCommand(path)
 		);
 
-		Utils.computePerformance(r, data);
+		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
+
+	@Test
+	public void u1060_NN() throws IOException {
+		String filePath = Utils.getTestFile("/problems/u1060.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+		);
+
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void u1060_NN_SA() throws IOException {
+		String filePath = Utils.getTestFile("/problems/u1060.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing())
+		);
+
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
 
 	@Test
 	public void d198() throws IOException {
