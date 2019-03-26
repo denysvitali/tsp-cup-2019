@@ -20,6 +20,10 @@ import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -71,18 +75,40 @@ public class SeedFinder {
 	}
 
 	@Test
-	public void ch130SA() throws IOException {
+	public void ch130SA(int seed) throws IOException {
 		TSPData data = loadProblem("ch130");
 
+		File f = new File("/tmp/tsp-130-sa.json");
+
 		OutputStreamWriter ob = new OutputStreamWriter(
-				new BufferedOutputStream(System.out));
+				new BufferedOutputStream(new FileOutputStream(f, true)));
 		runProblem(data,
-				ob,
-				(new CompositeRoutingAlgorithm())
-				.startWith(new RandomNearestNeighbour(data))
-				.add(new TwoOpt(data))
-				.add(new SimulatedAnnealing())
-);
+					ob,
+					(new CompositeRoutingAlgorithm())
+					.startWith(new RandomNearestNeighbour(seed, data))
+					.add(new TwoOpt(data))
+					.add(new SimulatedAnnealing(seed))
+		);
+		ob.flush();
+	}
+
+	@Test
+	public void ch130SA_SF() throws IOException, InterruptedException {
+		ExecutorService exec =
+				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+		for(int i=0; i<10000; i++) {
+			int finalI = i;
+			exec.submit(() -> {
+				try {
+					ch130SA(finalI);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+		}
+
+		exec.awaitTermination(10, TimeUnit.HOURS);
 	}
 
 
