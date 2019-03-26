@@ -21,7 +21,7 @@ import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TSPRunner {
+public class TSPRunnerTest {
 
 	@Test
 	public void ch130() throws IOException {
