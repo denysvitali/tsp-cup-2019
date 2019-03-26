@@ -2,6 +2,7 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
+import it.denv.supsi.i3b.advalg.algorithms.NotImplementedException;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IntermediateRoutingAlgorithm;
 
@@ -59,5 +60,10 @@ public class GeneticAlgorithm implements IntermediateRoutingAlgorithm {
 		System.out.println("Final Path: " + arrayOutput);
 
 		return new Route(finalPath, data);
+	}
+
+	@Override
+	public int getSeed() {
+		throw new NotImplementedException();
 	}
 }

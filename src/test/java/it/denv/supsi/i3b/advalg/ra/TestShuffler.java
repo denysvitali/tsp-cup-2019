@@ -10,8 +10,10 @@ import java.util.Random;
 
 public class TestShuffler extends RoutingAlgorithm {
 	private Random rand;
+	private int seed;
 
 	public TestShuffler(int seed){
+		this.seed = seed;
 		this.rand = new Random(seed);
 	}
 
@@ -23,7 +25,7 @@ public class TestShuffler extends RoutingAlgorithm {
 			path.add(i);
 		}
 
-		Collections.shuffle(path, new Random(5));
+		Collections.shuffle(path, this.rand);
 		path.add(path.get(0));
 
 		int[] newPath = path.stream().mapToInt(Integer::intValue).toArray();
@@ -32,5 +34,10 @@ public class TestShuffler extends RoutingAlgorithm {
 
 		Route r = new Route(newPath, data);
 		return r;
+	}
+
+	@Override
+	public int getSeed() {
+		return seed;
 	}
 }

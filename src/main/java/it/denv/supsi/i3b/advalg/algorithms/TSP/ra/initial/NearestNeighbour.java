@@ -65,6 +65,11 @@ public class NearestNeighbour extends RoutingAlgorithm {
 		return r;
 	}
 
+	@Override
+	public int getSeed() {
+		return 0;
+	}
+
 	private boolean visited(int a) {
 		if (tour.size() == 0) {
 			return false;

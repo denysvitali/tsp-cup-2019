@@ -20,6 +20,11 @@ public class TwoOpt implements IntermediateRoutingAlgorithm  {
 		return improve(route);
 	}
 
+	@Override
+	public int getSeed() {
+		return 0;
+	}
+
 	public void setData(TSPData data){
 		this.data = data;
 	}

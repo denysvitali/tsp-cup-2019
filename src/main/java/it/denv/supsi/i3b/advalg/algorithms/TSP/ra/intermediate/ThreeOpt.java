@@ -32,6 +32,11 @@ public class ThreeOpt implements IntermediateRoutingAlgorithm  {
 		return improve(route);
 	}
 
+	@Override
+	public int getSeed() {
+		return 0;
+	}
+
 	public ThreeOpt addCandidator(Candidator<Integer> c){
 		candidators.add(c);
 		return this;

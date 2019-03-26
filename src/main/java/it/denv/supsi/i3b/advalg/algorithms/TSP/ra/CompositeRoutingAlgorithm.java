@@ -33,9 +33,22 @@ public class CompositeRoutingAlgorithm extends RoutingAlgorithm {
 		return r;
 	}
 
+	@Override
+	public int getSeed() {
+		return 0;
+	}
+
 	public CompositeRoutingAlgorithm startWith(RoutingAlgorithm ra){
 		this.sa = ra;
 		return this;
+	}
+
+	public RoutingAlgorithm getSa() {
+		return sa;
+	}
+
+	public ArrayList<IntermediateRoutingAlgorithm> getIas() {
+		return ias;
 	}
 
 	public CompositeRoutingAlgorithm add(IntermediateRoutingAlgorithm ia){

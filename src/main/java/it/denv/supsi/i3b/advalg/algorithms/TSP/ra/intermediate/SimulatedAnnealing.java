@@ -8,6 +8,8 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.neighbour.RandomSwap;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
+import java.util.Random;
+
 
 public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 
@@ -15,12 +17,17 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 	private NeighbourAlgorithm na = new RandomSwap(5);
 	private static final double START_TEMPERATURE = 100.0;
 	private int seed = -1;
+	private Random random;
 
 	public SimulatedAnnealing(int seed){
 		this.seed = seed;
+		this.random = new Random(seed);
 	}
 
 	public SimulatedAnnealing(){
+		this.seed = (int) (Math.random() * 10000);
+		this.random = new Random(this.seed);
+		System.out.println(this.getClass().getName() + " - Seed: " + seed);
 	}
 
 	/*
@@ -59,15 +66,15 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 				int j_1 = 0;
 
 				do {
-					i_1 = (int) (Math.random() * data.getDimension());
+					i_1 = (int) (random.nextDouble() * data.getDimension());
 				}
 				while(i_1 == 0 || i_1 == data.getDimension());
 
 
 				do {
-					j_1 = (int) (Math.random() * data.getDimension());
+					j_1 = (int) (random.nextDouble() * data.getDimension());
 				}
-				while(j_1 == 0 || j_1 == data.getDimension());
+				while(j_1 == 0 || j_1 == i_1 || j_1 == data.getDimension());
 
 				SwappablePath sp = new SwappablePath(current.getPath())
 						.twoOptSwap(i_1, j_1);
@@ -79,7 +86,7 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 
 
 				double delta = candidateLength - current.getLength();
-				double x = Math.random();
+				double x = random.nextDouble();
 
 				if(candidateLength < current.getLength()){
 					current = new Route(improvedSP, data);
@@ -97,14 +104,25 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 			System.out.println("Spent " + (now - start) + "ms");
 			System.out.println("Current Length: " + current + " / " + data.getBestKnown());
 
+			if(best.getLength() == data.getBestKnown()){
+				break;
+			}
+
 			RouteUtils.computePerformance(current, data);
 
 			temperature = START_TEMPERATURE * (1 - (now-start)/max_runtime);
 			System.out.println("Temperature is " + temperature);
 		}
 
+		System.out.println(seed);
+
 
 		return best;
 
+	}
+
+	@Override
+	public int getSeed() {
+		return seed;
 	}
 }

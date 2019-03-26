@@ -7,6 +7,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.ra.TestShuffler;
+import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ class TwoOptTest {
 		assertFalse(r2.getLength() < data.getBestKnown());
 
 
-		Utils.computePerformance(r2, data);
+		RouteUtils.computePerformance(r2, data);
 
 	}
 }

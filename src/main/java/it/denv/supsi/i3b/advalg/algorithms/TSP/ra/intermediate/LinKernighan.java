@@ -9,4 +9,9 @@ public class LinKernighan implements IntermediateRoutingAlgorithm {
 	public Route route(Route route, TSPData data) {
 		return null;
 	}
+
+	@Override
+	public int getSeed() {
+		return 0;
+	}
 }

@@ -100,4 +100,9 @@ public class AntColonyOptimization extends RoutingAlgorithm {
 
 		return bestRoute;
 	}
+
+	@Override
+	public int getSeed() {
+		return 0;
+	}
 }
