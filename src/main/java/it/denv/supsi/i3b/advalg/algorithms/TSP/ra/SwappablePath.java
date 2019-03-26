@@ -41,6 +41,63 @@ public class SwappablePath {
 		return new SwappablePath(np);
 	}
 
+	public SwappablePath[] threeOptSwap(int i, int j, int k){
+		assert(i+1 != j);
+		assert(j+1 != k);
+		assert(k+1 != i);
+
+		assert(i < j);
+		assert(j < k);
+
+		// First Move
+
+		// i - (i+1) becomes i - (j+1)
+		// j - (j+1) becomes j - (k+1)
+		// k - (k+1) becomes k - (i+1)
+
+		int[] first = new int[this.path.length];
+
+		for(int a=0; a<=i; a++){
+			first[a] = path[a];
+		}
+
+		for(int a=i+1; a<=j; a++){
+			first[a] = path[a - i + j];
+		}
+
+		for(int a=j+1; a<=k; a++){
+			first[a] = path[a - j + i];
+		}
+
+		for(int a=k+1; a<this.path.length; a++){
+			first[a] = path[a];
+		}
+
+		int[] second = new int[this.path.length];
+
+		for(int a = 0; a<=i; a++){
+			second[a] = this.path[a];
+		}
+
+		for(int a = i+1; a<=j; a++){
+			second[a] = this.path[j - a + 1];
+		}
+
+		for(int a=j+1; a<=k; a++){
+			second[a] = this.path[k+1 - a + j];
+		}
+
+		for(int a=k+1; a<this.path.length; a++){
+			second[a] = this.path[a];
+		}
+
+		return new SwappablePath[]{
+			new SwappablePath(first),
+			new SwappablePath(second),
+		};
+
+	}
+
 	public LinkedList<Integer> getPath(){
 		LinkedList<Integer> ll = new LinkedList<>();
 		for (int value : path) {
