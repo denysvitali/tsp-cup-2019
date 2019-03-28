@@ -15,6 +15,8 @@ public class Route {
 	private TSPData data;
 	private int length = -1;
 
+	int[][] incidenceMat = null;
+
 	public Route(int[] path, TSPData data){
 		this.path = path;
 		this.data = data;
@@ -85,5 +87,22 @@ public class Route {
 
 		return path[0] == path[path.length-1];
 
+	}
+
+	private void genMatrix(){
+		// Generate incidence matrix
+		for(int i=1; i<path.length; i++){
+			incidenceMat[i-1][i] = 1;
+			incidenceMat[i][i-1] = 1;
+		}
+	}
+
+	public boolean hasArc(int i, int j) {
+		// GenMatrix
+		if(incidenceMat == null){
+			genMatrix();
+		}
+
+		return incidenceMat[i][j] == 1;
 	}
 }

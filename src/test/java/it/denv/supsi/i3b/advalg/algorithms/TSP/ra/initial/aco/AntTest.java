@@ -1,6 +1,7 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco;
 
 import it.denv.supsi.i3b.advalg.Utils;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.TSP;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ class AntTest {
 		TSPLoader tspLoader = new TSPLoader(
 				Utils.getTestFile("/problems/eil76.tsp"));
 		TSPData data = tspLoader.load();
-		Ant a = new Ant(new AntColony(1, data));
+		Ant a = new Ant(new AntColony(AcoType.ACS , 1, data));
 		assertEquals(0, a.getTabuList().size());
 
 		a.visit(1);
@@ -25,35 +26,19 @@ class AntTest {
 	}
 
 	@Test
-	void hasArc() throws IOException {
+	void step() throws IOException {
 		TSPLoader tspLoader = new TSPLoader(
 				Utils.getTestFile("/problems/eil76.tsp"));
 		TSPData data = tspLoader.load();
-		Ant a = new Ant(new AntColony(1, data));
+		TSP tsp = new TSP();
+		tsp.init(data);
+		Ant a = new Ant(new AntColony(AcoType.ACS , 0, 1, data));
+		assertEquals(1, a.visitedCities.size());
+		assertEquals(24, a.getTabuList().get(0));
 
-		assertFalse(a.hasArc(1,2));
-
-		a.visit(1);
-		a.visit(2);
-
-		assertTrue(a.hasArc(1,2));
-	}
-
-	@Test
-	void getProbabilisticRandom() {
-	}
-
-	@Test
-	void doStep() throws IOException {
-		TSPLoader tspLoader = new TSPLoader(
-				Utils.getTestFile("/problems/eil76.tsp"));
-		TSPData data = tspLoader.load();
-		Ant a = new Ant(new AntColony(1, data));
-
-		assertFalse(a.hasArc(1,2));
-
-		a.visit(1);
-		a.doStep();
+		a.step();
+		assertEquals(2, a.getTabuList().size());
+		assertEquals(12, a.getTabuList().get(1));
 	}
 
 	@Test

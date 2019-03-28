@@ -11,12 +11,25 @@ import java.util.stream.Collectors;
 public class Population {
 	private int size;
 	private int generation = 0;
-	private double mutation_prob = 0.88;
-	private double crossover_prob = 0.99;
-	private double fittest_perc = 0.12;
-	private int[] initial_genes;
 
-	private int parents = 20;
+	/*
+	private int individuals = 100; // Magic Value by Gambardella
+	private double crossover_prob = 0.99; // 1.0 is best, according to Gambardella
+	private double generation_gap = 1.0; // Number of children to keep
+	private double mutation_prob = 5.0/1000;
+	private int elitism = 1; // Number of best indivduals to keep
+
+	*/
+
+	// Genetic Varied
+	private int individuals = 100; // Magic Value by Gambardella
+	private double crossover_prob = 0.50; // 1.0 is best, according to Gambardella
+	private double generation_gap = 0.80; // Number of children to keep vs parent
+	private double mutation_prob = 5.0/1000;
+	private int elitism = 1; // Number of best indivduals to keep, most imporant
+
+
+	private int[] initial_genes;
 
 	private int pop_size;
 	private Individual best;
@@ -59,12 +72,9 @@ public class Population {
 		this.generation = pop.generation + 1;
 		this.data = pop.data;
 		this.best = pop.best;
+		this.pop_size = pop.pop_size;
 
-		int bestSize = (int) (pop.size * fittest_perc);
-
-		if(bestSize < 1){
-			bestSize = 1;
-		}
+		int bestSize = individuals - elitism;
 
 		ArrayList<Individual> parentsCandidates = new ArrayList<>();
 
@@ -137,13 +147,23 @@ public class Population {
 
 
 		ArrayList<Individual> mutationCandidates = new ArrayList<>();
-		mutationCandidates.addAll(crossOverIndividuals);
-		mutationCandidates.addAll(parentsCandidates);
+		mutationCandidates.addAll(
+				crossOverIndividuals
+						.stream()
+						.limit((long) (pop_size * generation_gap))
+						.collect(Collectors.toCollection(ArrayList::new))
+		);
+
+		mutationCandidates.addAll(
+				parentsCandidates
+						.stream()
+						.limit((long) (pop_size * (1-generation_gap)))
+						.collect(Collectors.toCollection(ArrayList::new))
+		);
 
 		// Mutation
 
 		for (Individual mutationCandidate : mutationCandidates) {
-
 			double rand = Math.random();
 			if (rand < mutation_prob) {
 				int[] genes = mutationCandidate.getGenes();
@@ -170,10 +190,7 @@ public class Population {
 		// Add new children
 		population.addAll(mutatedIndividuals);
 		population.addAll(unmutatedIndividuals);
-
-		// Add parents that didn't cross over
-		population.addAll(crossOverItems);
-		population.addAll(nonCrossOverItems);
+		population.addAll(getFittest(elitism));
 
 		this.initial_genes = pop.initial_genes;
 		this.pop_size = pop.pop_size;

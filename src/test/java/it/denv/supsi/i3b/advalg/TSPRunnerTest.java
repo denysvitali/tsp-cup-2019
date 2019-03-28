@@ -7,7 +7,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPSolution;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.candidators.NNCandidator;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AntColonyOptimization;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.ThreeOpt;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.GeneticAlgorithm;
@@ -362,10 +362,11 @@ public class TSPRunnerTest {
 		TSPData data = loader.load();
 
 		TSP tsp = new TSP();
+		tsp.init(data);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(
-								new AntColonyOptimization(3, data)
+								new AntColonySystem(3, data)
 										.setSolutionImprover(null))
 		);
 
@@ -420,6 +421,28 @@ public class TSPRunnerTest {
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
+	@Test
+	public void u1060SA() throws IOException {
+		String filePath = Utils.getTestFile("/problems/u1060.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+						.add(new SimulatedAnnealing().setMode(SimulatedAnnealing.Mode.TwoOpt))
+		);
+
+		String path = tsp.writeRoute(r);
+		GnuPlotUtils.plot(path);
+		System.out.println("Route length: " + r.getLength());
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
 
 	@Test
 	public void ch130SimulatedAnnealing() throws IOException {
@@ -435,6 +458,34 @@ public class TSPRunnerTest {
 						.startWith(new RandomNearestNeighbour(data))
 						.add(new TwoOpt(data))
 						.add(new SimulatedAnnealing())
+		);
+
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+
+		System.out.println("Route length: " + r.getLength());
+
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void ch130SimulatedAnnealing3Opt() throws IOException {
+		String filePath = Utils.getTestFile("/problems/ch130.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing()
+								.setMode(SimulatedAnnealing.Mode.ThreeOpt))
 		);
 
 		String path = tsp.writeRoute(r);

@@ -2,16 +2,17 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IntermediateRoutingAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IRA;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.NeighbourAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.neighbour.RandomSwap;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
+import java.util.Arrays;
 import java.util.Random;
 
 
-public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
+public class SimulatedAnnealing implements IRA {
 
 	private static final int r = 100;
 	private NeighbourAlgorithm na = new RandomSwap(5);
@@ -19,15 +20,30 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 	private int seed = -1;
 	private Random random;
 
-	public SimulatedAnnealing(int seed){
+	public enum Mode {
+		TwoOpt, ThreeOpt
+	}
+
+	private Mode mode = Mode.TwoOpt;
+
+	public SimulatedAnnealing(int seed) {
 		this.seed = seed;
 		this.random = new Random(seed);
 	}
 
-	public SimulatedAnnealing(){
+	public SimulatedAnnealing() {
 		this.seed = (int) (Math.random() * 10000);
 		this.random = new Random(this.seed);
 		System.out.println(this.getClass().getName() + " - Seed: " + seed);
+	}
+
+	public SimulatedAnnealing setMode(Mode mode) {
+		this.mode = mode;
+		return this;
+	}
+
+	public Mode getMode() {
+		return mode;
 	}
 
 	/*
@@ -53,34 +69,75 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 		Route best = route;
 		Route current = route;
 
-		TwoOpt twoOpt = new TwoOpt(data);
+		TwoOpt twoOpt = null;
+		ThreeOpt threeOpt = null;
+
+		twoOpt = new TwoOpt(data);
+
+		if (mode == Mode.ThreeOpt) {
+			threeOpt = new ThreeOpt(data);
+		}
 
 		double start = System.currentTimeMillis();
 		double max_runtime = 1000 * 60 * 2;
 
-		while(temperature > 0.001){
-			for(int i=0; i<r; i++){
+		while (temperature > 0.001) {
+			for (int i = 0; i < r; i++) {
 				// 1. n = neighbour(current)
 
-				int i_1 = 0;
-				int j_1 = 0;
+				SwappablePath sp;
+				int[] improvedSP = null;
 
-				do {
-					i_1 = (int) (random.nextDouble() * data.getDimension());
+				switch (mode) {
+					case TwoOpt:
+						int i_1 = 0;
+						int j_1 = 0;
+
+						do {
+							i_1 = (int) (random.nextDouble() * data.getDimension());
+						}
+						while (i_1 == 0 || i_1 == data.getDimension());
+
+
+						do {
+							j_1 = (int) (random.nextDouble() * data.getDimension());
+						}
+						while (j_1 == 0 || j_1 == i_1 || j_1 == data.getDimension());
+
+						sp = new SwappablePath(current.getPath())
+								.twoOptSwap(i_1, j_1);
+						// 2. candidators = local_opt(n)
+
+						assert twoOpt != null;
+						improvedSP = twoOpt.improveSP(sp);
+						break;
+
+					case ThreeOpt:
+						int[] numbers = new int[3];
+
+						do {
+							for (int a = 0; a < numbers.length; a++) {
+								numbers[a] = (int) (random.nextDouble() * data.getDimension());
+							}
+							Arrays.sort(numbers);
+						} while (
+								numbers[0] == 0
+										|| numbers[2] >= data.getDimension()
+								|| numbers[0] + 1 == numbers[1]
+								|| numbers[1] + 1 == numbers[2]);
+
+						System.out.println(Arrays.toString(numbers));
+
+						sp = new SwappablePath(current.getPath())
+								.threeOptSwap(numbers[0],
+										numbers[1], numbers[2])[random.nextInt(2)];
+						improvedSP = twoOpt.improveSP(sp);
+
+						break;
 				}
-				while(i_1 == 0 || i_1 == data.getDimension());
 
+				assert(improvedSP != null);
 
-				do {
-					j_1 = (int) (random.nextDouble() * data.getDimension());
-				}
-				while(j_1 == 0 || j_1 == i_1 || j_1 == data.getDimension());
-
-				SwappablePath sp = new SwappablePath(current.getPath())
-						.twoOptSwap(i_1, j_1);
-				// 2. candidators = local_opt(n)
-
-				int[] improvedSP = twoOpt.improveSP(sp);
 				int candidateLength = new SwappablePath(improvedSP)
 						.calulateDistance(data);
 
@@ -88,13 +145,13 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 				double delta = candidateLength - current.getLength();
 				double x = random.nextDouble();
 
-				if(candidateLength < current.getLength()){
+				if (candidateLength < current.getLength()) {
 					current = new Route(improvedSP, data);
 
-					if(current.getLength() < best.getLength()){
+					if (current.getLength() < best.getLength()) {
 						best = current;
 					}
-				} else if(delta < 0 || x < Math.exp(-delta / temperature)){
+				} else if (delta < 0 || x < Math.exp(-delta / temperature)) {
 					current = new Route(improvedSP, data);
 				}
 			}
@@ -104,13 +161,13 @@ public class SimulatedAnnealing implements IntermediateRoutingAlgorithm {
 			System.out.println("Spent " + (now - start) + "ms");
 			System.out.println("Current Length: " + current + " / " + data.getBestKnown());
 
-			if(best.getLength() == data.getBestKnown()){
+			if (best.getLength() == data.getBestKnown()) {
 				break;
 			}
 
 			RouteUtils.computePerformance(current, data);
 
-			temperature = START_TEMPERATURE * (1 - (now-start)/max_runtime);
+			temperature = START_TEMPERATURE * (1 - (now - start) / max_runtime);
 			System.out.println("Temperature is " + temperature);
 		}
 

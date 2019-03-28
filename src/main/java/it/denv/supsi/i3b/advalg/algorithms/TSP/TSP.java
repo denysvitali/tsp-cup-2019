@@ -20,37 +20,7 @@ public class TSP {
 	}
 
 	public Route run(TSPData data, RoutingAlgorithm ra){
-		int[][] distances = calculateDistances(data);
-		data.setDistances(distances);
-
-		// Calculate HM<Integer, TS>
-		HashMap<Integer, TreeSet<Edge<Integer>>> nearest = new HashMap<>();
-		ArrayList<Edge<Integer>> edges = new ArrayList<>();
-
-		long s1 = System.currentTimeMillis();
-
-		for(int i=0; i<distances.length; i++){
-			TreeSet<Edge<Integer>> ts = new TreeSet<>();
-			for(int j=0; j<distances.length; j++){
-				if(i == j){
-					continue;
-				}
-				Edge e = new Edge(i, j, distances[i][j]);
-				ts.add(e);
-				edges.add(e);
-			}
-			nearest.put(i, ts);
-		}
-
-		long s2 = System.currentTimeMillis();
-
-		System.out.println("Computed HM<I, TS<Edge>> in " + (s2-s1) + " ms");
-
-		data.setNearest(nearest);
-		data.setEdges(edges);
-		//printDistanceMatrix(data.getCoordinates().size(), distances);
-
-		data.setStartNode(1);
+		init(data);
 		return ra.route(data.getStartNode(), data);
 	}
 
@@ -102,5 +72,46 @@ public class TSP {
 			}
 			System.out.println(" ");
 		}
+	}
+
+	public void init(TSPData data) {
+
+		if(data.getInit()){
+			return;
+		}
+
+
+		int[][] distances = calculateDistances(data);
+		data.setDistances(distances);
+
+		// Calculate HM<Integer, TS>
+		HashMap<Integer, TreeSet<Edge<Integer>>> nearest = new HashMap<>();
+		ArrayList<Edge<Integer>> edges = new ArrayList<>();
+
+		long s1 = System.currentTimeMillis();
+
+		for(int i=0; i<distances.length; i++){
+			TreeSet<Edge<Integer>> ts = new TreeSet<>();
+			for(int j=0; j<distances.length; j++){
+				if(i == j){
+					continue;
+				}
+				Edge e = new Edge(i, j, distances[i][j]);
+				ts.add(e);
+				edges.add(e);
+			}
+			nearest.put(i, ts);
+		}
+
+		long s2 = System.currentTimeMillis();
+
+		System.out.println("Computed HM<I, TS<Edge>> in " + (s2-s1) + " ms");
+
+		data.setNearest(nearest);
+		data.setEdges(edges);
+		//printDistanceMatrix(data.getCoordinates().size(), distances);
+
+		data.setStartNode(1);
+		data.setInit(true);
 	}
 }

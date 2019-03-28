@@ -2,197 +2,167 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Random;
 
 public class AntColony {
-	private ArrayList<Ant> ants = new ArrayList<>();
-	private TSPData data;
+	protected AcoType type;
+	public Random random;
+	private int nr_ants = 0;
+	protected TSPData data;
+	private int seed;
 
-	private double[][] pheromoneValues;
-	private double[][] initialPheromoneValues;
+	private int cnn = -1;
 
-	private HashMap<Integer, double[][]> deltaT = new HashMap<>();
-	private HashMap<Integer, double[][]> T = new HashMap<>();
-
-
-	// Decay Parameter:
-	public final double ALPHA = 0.3; // 0 < a < 1
-	// Relative importance of pheromone vs. distance
-	public final double BETA = 0.3; // Must be >0
-	// Probability of a biased exploration
-	public final double Q0 = 0.3; // 0 < Q0 < 1
-
-	// Local Trail Decay
-	public final double PL = 0.1;
-	public final double PHI = 0.2;
-
-	public final double Q = 1.0;
-
-
-	/*
-		Gamma = 1 is a parameter introduced in Botee and Bonabeau's study:
-		refer to "Evolving Ant Colony Optimization" (page 152).
-
-		Used for \Delta T_{i,j}(t):
-			\frac{Q}{(L_+)^\gamma}\quad \text{if } (i, j} \in T_+,\\
-			0 \quad \text{otherwise.}
-	 */
-	public final double GAMMA = 1.0;
-
-	// Global Trail Decay
-	private final double RHO_G = 0.2; // 0 <= RHO_G <= 1
-
-	private double iPV = 1000.0;
+	private Ant[] ants;
+	private ArrayList<double[][]> pheromone = new ArrayList<>();
 	private int time = 0;
+	private double p0 = -1;
 
-	public AntColony(int nrAnts, TSPData data){
-		assert(BETA > 0);
+	private Route bestRoute = null;
 
+	public AntColony(AcoType type, int ants, TSPData data){
+		this.type = type;
+		initAC((int) (Math.random() * 1000), ants, data);
+	}
+
+	public AntColony(AcoType type, int seed, int ants, TSPData data){
+		this.type = type;
+		initAC(seed, ants, data);
+	}
+
+	private void initAC(int seed, int ants, TSPData data){
+		this.nr_ants = ants;
 		this.data = data;
+		this.ants = new Ant[this.nr_ants];
+		this.random = new Random(seed);
+		this.seed = seed;
 
-		for(int i=0; i<nrAnts; i++){
-			this.ants.add(new Ant(this));
-		}
+		this.cnn = new NearestNeighbour(data)
+				.route(1, data)
+				.getLength();
+		this.p0 = (nr_ants * 1.0) / cnn;
 
-		//iPV = iPV / data.getBestKnown();
-
-		pheromoneValues = new double[data.getDimension()][data.getDimension()];
-		initialPheromoneValues = new double[data.getDimension()][data.getDimension()];
+		double[][] iPV = new double[data.getDimension()][data.getDimension()];
 
 		for(int i=0; i<data.getDimension(); i++){
-			for(int j=0; j<i; j++){
-				initialPheromoneValues[i][j] = iPV;
-				pheromoneValues[i][j] = iPV;
+			iPV[i][i] = Double.MAX_VALUE;
 
-				initialPheromoneValues[j][i] = iPV;
-				pheromoneValues[j][i] = iPV;
+			for(int j=i; j<data.getDimension(); j++){
+				iPV[i][j] = this.p0;
+				iPV[j][i] = this.p0;
 			}
 		}
 
-		T.put(0, pheromoneValues);
-	}
+		this.pheromone.add(iPV);
 
-	public int getTime() {
-		return time;
-	}
-
-	public double getiPV() {
-		return iPV;
-	}
-
-	public double getPheromone(int i, int j){
-		return pheromoneValues[i][j];
-	}
-
-	public int sizeNodes(){
-		return data.getDimension();
-	}
-
-	public int getTarget(){
-		return data.getStartNode();
-	}
-
-	public double getBeta() {
-		return BETA;
-	}
-
-	public void updatePheronome(){
-		for(int i=0; i<sizeNodes(); i++){
-			for(int j=0; j<i; j++) {
-				double sumDeltaTk = 0.0;
-
-				for (Ant ant : ants) {
-					if (ant.hasArc(i, j)) {
-						sumDeltaTk += 1 / ant.pathLength();
-					}
-				}
-
-				pheromoneValues[i][j] =
-						(1 - ALPHA) * pheromoneValues[i][j] +
-								sumDeltaTk;
-
-				pheromoneValues[j][i] = pheromoneValues[i][j];
-			}
+		for(int i=0; i<nr_ants; i++){
+			this.ants[i] = new Ant(this);
 		}
 	}
 
-	public double getN(int i, int k) {
-		// n = 1/d, where d = distance
-		return 1.0 / data.getDistances()[i][k];
+	public double[][] getPheromone(int time) {
+		return pheromone.get(time);
 	}
 
-	public double[][] getPheromoneValues() {
-		return pheromoneValues;
-	}
-
-	public int[][] getDistances() {
-		return data.getDistances();
-	}
-
-	public double getAlpha() {
-		return ALPHA;
-	}
-
-	public double getInitialPheromoneValue(int i, int j) {
-		return initialPheromoneValues[i][j];
-	}
-
-	public double getQ0() {
-		return Q0;
-	}
-
-	public List<Ant> getAnts() {
-		return ants;
-	}
-
-	public int getStartNode() {
-		return data.getStartNode();
-	}
-
-	public void setPheromone(int i, int j, double v) {
-		pheromoneValues[i][j] = v;
-	}
-
-	public void globalUpdate(Route route) {
-		int[] p = route.getPath();
-
-		for(int i = 0; i<p.length-1; i++){
-			double[][] deltaTij = getDeltaT(getTime());
-			double[][] T = getT(getTime() + 1);
-
-			int i_e = p[i];
-			int j_e = p[i+1];
-
-			T[i_e][j_e] =
-					(1-PHI) * T[i_e][j_e]
-					+ RHO_G * deltaTij[i_e][j_e];
-		}
-	}
-
-	public double[][] getT(int time) {
-		if(!T.containsKey(time)){
-			T.put(time, new double[sizeNodes()][sizeNodes()]);
-		}
-
-		return T.get(time);
-	}
-
-	public TSPData getData() {
-		return data;
-	}
-
-	public double[][] getDeltaT(int time) {
-		if(!deltaT.containsKey(time)){
-			deltaT.put(time, new double[sizeNodes()][sizeNodes()]);
-		}
-
-		return deltaT.get(time);
-	}
-
-	public void doTime() {
+	public void timeTick(){
 		this.time++;
+		pheromone.add(time, new double[data.getDimension()][data.getDimension()]);
+		System.arraycopy(pheromone.get(time - 1),
+				0,
+				pheromone.get(time),
+				0,
+				data.getDimension()
+		);
+	}
+
+	public Route run() {
+		int runs = 0;
+
+		while(runs < 1){
+
+			boolean runEnd = false;
+			for(int i=0; i<this.nr_ants; i++){
+				this.ants[i].step();
+				if(this.ants[i].getStatus() == AntStatus.STOPPED){
+					runEnd = true;
+				}
+			}
+			this.timeTick();
+
+			if(runEnd) {
+				this.globalPheromoneUpdate();
+				// Reset ants
+				for(Ant ant : ants){
+					ant.reset();
+				}
+				runs++;
+			}
+		}
+
+		return null;
+	}
+
+	protected double heurN(int i, int j){
+		return 1.0 / data.getDistances()[i][j];
+	}
+
+	private void globalPheromoneUpdate() {
+		// Performed after all ants have completed their tours
+
+		// Global Updating rule (4)
+		timeTick();
+		double[][] pv = getPheromone(time);
+		for(int i=0; i<data.getDimension(); i++){
+			for(int j=0; j<data.getDimension(); j++){
+
+				switch(type){
+					case ACS:
+						/*
+							In ACS only the globally best ant (i.e., the ant
+							which constructed the shortest tour from the
+							beginning of the trial) is allowed to
+							deposit pheromone.
+						 */
+
+						double deltaT = 0.0;
+
+						if(bestRoute.hasArc(i, j)){
+							deltaT = Math.pow(bestRoute.getLength(), -1);
+						}
+
+						pv[i][j] = (1-AntColonySystem.PD) * pv[i][j] +
+								AntColonySystem.PD * deltaT;
+						break;
+				}
+			}
+		}
+	}
+
+	private void localUpdate(int r, int s){
+		/*
+			While building a solution (i.e., a tour) of the TSP, ants visit
+			edges and change their pheromone level by applying the local
+			updating rule of (5)
+		 */
+		double[][] pv = getPheromone(time);
+		switch(type) {
+			case ACS:
+				pv[r][s] *= (1-AntColonySystem.PE);
+				pv[r][s] += AntColonySystem.PE * p0;
+				pv[r][s] = pv[r][s];
+				break;
+		}
+	}
+
+	public int getSeed() {
+		return seed;
+	}
+
+	public double getCurrentP(int i, int j) {
+		return getPheromone(time)[i][j];
 	}
 }

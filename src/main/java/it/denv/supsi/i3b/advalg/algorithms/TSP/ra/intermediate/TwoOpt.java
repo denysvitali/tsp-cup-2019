@@ -2,10 +2,10 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IntermediateRoutingAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IRA;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 
-public class TwoOpt implements IntermediateRoutingAlgorithm  {
+public class TwoOpt implements IRA {
 
 	private TSPData data = null;
 

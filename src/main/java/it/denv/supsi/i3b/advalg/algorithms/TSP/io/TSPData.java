@@ -20,6 +20,7 @@ public class TSPData {
 	protected HashMap<Integer, Coordinate> coordinates = new HashMap<>();
 	protected HashMap<Integer, TreeSet<Edge<Integer>>> nearest = new HashMap<>();
 	protected ArrayList<Edge<Integer>> edges = new ArrayList<>();
+	private boolean init = false;
 
 
 	protected int[][] distances;
@@ -87,5 +88,13 @@ public class TSPData {
 
 	public void setEdges(ArrayList<Edge<Integer>> edges) {
 		this.edges = edges;
+	}
+
+	public void setInit(boolean init) {
+		this.init = init;
+	}
+
+	public boolean getInit() {
+		return this.init;
 	}
 }

@@ -3,32 +3,27 @@ package it.denv.supsi.i3b.advalg;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.TSP;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPSolution;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IntermediateRoutingAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IRA;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.candidators.NNCandidator;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AntColonyOptimization;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.ThreeOpt;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.GeneticAlgorithm;
-import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
-import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+
+
 public class SeedFinderTest {
+
+	private interface Thunk { void apply(int seed); };
 
 	private static TSPData loadProblem(String pName) throws IOException {
 		String filePath = Utils.getTestFile("/problems/" + pName + ".tsp");
@@ -36,6 +31,24 @@ public class SeedFinderTest {
 
 		TSPLoader loader = new TSPLoader(filePath);
 		return loader.load();
+	}
+
+	private static void runThreaded(Thunk f) {
+		ExecutorService exec =
+				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+		for(int i=0; i<10000; i++) {
+			int finalI = i;
+			exec.submit(() -> {
+				f.apply(finalI);
+			});
+		}
+
+		try {
+			exec.awaitTermination(10, TimeUnit.HOURS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static void runProblem(TSPData data, OutputStreamWriter os, CompositeRoutingAlgorithm alg) throws IOException {
@@ -50,7 +63,7 @@ public class SeedFinderTest {
 		);
 
 		printAlgorithm(os, alg.getSa());
-		for(IntermediateRoutingAlgorithm ira : alg.getIas()){
+		for(IRA ira : alg.getIas()){
 			os.write(",");
 			printAlgorithm(os, ira);
 		}
@@ -69,46 +82,65 @@ public class SeedFinderTest {
 				"\"seed\": " + sa.getSeed() + "}");
 	}
 
-	private static void printAlgorithm(OutputStreamWriter os, IntermediateRoutingAlgorithm ra) throws IOException {
+	private static void printAlgorithm(OutputStreamWriter os, IRA ra) throws IOException {
 		os.write("{\"name\": \"" + ra.getClass().getName() + "\"," +
 				"\"seed\": " + ra.getSeed() + "}");
 	}
 
 	@Test
-	public void ch130SA(int seed) throws IOException {
-		TSPData data = loadProblem("ch130");
+	public static void ch130SA(int seed) {
+		try {
+			TSPData data = loadProblem("ch130");
 
-		File f = new File("/tmp/tsp-130-sa.json");
+			File f = new File("/tmp/tsp-130-sa.json");
 
-		OutputStreamWriter ob = new OutputStreamWriter(
-				new BufferedOutputStream(new FileOutputStream(f, true)));
-		runProblem(data,
+			OutputStreamWriter ob = new OutputStreamWriter(
+					new BufferedOutputStream(new FileOutputStream(f, true)));
+			runProblem(data,
 					ob,
 					(new CompositeRoutingAlgorithm())
-					.startWith(new RandomNearestNeighbour(seed, data))
-					.add(new TwoOpt(data))
-					.add(new SimulatedAnnealing(seed))
-		);
-		ob.flush();
+							.startWith(new RandomNearestNeighbour(seed, data))
+							.add(new TwoOpt(data))
+							.add(new SimulatedAnnealing(seed)
+									.setMode(SimulatedAnnealing.Mode.TwoOpt))
+			);
+			ob.flush();
+		} catch(IOException ex){
+
+		}
 	}
 
 	@Test
-	public void ch130SA_SF() throws IOException, InterruptedException {
-		ExecutorService exec =
-				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	public static void ch130SA3O(int seed) {
+		try {
+			TSPData data = loadProblem("ch130");
 
-		for(int i=0; i<10000; i++) {
-			int finalI = i;
-			exec.submit(() -> {
-				try {
-					ch130SA(finalI);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			});
+			File f = new File("/tmp/tsp-130-sa-3o.json");
+
+			OutputStreamWriter ob = new OutputStreamWriter(
+					new BufferedOutputStream(new FileOutputStream(f, true)));
+			runProblem(data,
+					ob,
+					(new CompositeRoutingAlgorithm())
+							.startWith(new RandomNearestNeighbour(seed, data))
+							.add(new TwoOpt(data))
+							.add(new SimulatedAnnealing(seed)
+									.setMode(SimulatedAnnealing.Mode.ThreeOpt))
+			);
+			ob.flush();
+		} catch(IOException ex){
+
 		}
+	}
 
-		exec.awaitTermination(10, TimeUnit.HOURS);
+	@Test
+	public void ch130SA_SF() {
+		runThreaded(SeedFinderTest::ch130SA);
+	}
+
+	@Test
+	public void ch130SA3O_SF() {
+		runThreaded(SeedFinderTest::ch130SA3O);
 	}
 
 

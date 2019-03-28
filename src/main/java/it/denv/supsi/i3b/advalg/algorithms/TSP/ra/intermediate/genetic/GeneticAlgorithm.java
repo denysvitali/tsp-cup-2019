@@ -1,16 +1,14 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic;
 
 import it.denv.supsi.i3b.advalg.Route;
-import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.NotImplementedException;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IntermediateRoutingAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IRA;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.stream.Collectors;
 
-public class GeneticAlgorithm implements IntermediateRoutingAlgorithm {
+public class GeneticAlgorithm implements IRA {
 
 	private int genes_size = -1;
 	private int[] initial_genes;
