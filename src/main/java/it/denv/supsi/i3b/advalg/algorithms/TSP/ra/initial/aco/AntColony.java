@@ -4,8 +4,10 @@ import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
+import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Random;
 
 public class AntColony {
@@ -15,6 +17,8 @@ public class AntColony {
 	protected TSPData data;
 	private int seed;
 
+	public static boolean DEBUG = false;
+
 	private int cnn = -1;
 
 	private Ant[] ants;
@@ -23,6 +27,9 @@ public class AntColony {
 	private double p0 = -1;
 
 	private Route bestRoute = null;
+	private Route localBest = null;
+
+	private double my_epsilon = -1;
 
 	public AntColony(AcoType type, int ants, TSPData data){
 		this.type = type;
@@ -46,6 +53,12 @@ public class AntColony {
 				.getLength();
 		this.p0 = (nr_ants * 1.0) / cnn;
 
+		switch (type){
+			case ACS:
+				my_epsilon = 1.0 / (this.data.getDimension() * this.cnn);
+				break;
+		}
+
 		double[][] iPV = new double[data.getDimension()][data.getDimension()];
 
 		for(int i=0; i<data.getDimension(); i++){
@@ -61,6 +74,7 @@ public class AntColony {
 
 		for(int i=0; i<nr_ants; i++){
 			this.ants[i] = new Ant(this);
+			this.ants[i].setId(i);
 		}
 	}
 
@@ -82,7 +96,7 @@ public class AntColony {
 	public Route run() {
 		int runs = 0;
 
-		while(runs < 1){
+		while(runs < 1000){
 
 			boolean runEnd = false;
 			for(int i=0; i<this.nr_ants; i++){
@@ -94,7 +108,24 @@ public class AntColony {
 			this.timeTick();
 
 			if(runEnd) {
-				this.globalPheromoneUpdate();
+
+				ArrayList<Route> routes = new ArrayList<>();
+				for(Ant ant : ants){
+					routes.add(ant.getRoute());
+				}
+
+				Optional<Route> r = routes.stream()
+						.sorted(Route::compare).limit(1).findAny();
+
+				if(r.isPresent()){
+					localBest = r.get();
+					if(bestRoute == null || localBest.getLength() < bestRoute.getLength()){
+						bestRoute = r.get();
+					}
+					RouteUtils.computePerformance(localBest, data);
+					this.globalPheromoneUpdate();
+				}
+
 				// Reset ants
 				for(Ant ant : ants){
 					ant.reset();
@@ -103,7 +134,7 @@ public class AntColony {
 			}
 		}
 
-		return null;
+		return bestRoute;
 	}
 
 	protected double heurN(int i, int j){
@@ -130,8 +161,8 @@ public class AntColony {
 
 						double deltaT = 0.0;
 
-						if(bestRoute.hasArc(i, j)){
-							deltaT = Math.pow(bestRoute.getLength(), -1);
+						if(localBest.hasArc(i, j)){
+							deltaT = Math.pow(localBest.getLength(), -1);
 						}
 
 						pv[i][j] = (1-AntColonySystem.PD) * pv[i][j] +
@@ -142,7 +173,7 @@ public class AntColony {
 		}
 	}
 
-	private void localUpdate(int r, int s){
+	protected void localUpdate(int r, int s){
 		/*
 			While building a solution (i.e., a tour) of the TSP, ants visit
 			edges and change their pheromone level by applying the local
@@ -151,9 +182,9 @@ public class AntColony {
 		double[][] pv = getPheromone(time);
 		switch(type) {
 			case ACS:
-				pv[r][s] *= (1-AntColonySystem.PE);
-				pv[r][s] += AntColonySystem.PE * p0;
-				pv[r][s] = pv[r][s];
+				pv[r][s] *= (1-this.my_epsilon);
+				pv[r][s] += this.my_epsilon * p0;
+				pv[s][r] = pv[r][s];
 				break;
 		}
 	}

@@ -96,7 +96,7 @@ public class TSP {
 				if(i == j){
 					continue;
 				}
-				Edge e = new Edge(i, j, distances[i][j]);
+				Edge<Integer> e = new Edge<>(i, j, distances[i][j]);
 				ts.add(e);
 				edges.add(e);
 			}

@@ -17,6 +17,14 @@ public class Route {
 
 	int[][] incidenceMat = null;
 
+	/*
+		A Route is a complete Hamiltonian cycle,
+		that is, given a starting node A,
+		a Route can only start from A and end in A.
+
+		E.g: [A, B, C, D, E, A]
+	 */
+
 	public Route(int[] path, TSPData data){
 		this.path = path;
 		this.data = data;
@@ -91,7 +99,8 @@ public class Route {
 
 	private void genMatrix(){
 		// Generate incidence matrix
-		for(int i=1; i<path.length; i++){
+		incidenceMat = new int[data.getDimension()][data.getDimension()];
+		for(int i=1; i<path.length-1; i++){
 			incidenceMat[i-1][i] = 1;
 			incidenceMat[i][i-1] = 1;
 		}
@@ -104,5 +113,17 @@ public class Route {
 		}
 
 		return incidenceMat[i][j] == 1;
+	}
+
+	public int compare(Route r){
+		int m_length = this.getLength();
+		int o_length = r.getLength();
+
+		if(m_length < o_length){
+			return -1;
+		} else if (m_length > o_length){
+			return 1;
+		}
+		return 0;
 	}
 }
