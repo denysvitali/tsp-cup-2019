@@ -393,7 +393,7 @@ public class TSPRunnerTest {
 						.startWith(
 								new AntColonySystem(
 										data.getDimension(), data)
-										.setSolutionImprover(null))
+										.setSolutionImprover(new TwoOpt(data)))
 		);
 
 		String path = tsp.writeRoute(r);

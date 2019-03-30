@@ -3,9 +3,9 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco;
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeSet;
 
 public class Ant {
 	private AntColony colony;
@@ -84,7 +84,7 @@ public class Ant {
 					return maxEl;
 				} else {
 					// J
-					/* J = random variable given by (4.1) with alpha = 1 */
+					/* J = random variable given by (4.1) with α = 1 */
 					double rand = colony.random.nextDouble();
 					double tmp_sum = 0;
 					for(int i=0; i < probK.length; i++){
@@ -151,12 +151,18 @@ public class Ant {
 		switch (colony.type){
 			case ACS:
 				double[] num = new double[colony.data.getDimension()];
-				int r = visitedCities.getLast();
+				int r = currentCity;
 
 				double sum = 0.0;
 
 				for(Integer s : unvisitedCities){
-					num[s] = colony.getCurrentP(r, s);
+					num[s] = Math.pow(
+							colony.getCurrentP(r, s),
+							AntColonySystem.ALPHA);
+					num[s] *= Math.pow(
+							colony.heurN(r,s),
+							AntColonySystem.BETA
+					);
 					sum += num[s];
 				}
 

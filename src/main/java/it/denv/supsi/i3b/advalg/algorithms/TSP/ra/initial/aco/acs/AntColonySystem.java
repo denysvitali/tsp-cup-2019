@@ -12,7 +12,7 @@ public class AntColonySystem extends RoutingAlgorithm {
 	public static final double ALPHA = 1;
 
 	// Relative importance of pheromone
-	public static final double BETA = 4;
+	public static final double BETA = 3;
 
 	// Pheromone Decay (PD, ρ)
 	public static final double PD = 0.1;
@@ -28,7 +28,7 @@ public class AntColonySystem extends RoutingAlgorithm {
 	 */
 	public static final double UNUSED_PE = -1;
 
-	public static final double q0 = 0.5;
+	public static final double q0 = 0.3;
 
 	private AntColony ac;
 	private IRA ira = null;
@@ -44,6 +44,7 @@ public class AntColonySystem extends RoutingAlgorithm {
 
 	public AntColonySystem setSolutionImprover(IRA ira){
 		this.ira = ira;
+		this.ac.setSolutionImprover(ira);
 		return this;
 	}
 
