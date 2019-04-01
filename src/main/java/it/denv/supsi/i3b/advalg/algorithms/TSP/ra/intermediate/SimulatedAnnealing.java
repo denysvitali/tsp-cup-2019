@@ -108,8 +108,16 @@ public class SimulatedAnnealing implements IRA {
 								.twoOptSwap(i_1, j_1);
 						// 2. candidators = local_opt(n)
 
-						assert twoOpt != null;
-						improvedSP = twoOpt.improveSP(sp);
+						switch(mode){
+							case TwoOpt:
+								assert twoOpt != null;
+								improvedSP = twoOpt.improveSP(sp);
+								break;
+							case ThreeOpt:
+								assert threeOpt != null;
+								improvedSP = threeOpt.improveSP(sp);
+								break;
+						}
 						break;
 
 					case ThreeOpt:

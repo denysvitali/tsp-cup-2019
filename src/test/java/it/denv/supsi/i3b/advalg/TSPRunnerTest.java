@@ -378,9 +378,12 @@ public class TSPRunnerTest {
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
+
+	////////////////////////////// ACO /////////////////////////////////////////
+
 	@Test
-	public void eil76ACO() throws IOException {
-		String filePath = Utils.getTestFile("/problems/eil76.tsp");
+	public void ch130ACO() throws IOException {
+		String filePath = Utils.getTestFile("/problems/ch130.tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
@@ -402,6 +405,58 @@ public class TSPRunnerTest {
 		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
+
+	@Test
+	public void eil76ACS() throws IOException {
+		String filePath = Utils.getTestFile("/problems/eil76.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		tsp.init(data);
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+					.startWith(
+						new AntColonySystem(1, 10, data)
+								.setSolutionImprover(new TwoOpt(data))
+					)
+		);
+
+		String path = tsp.writeRoute(r);
+		GnuPlotUtils.plot(path);
+		System.out.println("Route length: " + r.getLength());
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void u1060ACS() throws IOException {
+		String filePath = Utils.getTestFile("/problems/u1060.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		tsp.init(data);
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(
+								new AntColonySystem(
+										10, data)
+										.setSolutionImprover(new TwoOpt(data)))
+		);
+
+		String path = tsp.writeRoute(r);
+		GnuPlotUtils.plot(path);
+		System.out.println("Route length: " + r.getLength());
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	///////////////////////////////////////////////////////////////////////////
 
 	@Test
 	public void eil76GA() throws IOException {
@@ -565,14 +620,7 @@ public class TSPRunnerTest {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
-						.add(new ThreeOpt(data)
-								.addCandidator(
-										new NNCandidator(10, data)
-								)
-								.addCandidator(
-										new NNCandidator(10, data)
-								)
-						)
+						.add(new ThreeOpt(data))
 						.add(new SimulatedAnnealing())
 		);
 
