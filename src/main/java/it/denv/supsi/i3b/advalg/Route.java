@@ -30,6 +30,15 @@ public class Route {
 		this.data = data;
 	}
 
+	public Route(SwappablePath sp, TSPData data){
+		if(sp.getLength() != -1){
+			this.length = sp.getLength();
+		}
+
+		this.data = data;
+		this.path = sp.getPathArr();
+	}
+
 	public Route(int[] path, int length, TSPData data){
 		this.path = path;
 		this.length = length;

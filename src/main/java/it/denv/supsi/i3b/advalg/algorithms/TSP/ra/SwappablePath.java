@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 public class SwappablePath {
 	private int[] path;
+	private int length = -1;
 
 	public SwappablePath(int[] path){
 		this.path = path;
@@ -111,6 +112,10 @@ public class SwappablePath {
 	}
 
 	public int calulateDistance(TSPData data) {
+		if(length != -1){
+			return length;
+		}
+
 		int[][] distances = data.getDistances();
 
 		int distance = 0;
@@ -120,6 +125,11 @@ public class SwappablePath {
 
 			distance += distances[a][b];
 		}
+		length = distance;
 		return distance;
+	}
+
+	public int getLength() {
+		return length;
 	}
 }

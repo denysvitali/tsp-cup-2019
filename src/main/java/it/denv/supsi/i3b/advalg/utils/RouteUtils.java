@@ -2,6 +2,7 @@ package it.denv.supsi.i3b.advalg.utils;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 
 public class RouteUtils {
 	public static void computePerformance(Route r, TSPData d){
@@ -10,6 +11,19 @@ public class RouteUtils {
 		System.out.println(String.format(
 				"Our path: %d \t Best: %d \t Perf: %f",
 				r.getLength(),
+				d.getBestKnown(),
+				perf * 100
+				)
+		);
+	}
+
+	public static void computePerformance(SwappablePath sp, TSPData d){
+		sp.calulateDistance(d);
+		double perf = 1 - d.getBestKnown() * 1.0 / sp.getLength();
+
+		System.out.println(String.format(
+				"Our path: %d \t Best: %d \t Perf: %f",
+				sp.getLength(),
 				d.getBestKnown(),
 				perf * 100
 				)

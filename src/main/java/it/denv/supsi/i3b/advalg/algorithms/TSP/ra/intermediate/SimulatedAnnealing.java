@@ -15,9 +15,8 @@ import java.util.Random;
 public class SimulatedAnnealing implements ILS {
 
 	private static final int r = 100;
-	private NeighbourAlgorithm na = new RandomSwap(5);
 	private static final double START_TEMPERATURE = 100.0;
-	private int seed = -1;
+	private int seed;
 	private Random random;
 
 	public enum Mode {
@@ -66,16 +65,19 @@ public class SimulatedAnnealing implements ILS {
 	public Route route(Route route, TSPData data) {
 		double temperature = START_TEMPERATURE;
 
-		Route best = route;
-		Route current = route;
+		SwappablePath best = route.getSP();
+		SwappablePath current = best;
 
 		TwoOpt twoOpt = null;
 		ThreeOpt threeOpt = null;
 
-		twoOpt = new TwoOpt(data);
-
-		if (mode == Mode.ThreeOpt) {
-			threeOpt = new ThreeOpt(data);
+		switch(mode){
+			case TwoOpt:
+				twoOpt = new TwoOpt(data);
+				break;
+			case ThreeOpt:
+				threeOpt = new ThreeOpt(data);
+				break;
 		}
 
 		double start = System.currentTimeMillis();
@@ -86,26 +88,26 @@ public class SimulatedAnnealing implements ILS {
 				// 1. n = neighbour(current)
 
 				SwappablePath sp;
-				int[] improvedSP = null;
+				SwappablePath improvedSP = null;
 
 				switch (mode) {
 					case TwoOpt:
-						int i_1 = 0;
-						int j_1 = 0;
+						int i_1;
+						int j_1;
 
 						do {
-							i_1 = (int) (random.nextDouble() * data.getDimension());
+							i_1 = random.nextInt(data.getDimension());
 						}
 						while (i_1 == 0 || i_1 == data.getDimension());
 
 
 						do {
-							j_1 = (int) (random.nextDouble() * data.getDimension());
+							j_1 = random.nextInt(data.getDimension());
 						}
 						while (j_1 == 0 || j_1 == i_1 || j_1 == data.getDimension());
 
-						sp = new SwappablePath(current.getPath())
-								.twoOptSwap(i_1, j_1);
+						sp = current.twoOptSwap(i_1, j_1);
+
 						// 2. candidators = local_opt(n)
 
 						switch(mode){
@@ -129,51 +131,43 @@ public class SimulatedAnnealing implements ILS {
 							}
 							Arrays.sort(numbers);
 						} while (
-								numbers[0] == 0
-										|| numbers[2] >= data.getDimension()
+								numbers[0] == 0 || numbers[2] >= data.getDimension()
 								|| numbers[0] + 1 == numbers[1]
 								|| numbers[1] + 1 == numbers[2]);
 
-						System.out.println(Arrays.toString(numbers));
-
-						sp = new SwappablePath(current.getPath())
-								.threeOptSwap(numbers[0],
-										numbers[1], numbers[2])[random.nextInt(2)];
-						improvedSP = twoOpt.improveSP(sp);
+						improvedSP = current.threeOptSwap(numbers[0], numbers[1], numbers[2])[random.nextInt(2)];
+						//improvedSP = twoOpt.improveSP(sp);
 
 						break;
 				}
 
 				assert(improvedSP != null);
 
-				int candidateLength = new SwappablePath(improvedSP)
-						.calulateDistance(data);
+				int candidateLength = improvedSP.calulateDistance(data);
+
+				if(candidateLength == data.getBestKnown()){
+					// Found our solution
+					best = improvedSP;
+					break;
+				}
 
 
 				double delta = candidateLength - current.getLength();
 				double x = random.nextDouble();
 
 				if (candidateLength < current.getLength()) {
-					current = new Route(improvedSP, data);
+					current = improvedSP;
 
 					if (current.getLength() < best.getLength()) {
 						best = current;
 					}
 				} else if (delta < 0 || x < Math.exp(-delta / temperature)) {
-					current = new Route(improvedSP, data);
+					current = improvedSP;
 				}
 			}
 
-			double now = System.currentTimeMillis();
-
-			System.out.println("Spent " + (now - start) + "ms");
-			System.out.println("Current Length: " + current + " / " + data.getBestKnown());
-
-			if (best.getLength() == data.getBestKnown()) {
-				break;
-			}
-
 			RouteUtils.computePerformance(current, data);
+			long now = System.currentTimeMillis();
 
 			temperature = START_TEMPERATURE * (1 - (now - start) / max_runtime);
 			System.out.println("Temperature is " + temperature);
@@ -182,7 +176,7 @@ public class SimulatedAnnealing implements ILS {
 		System.out.println(seed);
 
 
-		return best;
+		return new Route(best, data);
 
 	}
 

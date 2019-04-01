@@ -51,10 +51,10 @@ public class TwoOpt implements ILS {
 		int[] path = r.getPath();
 
 		SwappablePath sp = new SwappablePath(path);
-		return new Route(improveSP(sp), data);
+		return new Route(sp, data);
 	}
 
-	public int[] improveSP(SwappablePath sp){
+	public SwappablePath improveSP(SwappablePath sp){
 		int bestLength = sp.calulateDistance(data);
 		int[] msp = sp.getPathArr();
 		int sp_size = sp.getPathArr().length;
@@ -96,6 +96,6 @@ public class TwoOpt implements ILS {
 
 		} while(swapped);
 
-		return best.getPathArr();
+		return best;
 	}
 }

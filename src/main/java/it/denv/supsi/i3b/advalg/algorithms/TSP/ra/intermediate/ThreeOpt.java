@@ -61,7 +61,7 @@ public class ThreeOpt implements ILS {
 		return new Route(improveSP(sp), data);
 	}
 
-	public int[] improveSP(SwappablePath sp){
+	public SwappablePath improveSP(SwappablePath sp){
 		int bestLength = sp.calulateDistance(data);
 		int sp_size = sp.getPathArr().length;
 
@@ -118,6 +118,6 @@ public class ThreeOpt implements ILS {
 
 		} while(swapped);
 
-		return best.getPathArr();
+		return best;
 	}
 }
