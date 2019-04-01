@@ -7,8 +7,6 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
-import java.util.ArrayList;
-import java.util.Optional;
 import java.util.Random;
 
 public class AntColony {
@@ -25,9 +23,10 @@ public class AntColony {
 	private int cnn = -1;
 
 	private Ant[] ants;
-	private ArrayList<double[][]> pheromone = new ArrayList<>();
-	private int time = 0;
+	private double[][] pheromone;
+
 	private double p0 = -1;
+	private double tau0 = -1;
 
 	private Route bestRoute = null;
 	private Route localBest = null;
@@ -60,9 +59,12 @@ public class AntColony {
 				.getLength();
 		this.p0 = (nr_ants * 1.0) / cnn;
 
+		this.tau0 = this.p0;
+
 		switch (type){
 			case ACS:
-				my_epsilon = 1.0 / (this.data.getDimension() * this.cnn);
+				my_epsilon = 1.0 / (this.data.getDimension() * cnn);
+				//my_epsilon = 0.1;
 				break;
 		}
 
@@ -77,7 +79,7 @@ public class AntColony {
 			}
 		}
 
-		this.pheromone.add(iPV);
+		this.pheromone = iPV;
 
 		for(int i=0; i<nr_ants; i++){
 			this.ants[i] = new Ant(this);
@@ -85,25 +87,14 @@ public class AntColony {
 		}
 	}
 
-	public double[][] getPheromone(int time) {
-		return pheromone.get(time);
-	}
-
-	public void timeTick(){
-		this.time++;
-		pheromone.add(time, new double[data.getDimension()][data.getDimension()]);
-		System.arraycopy(pheromone.get(time - 1),
-				0,
-				pheromone.get(time),
-				0,
-				data.getDimension()
-		);
+	public double[][] getPheromone() {
+		return pheromone;
 	}
 
 	public Route run() {
 		int runs = 0;
 
-		while(runs < 1000){
+		while(runs < 10 * 1000){
 
 			boolean runEnd = false;
 			for(int i=0; i<this.nr_ants; i++){
@@ -112,37 +103,35 @@ public class AntColony {
 					runEnd = true;
 				}
 			}
-			this.timeTick();
+			//this.timeTick();
 
 			if(runEnd) {
 
-				ArrayList<Route> routes = new ArrayList<>();
-				for(Ant ant : ants){
-					routes.add(
-							ant.getRoute()
-					);
-				}
+				Route[] routes = new Route[ants.length];
 
-				if(ira != null){
-					ArrayList<Route> improvedRoutes = new ArrayList<>();
-					for(Route r : routes){
-						improvedRoutes.add(ira.route(r, data));
+				if(ira != null) {
+					for (int i = 0; i < ants.length; i++) {
+						routes[i] = ira.route(ants[i].getRoute(), data);
 					}
-					routes.addAll(improvedRoutes);
-				}
-
-				Optional<Route> r = routes.stream()
-						.sorted(Route::compare).limit(1).findAny();
-
-				if(r.isPresent()){
-					localBest = r.get();
-
-					if(bestRoute == null || localBest.getLength() < bestRoute.getLength()){
-						bestRoute = r.get();
+				} else {
+					for (int i = 0; i < ants.length; i++) {
+						routes[i] = ants[i].getRoute();
 					}
-					RouteUtils.computePerformance(localBest, data);
-					this.globalPheromoneUpdate();
 				}
+
+				for (Route route : routes) {
+					if (localBest == null || route.getLength() < localBest.getLength()) {
+						localBest = route;
+					}
+				}
+
+
+				if(bestRoute == null || localBest.getLength() < bestRoute.getLength()){
+					bestRoute = localBest;
+				}
+
+				RouteUtils.computePerformance(localBest, data);
+				this.globalPheromoneUpdate();
 
 				// Reset ants
 				for(Ant ant : ants){
@@ -163,8 +152,11 @@ public class AntColony {
 		// Performed after all ants have completed their tours
 
 		// Global Updating rule (4)
-		timeTick();
-		double[][] pv = getPheromone(time);
+		//timeTick();
+		double[][] pv = getPheromone();
+
+		int bestLength = localBest.getLength();
+
 		for(int i=0; i<data.getDimension(); i++){
 			for(int j=0; j<data.getDimension(); j++){
 
@@ -177,14 +169,14 @@ public class AntColony {
 							deposit pheromone.
 						 */
 
-						double deltaT = 0.0;
+						double deltaT;
 
 						if(localBest.hasArc(i, j)){
-							deltaT = Math.pow(localBest.getLength(), -1);
+							deltaT = Math.pow(bestLength, -1);
+							pv[i][j] = (1-AntColonySystem.PD) * pv[i][j] +
+									AntColonySystem.PD * deltaT;
+							//pv[j][i] = pv[i][j];
 						}
-
-						pv[i][j] = (1-AntColonySystem.PD) * pv[i][j] +
-								AntColonySystem.PD * deltaT;
 						break;
 				}
 			}
@@ -197,11 +189,11 @@ public class AntColony {
 			edges and change their pheromone level by applying the local
 			updating rule of (5)
 		 */
-		double[][] pv = getPheromone(time);
+		double[][] pv = getPheromone();
 		switch(type) {
 			case ACS:
 				pv[r][s] *= (1-this.my_epsilon);
-				pv[r][s] += this.my_epsilon * p0;
+				pv[r][s] += this.my_epsilon * tau0;
 				pv[s][r] = pv[r][s];
 				break;
 		}
@@ -212,6 +204,6 @@ public class AntColony {
 	}
 
 	public double getCurrentP(int i, int j) {
-		return getPheromone(time)[i][j];
+		return getPheromone()[i][j];
 	}
 }

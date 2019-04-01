@@ -18,11 +18,11 @@ class AntTest {
 				Utils.getTestFile("/problems/eil76.tsp"));
 		TSPData data = tspLoader.load();
 		Ant a = new Ant(new AntColony(AcoType.ACS , 1, data));
-		assertEquals(0, a.getTabuList().size());
+		//assertEquals(0, a.getTabuList().size());
 
 		a.visit(1);
-		assertEquals(1, a.getTabuList().size());
-		assertEquals(1, a.getTabuList().get(0));
+		//assertEquals(1, a.getTabuList().size());
+		//assertEquals(1, a.getTabuList().get(0));
 	}
 
 	@Test
@@ -33,12 +33,12 @@ class AntTest {
 		TSP tsp = new TSP();
 		tsp.init(data);
 		Ant a = new Ant(new AntColony(AcoType.ACS , 0, 1, data));
-		assertEquals(1, a.visitedCities.size());
-		assertEquals(24, a.getTabuList().get(0));
+		assertEquals(1, a.getVisited());
+		//assertEquals(24, a.getTabuList().get(0));
 
 		a.step();
-		assertEquals(2, a.getTabuList().size());
-		assertEquals(12, a.getTabuList().get(1));
+		//assertEquals(2, a.getTabuList().size());
+		//assertEquals(12, a.getTabuList().get(1));
 	}
 
 	@Test
