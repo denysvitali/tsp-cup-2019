@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class CompositeRoutingAlgorithm extends RoutingAlgorithm {
 	private RoutingAlgorithm sa = null;
-	private ArrayList<IRA> ias = new ArrayList<>();
+	private ArrayList<ILS> ias = new ArrayList<>();
 
 	public Route route(int startNode, TSPData data){
 		if(sa == null){
@@ -22,7 +22,7 @@ public class CompositeRoutingAlgorithm extends RoutingAlgorithm {
 
 		System.out.println("Spent " + (s2-s1) + " ms");
 
-		for(IRA ia : ias){
+		for(ILS ia : ias){
 			s1 = System.currentTimeMillis();
 			System.out.println("Intermediate Routing w/ " + ia);
 			r = ia.route(r, data);
@@ -47,11 +47,11 @@ public class CompositeRoutingAlgorithm extends RoutingAlgorithm {
 		return sa;
 	}
 
-	public ArrayList<IRA> getIas() {
+	public ArrayList<ILS> getIas() {
 		return ias;
 	}
 
-	public CompositeRoutingAlgorithm add(IRA ia){
+	public CompositeRoutingAlgorithm add(ILS ia){
 		this.ias.add(ia);
 		return this;
 	}

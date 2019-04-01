@@ -2,7 +2,7 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IRA;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
@@ -16,7 +16,7 @@ public class AntColony {
 	protected TSPData data;
 	private int seed;
 
-	private IRA ira = null;
+	private ILS ILS = null;
 
 	public static boolean DEBUG = false;
 
@@ -43,8 +43,8 @@ public class AntColony {
 		initAC(seed, ants, data);
 	}
 
-	public void setSolutionImprover(IRA ira){
-		this.ira = ira;
+	public void setSolutionImprover(ILS ILS){
+		this.ILS = ILS;
 	}
 
 	private void initAC(int seed, int ants, TSPData data){
@@ -109,9 +109,9 @@ public class AntColony {
 
 				Route[] routes = new Route[ants.length];
 
-				if(ira != null) {
+				if(ILS != null) {
 					for (int i = 0; i < ants.length; i++) {
-						routes[i] = ira.route(ants[i].getRoute(), data);
+						routes[i] = ILS.route(ants[i].getRoute(), data);
 					}
 				} else {
 					for (int i = 0; i < ants.length; i++) {

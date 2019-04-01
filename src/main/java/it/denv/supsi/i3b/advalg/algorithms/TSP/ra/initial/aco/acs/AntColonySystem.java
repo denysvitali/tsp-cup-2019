@@ -2,7 +2,7 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IRA;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AcoType;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AntColony;
@@ -31,7 +31,7 @@ public class AntColonySystem extends RoutingAlgorithm {
 	public static final double q0 = 0.75;
 
 	private AntColony ac;
-	private IRA ira = null;
+	private ILS ILS = null;
 
 
 	public AntColonySystem(int seed, int amount_ants, TSPData data) {
@@ -42,9 +42,9 @@ public class AntColonySystem extends RoutingAlgorithm {
 		this.ac = new AntColony(AcoType.ACS, amount_ants, data);
 	}
 
-	public AntColonySystem setSolutionImprover(IRA ira){
-		this.ira = ira;
-		this.ac.setSolutionImprover(ira);
+	public AntColonySystem setSolutionImprover(ILS ILS){
+		this.ILS = ILS;
+		this.ac.setSolutionImprover(ILS);
 		return this;
 	}
 

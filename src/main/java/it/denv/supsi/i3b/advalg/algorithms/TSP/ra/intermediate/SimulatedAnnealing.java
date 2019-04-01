@@ -2,7 +2,7 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IRA;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.NeighbourAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.neighbour.RandomSwap;
@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 
-public class SimulatedAnnealing implements IRA {
+public class SimulatedAnnealing implements ILS {
 
 	private static final int r = 100;
 	private NeighbourAlgorithm na = new RandomSwap(5);

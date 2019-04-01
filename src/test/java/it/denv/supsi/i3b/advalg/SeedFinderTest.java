@@ -4,7 +4,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.TSP;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IRA;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -83,9 +82,9 @@ public class SeedFinderTest {
 		);
 
 		printAlgorithm(os, alg.getSa());
-		for(IRA ira : alg.getIas()){
+		for(ILS ILS : alg.getIas()){
 			os.write(",");
-			printAlgorithm(os, ira);
+			printAlgorithm(os, ILS);
 		}
 		os.write("]");
 
@@ -102,7 +101,7 @@ public class SeedFinderTest {
 				"\"seed\": " + sa.getSeed() + "}");
 	}
 
-	private static void printAlgorithm(OutputStreamWriter os, IRA ra) throws IOException {
+	private static void printAlgorithm(OutputStreamWriter os, ILS ra) throws IOException {
 		os.write("{\"name\": \"" + ra.getClass().getName() + "\"," +
 				"\"seed\": " + ra.getSeed() + "}");
 	}

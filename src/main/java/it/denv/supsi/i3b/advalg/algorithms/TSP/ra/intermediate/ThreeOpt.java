@@ -1,15 +1,14 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate;
 
 import it.denv.supsi.i3b.advalg.Route;
-import it.denv.supsi.i3b.advalg.algorithms.NotImplementedException;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Candidator;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.IRA;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 
 import java.util.ArrayList;
 
-public class ThreeOpt implements IRA {
+public class ThreeOpt implements ILS {
 
 	private TSPData data = null;
 	private ArrayList<Candidator<Integer>> candidators = new ArrayList<>();
