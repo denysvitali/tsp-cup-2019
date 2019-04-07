@@ -2,8 +2,6 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra;
 
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 
-import java.util.LinkedList;
-
 public class SwappablePath {
 	private int[] path;
 	private int length = -1;
@@ -22,7 +20,7 @@ public class SwappablePath {
 		}
 		*/
 
-		assert(i != 0);
+		//assert(i != 0);
 		assert(k != path.length - 1);
 
 		int[] np = new int[this.path.length];
@@ -99,19 +97,30 @@ public class SwappablePath {
 
 	}
 
-	public LinkedList<Integer> getPath(){
-		LinkedList<Integer> ll = new LinkedList<>();
-		for (int value : path) {
-			ll.add(value);
-		}
+	public SwappablePath doubleBridge(int A, int B, int C){
+		assert(A < B && B < C);
+		assert(B-A == C-B);
 
-		return ll;
+
+		int[] fp = new int[path.length];
+		int pos = 0;
+		System.arraycopy(path, 0, fp, pos, A);
+		pos+= A;
+		System.arraycopy(path, C, fp, pos, path.length - C);
+		pos += path.length - C;
+		System.arraycopy(path, B, fp, pos, C - B);
+		pos += C-B;
+		System.arraycopy(path, A, fp, pos, B - A);
+
+
+		return new SwappablePath(fp);
 	}
+
 	public int[] getPathArr(){
 		return path;
 	}
 
-	public int calulateDistance(TSPData data) {
+	public int calculateDistance(TSPData data) {
 		if(length != -1){
 			return length;
 		}

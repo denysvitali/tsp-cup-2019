@@ -167,7 +167,7 @@ public class SeedFinderTest {
 							.startWith(new RandomNearestNeighbour(seed, data))
 							.add(new TwoOpt(data))
 							.add(new SimulatedAnnealing(seed)
-									.setMode(SimulatedAnnealing.Mode.TwoOpt))
+									.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 			);
 			ob.flush();
 		} catch(IOException ex){

@@ -746,7 +746,73 @@ public class TSPRunnerTest {
 		TSPData data = loader.load();
 
 		TSP tsp = new TSP();
-		//tsp.run(data, new GeneticAlgorithm());
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing())
+		);
+
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void lin318SA_DB() throws IOException {
+		String filePath = Utils.getTestFile("/problems/lin318.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing().setMode(SimulatedAnnealing.Mode.DoubleBridge))
+		);
+
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void lin318SA_2O() throws IOException {
+		String filePath = Utils.getTestFile("/problems/lin318.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new NearestNeighbour(data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing().setMode(SimulatedAnnealing.Mode.TwoOpt))
+		);
+
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
 

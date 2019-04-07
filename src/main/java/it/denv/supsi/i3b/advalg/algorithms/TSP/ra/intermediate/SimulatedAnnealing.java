@@ -3,9 +3,7 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate;
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.NeighbourAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.neighbour.RandomSwap;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
 import java.util.Arrays;
@@ -20,7 +18,7 @@ public class SimulatedAnnealing implements ILS {
 	private Random random;
 
 	public enum Mode {
-		TwoOpt, ThreeOpt
+		TwoOpt, ThreeOpt, DoubleBridge
 	}
 
 	private Mode mode = Mode.TwoOpt;
@@ -61,6 +59,50 @@ public class SimulatedAnnealing implements ILS {
 	end of simulated annealing
 	 */
 
+	private boolean validNumbers(int[] numbers, int maxLength){
+		if(numbers[0] < 0){
+			return false;
+		}
+
+		if(numbers[numbers.length-1] >= maxLength - 1){
+			return false;
+		}
+
+		for(int i=1; i<numbers.length; i++){
+			if(numbers[i] <= numbers[i-1]){
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private int[] getRandomNumbers(int size, int maxLength){
+		int[] numbers = new int[size];
+		int r = random.nextInt(maxLength-size);
+		int offset = random.nextInt(maxLength - r) / size;
+
+		numbers[0] = r;
+
+		for (int a = 1; a < numbers.length; a++) {
+			numbers[a] = numbers[a-1] + offset;
+		}
+
+		return numbers;
+	}
+
+	private int[] getRandomOffsettedNumbers(int size, int maxLength){
+		int[] numbers = new int[size];
+		int randomOffset = (int) (random.nextDouble() * (maxLength/size - 1) + 1);
+		int prev = 0;
+		for (int a = 0; a < numbers.length; a++) {
+			numbers[a] = prev + randomOffset;
+			prev = numbers[a];
+		}
+
+		return numbers;
+	}
+
 	@Override
 	public Route route(Route route, TSPData data) {
 		double temperature = START_TEMPERATURE;
@@ -68,12 +110,11 @@ public class SimulatedAnnealing implements ILS {
 		SwappablePath best = route.getSP();
 		SwappablePath current = best;
 
-		TwoOpt twoOpt = null;
+		TwoOpt twoOpt = new TwoOpt(data);
 		ThreeOpt threeOpt = null;
 
 		switch(mode){
 			case TwoOpt:
-				twoOpt = new TwoOpt(data);
 				break;
 			case ThreeOpt:
 				threeOpt = new ThreeOpt(data);
@@ -81,69 +122,45 @@ public class SimulatedAnnealing implements ILS {
 		}
 
 		double start = System.currentTimeMillis();
-		double max_runtime = 1000 * 60 * 2;
+		double max_runtime = 1000 * 60 * 3;
 
-		while (temperature > 0.001) {
+		while (temperature > 0.2) {
 			for (int i = 0; i < r; i++) {
 				// 1. n = neighbour(current)
 
-				SwappablePath sp;
-				SwappablePath improvedSP = null;
+				SwappablePath sp = null;
+				SwappablePath improvedSP;
 
 				switch (mode) {
 					case TwoOpt:
-						int i_1;
-						int j_1;
+						int[] twoOptN = getRandomNumbers(2,
+								data.getDimension());
 
-						do {
-							i_1 = random.nextInt(data.getDimension());
-						}
-						while (i_1 == 0 || i_1 == data.getDimension());
-
-
-						do {
-							j_1 = random.nextInt(data.getDimension());
-						}
-						while (j_1 == 0 || j_1 == i_1 || j_1 == data.getDimension());
-
-						sp = current.twoOptSwap(i_1, j_1);
-
-						// 2. candidators = local_opt(n)
-
-						switch(mode){
-							case TwoOpt:
-								assert twoOpt != null;
-								improvedSP = twoOpt.improveSP(sp);
-								break;
-							case ThreeOpt:
-								assert threeOpt != null;
-								improvedSP = threeOpt.improveSP(sp);
-								break;
-						}
+						sp = current.twoOptSwap(twoOptN[0], twoOptN[1]);
 						break;
 
 					case ThreeOpt:
-						int[] numbers = new int[3];
+						int[] threeOptN = getRandomOffsettedNumbers(3, data.getDimension());
+						sp = current.threeOptSwap(threeOptN[0], threeOptN[1], threeOptN[2])
+								[random.nextInt(2)];
+						break;
 
-						do {
-							for (int a = 0; a < numbers.length; a++) {
-								numbers[a] = (int) (random.nextDouble() * data.getDimension());
-							}
-							Arrays.sort(numbers);
-						} while (
-								numbers[0] == 0 || numbers[2] >= data.getDimension()
-								|| numbers[0] + 1 == numbers[1]
-								|| numbers[1] + 1 == numbers[2]);
-
-						improvedSP = current.threeOptSwap(numbers[0], numbers[1], numbers[2])[random.nextInt(2)];
-						//improvedSP = twoOpt.improveSP(sp);
-
+					case DoubleBridge:
+						int[] dbN = getRandomOffsettedNumbers(3, data.getDimension());
+						sp = current.doubleBridge(dbN[0], dbN[1], dbN[2]);
 						break;
 				}
 
+				assert(sp != null);
+
+				// improvedSP = local_opt(n)
+
+				assert twoOpt != null;
+				improvedSP = twoOpt.improveSP(sp);
+
 				assert(improvedSP != null);
 
-				int candidateLength = improvedSP.calulateDistance(data);
+				int candidateLength = improvedSP.calculateDistance(data);
 
 				if(candidateLength == data.getBestKnown()){
 					// Found our solution
@@ -152,13 +169,13 @@ public class SimulatedAnnealing implements ILS {
 				}
 
 
-				double delta = candidateLength - current.getLength();
+				double delta = candidateLength - current.calculateDistance(data);
 				double x = random.nextDouble();
 
-				if (candidateLength < current.getLength()) {
+				if (candidateLength < current.calculateDistance(data)) {
 					current = improvedSP;
 
-					if (current.getLength() < best.getLength()) {
+					if (current.calculateDistance(data) < best.calculateDistance(data)) {
 						best = current;
 					}
 				} else if (delta < 0 || x < Math.exp(-delta / temperature)) {
@@ -166,8 +183,8 @@ public class SimulatedAnnealing implements ILS {
 				}
 			}
 
-			RouteUtils.computePerformance(current, data);
 			long now = System.currentTimeMillis();
+			RouteUtils.computePerformance(current, data);
 
 			temperature = START_TEMPERATURE * (1 - (now - start) / max_runtime);
 			System.out.println("Temperature is " + temperature);

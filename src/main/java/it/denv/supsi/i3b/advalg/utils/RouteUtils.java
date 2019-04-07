@@ -18,7 +18,7 @@ public class RouteUtils {
 	}
 
 	public static void computePerformance(SwappablePath sp, TSPData d){
-		sp.calulateDistance(d);
+		sp.calculateDistance(d);
 		double perf = 1 - d.getBestKnown() * 1.0 / sp.getLength();
 
 		System.out.println(String.format(

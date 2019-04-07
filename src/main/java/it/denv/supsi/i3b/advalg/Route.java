@@ -58,7 +58,7 @@ public class Route {
 	}
 
 	private void calculateLength(){
-		length = getSP().calulateDistance(data);
+		length = getSP().calculateDistance(data);
 	}
 
 	public void setPath(int[] new_path){

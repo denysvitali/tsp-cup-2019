@@ -55,7 +55,7 @@ public class TwoOpt implements ILS {
 	}
 
 	public SwappablePath improveSP(SwappablePath sp){
-		int bestLength = sp.calulateDistance(data);
+		int bestLength = sp.calculateDistance(data);
 		int[] msp = sp.getPathArr();
 		int sp_size = sp.getPathArr().length;
 		int[][] d = data.getDistances();
@@ -83,7 +83,7 @@ public class TwoOpt implements ILS {
 						msp = sp.getPathArr();
 						swapped = true;
 
-						int mRouteLength = sp.calulateDistance(data);
+						int mRouteLength = sp.calculateDistance(data);
 						if(mRouteLength < bestLength){
 							bestLength = mRouteLength;
 							best = sp;
