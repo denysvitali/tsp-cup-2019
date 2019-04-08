@@ -107,7 +107,7 @@ public class Population {
 					.toArray());
 
 			int[] newGenes = new int[data.getDimension()-1];
-			System.arraycopy(to.improveSP(sp),
+			System.arraycopy(to.improveSP(sp).getPathArr(),
 					1, newGenes, 0, data.getDimension() - 1);
 			ind.setGenes(newGenes);
 		}
@@ -198,8 +198,8 @@ public class Population {
 
 	private Individual getProbabilisticParent() {
 		double sum = 0.0;
-		for(int i=0; i<population.size(); i++){
-			sum += population.get(i).getFitness();
+		for (Individual individual : population) {
+			sum += individual.getFitness();
 		}
 
 		double sum_tmp = 0.0;
