@@ -9,13 +9,13 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AntColony;
 
 public class AntColonySystem extends RoutingAlgorithm {
 	// Relative importance of heuristic
-	public static final double ALPHA = 1.0;
+	public static final double ALPHA = 1;
 
 	// Relative importance of pheromone
-	public static final double BETA = 2.4;
+	public static final double BETA = 4.2;
 
 	// Pheromone Decay (PD, ρ)
-	public static final double PD = 0.1;
+	public static final double PD = 0.5;
 
 	/*
 		Pheromone Evaporation (PE, ξ)
@@ -28,7 +28,7 @@ public class AntColonySystem extends RoutingAlgorithm {
 	 */
 	public static final double UNUSED_PE = -1;
 
-	public static final double q0 = 0.75;
+	public static final double q0 = 0.42;
 
 	private AntColony ac;
 	private ILS ILS = null;

@@ -36,7 +36,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new GeneticAlgorithm())
+						.add(new GeneticAlgorithm(data))
 		);
 
 		double v = r.compareTo(data.getBestKnown());
@@ -90,7 +90,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new GeneticAlgorithm())
+						.add(new GeneticAlgorithm(data))
 		);
 
 		String path = tsp.writeRoute(r);
@@ -217,7 +217,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new GeneticAlgorithm())
+						.add(new GeneticAlgorithm(data))
 		);
 
 		assertTrue(r.isValid());
@@ -269,7 +269,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new GeneticAlgorithm())
+						.add(new GeneticAlgorithm(data))
 		);
 
 		String path = tsp.writeRoute(r);
@@ -294,7 +294,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new GeneticAlgorithm())
+						.add(new GeneticAlgorithm(data))
 		);
 
 		String path = tsp.writeRoute(r);
@@ -420,8 +420,9 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 					.startWith(
 						new AntColonySystem(1, 10, data)
-								.setSolutionImprover(new TwoOpt(data))
+								.setSolutionImprover(new ThreeOpt(data))
 					)
+				.add(new TwoOpt(data))
 		);
 
 		String path = tsp.writeRoute(r);
@@ -445,7 +446,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(
 								new AntColonySystem(
-										10, data)
+										5, data)
 										.setSolutionImprover(new TwoOpt(data)))
 		);
 
@@ -470,7 +471,7 @@ public class TSPRunnerTest {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
-						.add(new GeneticAlgorithm())
+						.add(new GeneticAlgorithm(data))
 		);
 
 		String path = tsp.writeRoute(r);
@@ -492,7 +493,7 @@ public class TSPRunnerTest {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
-						.add(new GeneticAlgorithm())
+						.add(new GeneticAlgorithm(data))
 		);
 
 		String path = tsp.writeRoute(r);
@@ -649,7 +650,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new GeneticAlgorithm())
+						.add(new GeneticAlgorithm(data))
 		);
 
 		String path = tsp.writeRoute(r);

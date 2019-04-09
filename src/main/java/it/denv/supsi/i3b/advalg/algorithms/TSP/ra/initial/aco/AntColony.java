@@ -63,8 +63,8 @@ public class AntColony {
 
 		switch (type){
 			case ACS:
-				my_epsilon = 1.0 / (this.data.getDimension() * cnn);
-				//my_epsilon = 0.1;
+				//my_epsilon = 1.0 / (this.data.getDimension() * cnn);
+				my_epsilon = 0.4;
 				break;
 		}
 
@@ -110,8 +110,14 @@ public class AntColony {
 				Route[] routes = new Route[ants.length];
 
 				if(ILS != null) {
+					routes = new Route[ants.length * 2];
 					for (int i = 0; i < ants.length; i++) {
 						routes[i] = ILS.route(ants[i].getRoute(), data);
+					}
+
+					// TODO: Check
+					for(int i=ants.length; i<routes.length; i++){
+						routes[i] = ants[i-ants.length].getRoute();
 					}
 				} else {
 					for (int i = 0; i < ants.length; i++) {
