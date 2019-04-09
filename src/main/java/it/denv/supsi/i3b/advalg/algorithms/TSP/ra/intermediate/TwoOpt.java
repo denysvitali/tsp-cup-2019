@@ -51,51 +51,51 @@ public class TwoOpt implements ILS {
 		int[] path = r.getPath();
 
 		SwappablePath sp = new SwappablePath(path);
+		sp = improveSP(sp);
 		return new Route(sp, data);
 	}
 
 	public SwappablePath improveSP(SwappablePath sp){
-		int bestLength = sp.calculateDistance(data);
-		int[] msp = sp.getPathArr();
-		int sp_size = sp.getPathArr().length;
-		int[][] d = data.getDistances();
-
-
+		int[] path = sp.getPathArr();
 		/*
 			Source:
 			- https://on-demand.gputechconf.com/gtc/2014/presentations/S4534-high-speed-2-opt-tsp-solver.pdf
 			- http://olab.is.s.u-tokyo.ac.jp/~kamil.rocki/logo.pdf
+			- Advanced search algorithms, Gambardella, 70
 		 */
 
-		SwappablePath best = sp;
-
+		int best_gain;
+		int d[][] = data.getDistances();
 		boolean swapped;
-		do {
-			swapped = false;
-			for(int i=1; i < sp_size - 2; i++) {
-				for(int j = i + 2; j < sp_size - 1; j++){
 
+		do {
+			best_gain = 0;
+			int best_i = -1;
+			int best_j = -1;
+			swapped = false;
+			int[] msp = sp.getPathArr();
+
+			for(int i=1; i< path.length - 2; i++){
+				for (int j = i + 2; j < path.length - 1; j++) {
 					int d1 = d[msp[i]][msp[j+1]] + d[msp[i-1]][msp[j]];
 					int d2 = d[msp[i]][msp[i-1]] + d[msp[j+1]][msp[j]];
 
-					if(d1 < d2){
-						sp = sp.twoOptSwap(i, j);
-						msp = sp.getPathArr();
-						swapped = true;
+					int gain = d1 - d2;
 
-						int mRouteLength = sp.calculateDistance(data);
-						if(mRouteLength < bestLength){
-							bestLength = mRouteLength;
-							best = sp;
-						} else {
-							swapped = false;
-						}
+					if(gain < best_gain){
+						best_gain = d1 - d2;
+						best_i = i;
+						best_j = j;
 					}
 				}
 			}
 
+			if(best_gain < 0) {
+				sp = sp.twoOptSwap(best_i, best_j);
+				swapped = true;
+			}
 		} while(swapped);
 
-		return best;
+		return sp;
 	}
 }
