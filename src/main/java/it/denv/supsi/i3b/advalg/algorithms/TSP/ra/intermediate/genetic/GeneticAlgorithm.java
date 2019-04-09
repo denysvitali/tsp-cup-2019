@@ -1,67 +1,77 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic;
 
 import it.denv.supsi.i3b.advalg.Route;
-import it.denv.supsi.i3b.advalg.algorithms.NotImplementedException;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.Random;
 
 public class GeneticAlgorithm implements ILS {
+	private int seed;
+	private TSPData data;
+	private Random random;
 
-	private int genes_size = -1;
-	private int[] initial_genes;
-	private Population population;
-	private int population_initial_size;
-	private int startNode = -1;
+	/*
+		GA Parameters:
+	 */
+
+	private double CROSSOVER_RATE = 0.8;
+	private double MUTATION_RATE = 0.5;
+	private int POPULATION_SIZE = 50;
+
+	public GeneticAlgorithm(int seed, TSPData data){
+		this.seed = seed;
+		this.data = data;
+		this.random = new Random(seed);
+	}
+
+	public GeneticAlgorithm(TSPData data){
+		this.seed = (int) (Math.random() * 1000);
+		this.random = new Random(seed);
+		this.data = data;
+	}
 
 	@Override
 	public Route route(Route route, TSPData data) {
-		this.startNode = route.getStartNode();
+		Population p = new Population(this, route, data);
 
-		initial_genes = new int[route.getPath().length - 2];
-
-		// Initial Genes: Path w/o Starting & Ending Node
-		System.arraycopy(route.getPath(), 1,
-				initial_genes,
-				0,
-				route.getPath().length - 2
-		);
-
-		this.genes_size = initial_genes.length;
-
-		population_initial_size = data.getDimension() * 3;
-		population = new Population(population_initial_size, initial_genes, data);
-		System.out.println(population + ", " + population.getRate(data.getBestKnown()));
-
-		int i = 0;
-		while(population.getRate(data.getBestKnown()) > 0.02){
-			population = new Population(population);
-			System.out.println(population + ", " + population.getRate(data.getBestKnown()));
-			i++;
+		for(int i=0; i<10; i++){
+			p = p.newGeneration();
 		}
 
-		Individual fittest = population.getFittest();
-		int[] finalPath = new int[genes_size+2];
-		System.arraycopy(fittest.getGenes(), 0, finalPath, 1,
-				genes_size);
-
-		finalPath[0] = startNode;
-		finalPath[genes_size+1] = startNode;
-
-
-		String arrayOutput = Arrays.stream(finalPath)
-				.mapToObj(Integer::toString)
-				.collect(Collectors.joining(", "));
-
-		System.out.println("Final Path: " + arrayOutput);
-
-		return new Route(finalPath, data);
+		return null;
 	}
 
 	@Override
 	public int getSeed() {
-		throw new NotImplementedException();
+		return 0;
+	}
+
+	public double getCrossoverRate() {
+		return CROSSOVER_RATE;
+	}
+
+	public void setCrossoverRate(double CROSSOVER_RATE) {
+		this.CROSSOVER_RATE = CROSSOVER_RATE;
+	}
+
+	public double getMutationRate() {
+		return MUTATION_RATE;
+	}
+
+	public void setMutationRate(double MUTATION_RATE) {
+		this.MUTATION_RATE = MUTATION_RATE;
+	}
+
+	public int getPopulationSize() {
+		return POPULATION_SIZE;
+	}
+
+	public void setPopulationSize(int POPULATION_SIZE) {
+		this.POPULATION_SIZE = POPULATION_SIZE;
+	}
+
+	public Random getRandom() {
+		return this.random;
 	}
 }

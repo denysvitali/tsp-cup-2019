@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class PopulationTest {
-	@Test
+	/*@Test
 	public void testCrossover() {
 		TSPData empty = null;
 		Individual i1 = new Individual(empty);
@@ -23,5 +23,5 @@ public class PopulationTest {
 
 		assertArrayEquals(new int[]{9,5,4,3,2,6,7,8,1}, genes);
 
-	}
+	}*/
 }
