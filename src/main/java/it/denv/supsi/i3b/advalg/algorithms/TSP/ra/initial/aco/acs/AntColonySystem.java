@@ -12,10 +12,10 @@ public class AntColonySystem extends RoutingAlgorithm {
 	public static final double ALPHA = 1;
 
 	// Relative importance of pheromone
-	public static final double BETA = 4.2;
+	public static final double BETA = 4.4;
 
 	// Pheromone Decay (PD, ρ)
-	public static final double PD = 0.5;
+	public static final double PD = 0.1;
 
 	/*
 		Pheromone Evaporation (PE, ξ)
@@ -28,7 +28,7 @@ public class AntColonySystem extends RoutingAlgorithm {
 	 */
 	public static final double UNUSED_PE = -1;
 
-	public static final double q0 = 0.42;
+	public static final double q0 = 0.9;
 
 	private AntColony ac;
 	private ILS ILS = null;

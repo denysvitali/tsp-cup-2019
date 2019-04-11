@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage[a4paper,margin=3cm]{geometry}
+\usepackage{xcolor}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{minted}
+\newminted[code]{java}{autogobble,
+breaklines, 
+frame=single,
+bgcolor=black,
+style=monokai,
+linenos}
+
+\newminted[tsp]{yaml}{autogobble,
+breaklines, 
+frame=single,
+bgcolor=black,
+style=monokai,
+linenos}
+
+\newcommand{\ic}[1]{\mintinline[style=manni]{java}{#1}}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+    {\scshape Scuola Universitaria della Svizzera Italiana (SUPSI)\par}
+    \vspace{0.5cm}
+    {C08003 - Advanced Algorithms and Optimization\par}
+    \vspace{5cm}
+    {
+    {\fontsize{1.5cm}{1.5cm}\selectfont 19\textsuperscript{th} Algorithms Cup\par}
+    \vspace{1cm}
+    {\Large Solving the Travelling Salesman Problem (TSP) with Java \par}
+    }
+    \vspace{8cm}
+    {\large Denys Vitali\par}
+    \vspace{1cm}
+    {\large April 2019}
+    \vfill
+\end{titlepage}
+
+\pagebreak
+
+\tableofcontents
+\pagebreak
+\section{Introduzione}
+Il presente documento contiene le informazioni riguardanti il mio metodo di
+risoluzione del problema del commesso viaggiatore (Travelling salesman problem, TSP).
+Questo progetto è un requisito del corso di
+\textit{Algoritmi Avanzati ed Ottimizzazione (C08003)}, tenuto presso la 
+\textit{Scuola Universitaria Professionale della Svizzera Italiana (SUPSI)} durante il
+corso di laurea in ingegneria informatica.
+\subsection{Scopo}
+Lo scopo del progetto è quello di risolvere 10 problemi di TSP (originati dalla
+libreria TSPLIB) forniteci ad inizio corso sfruttando uno o più algoritmi
+sviluppati in Java.
+
+\subsection{Requisiti}
+Di seguito vengono riportati i requisiti per un corretto svolgimento della coppa:
+\begin{itemize}
+\item Limite di tempo: massimo 3 minuti per problema,
+il tempo è inteso da quando il software inizia a quando finisce.
+\item 10 problemi (forniti in un file .zip ad inizio corso)
+\item Linguaggio di programmazione: Java
+\item Obbligatorio l'utilizzo di Maven, vietato l'utilizzo di librerie esterne
+\item Esecuzione replicabile: è necessario salvare eventuali seed e parametri da usare
+\item Risoluzione dei problemi: effettuata mediante tests. Deve essere possibile
+eseguire un test per risolvere un problema.
+\end{itemize}
+
+\pagebreak
+\section{Svolgimento del progetto}
+\subsection{I/O}
+Quale step iniziale e fondamentale è stato necessario sviluppare un parser dei problemi
+forniti, in quanto questi venivano forniti in un formato proprietario che sfrutta la
+struttura seguente:
+
+\begin{tsp}
+NAME: ch130
+TYPE: TSP
+COMMENT: 130 city problem (Churritz)
+DIMENSION: 130
+EDGE_WEIGHT_TYPE: EUC_2D
+BEST_KNOWN : 6110
+NODE_COORD_SECTION
+1 334.5909245845 161.7809319139
+2 397.6446634067 262.8165330708
+(...)
+EOF
+\end{tsp}
+
+Al fine di sfruttare al meglio il tempo a disposizione per i runs ho deciso di spendere
+un po' più del mio tempo a sviluppare un parser che fosse efficiente e non facesse
+uso di Regular Expressions. Questo ha portato alla creazione della classe \ic{TSPLoader}.
+Una volta caricato un problema (tramite il metodo \ic{parseFile()}) viene restituita
+un'istanza della classe \ic{TSPData}. Questa classe contiene i file di problema che
+verranno poi utilizzati in qualsiasi algoritmo di risoluzione.
+
+\end{document}

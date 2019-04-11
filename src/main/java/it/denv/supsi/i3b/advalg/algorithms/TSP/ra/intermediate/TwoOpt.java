@@ -2,6 +2,7 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate;
 
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 
@@ -66,24 +67,20 @@ public class TwoOpt implements ILS {
 
 		int best_gain;
 		int d[][] = data.getDistances();
-		boolean swapped;
 
 		do {
 			best_gain = 0;
 			int best_i = -1;
 			int best_j = -1;
-			swapped = false;
 			int[] msp = sp.getPathArr();
 
 			for(int i=1; i< path.length - 2; i++){
-				for (int j = i + 2; j < path.length - 1; j++) {
-					int d1 = d[msp[i]][msp[j+1]] + d[msp[i-1]][msp[j]];
-					int d2 = d[msp[i]][msp[i-1]] + d[msp[j+1]][msp[j]];
 
-					int gain = d1 - d2;
+				for(int j=i+2; j< path.length -2; j++){
+					int gain = cg(msp, i, j);
 
 					if(gain < best_gain){
-						best_gain = d1 - d2;
+						best_gain = gain;
 						best_i = i;
 						best_j = j;
 					}
@@ -92,10 +89,25 @@ public class TwoOpt implements ILS {
 
 			if(best_gain < 0) {
 				sp = sp.twoOptSwap(best_i, best_j);
-				swapped = true;
 			}
-		} while(swapped);
+		} while(best_gain < 0);
 
 		return sp;
+	}
+
+	private int cg(int[] c, int p, int q){
+		int[][] d = data.getDistances();
+
+		/*
+			From "The Traveling Salesman Problem: A Computational Study",
+			Chapter 15, page 425 - 426.
+
+			c_{i_{p-1}i}_{p} + c_{i_qi}
+		 */
+
+		int d1 = d[c[p-1]][c[q]] + d[c[p]][c[q+1]]; // before swap
+		int d2 = d[c[p-1]][c[p]] + d[c[q]][c[q+1]]; // after swap
+
+		return d1 - d2;
 	}
 }

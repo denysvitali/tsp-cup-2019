@@ -36,7 +36,6 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new GeneticAlgorithm(data))
 		);
 
 		double v = r.compareTo(data.getBestKnown());
@@ -420,7 +419,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 					.startWith(
 						new AntColonySystem(1, 10, data)
-								.setSolutionImprover(new ThreeOpt(data))
+								.setSolutionImprover(new TwoOpt(data))
 					)
 				.add(new TwoOpt(data))
 		);
@@ -446,8 +445,60 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(
 								new AntColonySystem(
-										5, data)
+										3, data)
 										.setSolutionImprover(new TwoOpt(data)))
+				.add(new TwoOpt(data))
+		);
+
+		String path = tsp.writeRoute(r);
+		GnuPlotUtils.plot(path);
+		System.out.println("Route length: " + r.getLength());
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void fl1577() throws IOException {
+		String filePath = Utils.getTestFile("/problems/fl1577.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		tsp.init(data);
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(
+								new AntColonySystem(
+										4, data)
+										.setSolutionImprover(new TwoOpt(data)))
+						.add(new TwoOpt(data))
+		);
+
+		String path = tsp.writeRoute(r);
+		GnuPlotUtils.plot(path);
+		System.out.println("Route length: " + r.getLength());
+		RouteUtils.computePerformance(r, data);
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
+	public void u1060ACS_SI2OPT() throws IOException {
+		String filePath = Utils.getTestFile("/problems/u1060.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		tsp.init(data);
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+					.startWith(
+					new AntColonySystem(
+					3, data)
+					.setSolutionImprover(new TwoOpt(data)))
 		);
 
 		String path = tsp.writeRoute(r);

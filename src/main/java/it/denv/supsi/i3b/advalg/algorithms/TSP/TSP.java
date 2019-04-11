@@ -5,14 +5,16 @@ import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.spanningtree.KruskalMST;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.spanningtree.SpanningTree;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class TSP {
 	public TSP(){
@@ -85,30 +87,60 @@ public class TSP {
 		data.setDistances(distances);
 
 		// Calculate HM<Integer, TS>
-		HashMap<Integer, TreeSet<Edge<Integer>>> nearest = new HashMap<>();
-		ArrayList<Edge<Integer>> edges = new ArrayList<>();
+		HashMap<Integer, ArrayList<Edge<Integer>>> candidate_list = new HashMap<>();
+		TreeSet<Edge<Integer>> edges = new TreeSet<>();
 
 		long s1 = System.currentTimeMillis();
 
 		for(int i=0; i<distances.length; i++){
-			TreeSet<Edge<Integer>> ts = new TreeSet<>();
+			ArrayList<Edge<Integer>> nn = new ArrayList<>();
 			for(int j=0; j<distances.length; j++){
 				if(i == j){
 					continue;
 				}
 				Edge<Integer> e = new Edge<>(i, j, distances[i][j]);
-				ts.add(e);
+				nn.add(e);
 				edges.add(e);
 			}
-			nearest.put(i, ts);
+			nn.sort(Edge::compareTo);
+			candidate_list.put(i,
+					nn.stream()
+							.limit(15)
+							.collect(Collectors.toCollection(ArrayList::new)));
 		}
+
+		/*
+		 	Given the Kruskal's MST, assign to each CL entry the previous / next
+		 	node in the MST.
+		 */
+
+		SpanningTree st = KruskalMST.compute(edges);
+
+		for(Edge<Integer> e : st.getEdges()){
+			candidate_list.get(e.getU()).add(e);
+			candidate_list.get(e.getV()).add(e.invert());
+		}
+
+		/*
+		 	We're going to keep only the V part of the edge, to reduce space
+		 	and time complexity.
+		 */
+
+		HashMap<Integer, int[]> clHM = new HashMap<>();
+		for(int i=0; i<data.getDimension(); i++){
+			clHM.put(i, candidate_list.get(i).stream().mapToInt(Edge::getV)
+				.toArray()
+			);
+		}
+
+
 
 		long s2 = System.currentTimeMillis();
 
-		System.out.println("Computed HM<I, TS<Edge>> in " + (s2-s1) + " ms");
+		System.out.println("Computed HM<I, A<Edge>> in " + (s2-s1) + " ms");
 
-		data.setNearest(nearest);
-		data.setEdges(edges);
+		data.setCL(clHM);
+		//data.setEdges(edges);
 		//printDistanceMatrix(data.getCoordinates().size(), distances);
 
 		data.setStartNode(1);

@@ -31,17 +31,17 @@ public class NearestNeighbour extends RoutingAlgorithm {
 			Edge<Integer> candidate = candidates.get(0);
 			tour.add(candidate);
 			candidator.addVisited(candidate);
-			candidates = candidator.getCandidates(candidate.getSecond());
+			candidates = candidator.getCandidates(candidate.getV());
 		}
 		while (candidates.size() != 0);
 
-		int last = tour.getLast().getSecond();
+		int last = tour.getLast().getV();
 
 		tour.add(new Edge<>(last, startNode,
 				data.getDistances()[last][startNode - 1]));
 
 		ArrayList<Integer> arr = tour.stream()
-				.map(Edge::getFirst)
+				.map(Edge::getU)
 				.collect(Collectors.toCollection(ArrayList::new));
 
 		arr.add(startNode);
@@ -75,10 +75,10 @@ public class NearestNeighbour extends RoutingAlgorithm {
 			return false;
 		}
 
-		if (tour.stream().map(Edge::getFirst).anyMatch(e -> e == a)) {
+		if (tour.stream().map(Edge::getU).anyMatch(e -> e == a)) {
 			return true;
 		}
 
-		return tour.getLast().getSecond() == a;
+		return tour.getLast().getV() == a;
 	}
 }

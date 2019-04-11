@@ -11,11 +11,11 @@ public class Edge<T extends Comparable<T>> implements Comparable<Edge<T>> {
 		this.weight = weight;
 	}
 
-	public int getFirst() {
+	public int getU() {
 		return first;
 	}
 
-	public int getSecond() {
+	public int getV() {
 		return second;
 	}
 
@@ -26,5 +26,9 @@ public class Edge<T extends Comparable<T>> implements Comparable<Edge<T>> {
 	@Override
 	public int compareTo(Edge<T> o) {
 		return this.weight.compareTo(o.weight);
+	}
+
+	public Edge<T> invert() {
+		return new Edge<>(second, first, weight);
 	}
 }

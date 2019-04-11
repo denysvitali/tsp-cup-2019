@@ -64,8 +64,8 @@ public class RNNCandidator implements Candidator<Integer> {
 
 	@Override
 	public void addVisited(Edge<Integer> candidate) {
-		tabuList.add(candidate.getFirst());
-		unvisitedNodes.remove(candidate.getFirst());
+		tabuList.add(candidate.getU());
+		unvisitedNodes.remove(candidate.getU());
 	}
 
 	@Override

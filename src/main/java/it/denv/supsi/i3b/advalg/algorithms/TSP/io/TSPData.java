@@ -18,7 +18,7 @@ public class TSPData {
 	protected EdgeWeightType ewt;
 	protected int best_known = 0;
 	protected HashMap<Integer, Coordinate> coordinates = new HashMap<>();
-	protected HashMap<Integer, TreeSet<Edge<Integer>>> nearest = new HashMap<>();
+	protected HashMap<Integer, int[]> nearest = new HashMap<>();
 	protected ArrayList<Edge<Integer>> edges = new ArrayList<>();
 	private boolean init = false;
 
@@ -74,11 +74,11 @@ public class TSPData {
 		return startNode;
 	}
 
-	public TreeSet<Edge<Integer>> getNearest(int startNode) {
+	public int[] getCL(int startNode) {
 		return nearest.get(startNode);
 	}
 
-	public void setNearest(HashMap<Integer, TreeSet<Edge<Integer>>> nearest) {
+	public void setCL(HashMap<Integer, int[]> nearest) {
 		this.nearest = nearest;
 	}
 

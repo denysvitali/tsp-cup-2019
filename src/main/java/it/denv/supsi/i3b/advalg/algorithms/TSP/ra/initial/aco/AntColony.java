@@ -110,14 +110,9 @@ public class AntColony {
 				Route[] routes = new Route[ants.length];
 
 				if(ILS != null) {
-					routes = new Route[ants.length * 2];
+					routes = new Route[ants.length];
 					for (int i = 0; i < ants.length; i++) {
 						routes[i] = ILS.route(ants[i].getRoute(), data);
-					}
-
-					// TODO: Check
-					for(int i=ants.length; i<routes.length; i++){
-						routes[i] = ants[i-ants.length].getRoute();
 					}
 				} else {
 					for (int i = 0; i < ants.length; i++) {

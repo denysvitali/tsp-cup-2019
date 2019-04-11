@@ -1,6 +1,7 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco;
 
 import it.denv.supsi.i3b.advalg.Route;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 
 public class Ant {
@@ -85,19 +86,18 @@ public class Ant {
 				} else {
 					// J
 					/* J = random variable given by (4.1) with α = 1 */
-					double rand = colony.random.nextDouble();
-					double tmp_sum = 0;
-					for(int i=0; i < probK.length; i++){
-						tmp_sum += probK[i];
 
-						if(tmp_sum >= rand){
+					double rand = colony.random.nextDouble();
+					for(int i=0; i < probK.length; i++){
+						rand -= probK[i];
+
+						if(rand <= 0){
 							return i;
 						}
 					}
 
-					System.out.println("Watch out!");
+					return getNextUnvisitedCity();
 				}
-				break;
 		}
 
 		return -1;
@@ -150,7 +150,7 @@ public class Ant {
 		currentCity = city;
 		probK = new double[colony.data.getDimension()];
 		calculateProbs();
-		printStatus("I'm at city " + city);
+		//printStatus("I'm at city " + city);
 		visitedCount++;
 
 		// Local Update
@@ -159,34 +159,55 @@ public class Ant {
 	private void calculateProbs() {
 		switch (colony.type){
 			case ACS:
-				double[] num = new double[colony.data.getDimension()];
 				int r = currentCity;
 
 				double sum = 0.0;
+				int[] cl = colony.data.getCL(currentCity);
+				double[] num = new double[cl.length];
 
-				for(int s=0; s<colony.data.getDimension(); s++){
-					if(!this.visitedCities[s]) {
+				if (cl.length == 0){
+					probK = new double[probK.length];
+					return;
+				}
+
+				for(int s=0; s<cl.length; s++){
+					if(!this.visitedCities[cl[s]]) {
 						num[s] = Math.pow(
-								colony.getCurrentP(r, s),
+								colony.getCurrentP(r, cl[s]),
 								AntColonySystem.ALPHA);
 						num[s] *= Math.pow(
-								colony.heurN(r, s),
+								colony.heurN(r, cl[s]),
 								AntColonySystem.BETA
 						);
 						sum += num[s];
 					}
 				}
 
-				for(int s = 0; s<colony.data.getDimension(); s++){
-					if(!this.visitedCities[s]) {
-						probK[s] = num[s] / sum;
+				for(int s = 0; s<cl.length; s++){
+					if(!this.visitedCities[cl[s]]) {
+						int second = cl[s];
+						probK[second] = num[s] / sum;
 					} else {
-						probK[s] = 0.0;
+						probK[cl[s]] = 0.0;
 					}
 				}
 
 				break;
 		}
+	}
+
+	private Edge<Integer> randomUnvisitedEdge(int u){
+		int v = getNextUnvisitedCity();
+		return new Edge<>(u, v, colony.data.getDistances()[u][v]);
+	}
+
+	private int getNextUnvisitedCity(){
+		for(int i=0; i<visitedCities.length; i++){
+			if(!visitedCities[i]){
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	private int getRandomCity() {

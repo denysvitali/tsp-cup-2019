@@ -10,7 +10,7 @@ public class SwappablePath {
 		this.path = path;
 	}
 
-	public SwappablePath twoOptSwap(int i, int k){
+	public SwappablePath twoOptSwap(int p, int q){
 		/*
 		2optSwap(route, i, k) {
 			1. take route[0] to route[i-1] and add them in order to new_route
@@ -20,22 +20,22 @@ public class SwappablePath {
 		}
 		*/
 
-		//assert(i != 0);
-		assert(k != path.length - 1);
-
 		int[] np = new int[this.path.length];
 
-		for(int j=0; j<i; j++){
-			np[j] = path[j];
+		for(int i=0; i<p; i++){
+			np[i] = path[i];
 		}
 
-		for(int j=i; j<=k; j++){
-			np[k-j + i] = path[j];
+		int dec = 0;
+		for(int i=p; i<=q; i++){
+			np[i] = path[(q - dec)];
+			dec++;
 		}
 
-		for(int j=k+1; j<this.path.length; j++){
-			np[j] = path[j];
+		for(int i=q+1; i<this.path.length; i++){
+			np[i] = path[i];
 		}
+
 
 		return new SwappablePath(np);
 	}
