@@ -418,7 +418,7 @@ public class TSPRunnerTest {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 					.startWith(
-						new AntColonySystem(1, 3, data)
+						new AntColonySystem(15, 3, data)
 								.setSolutionImprover(new TwoOpt(data))
 					)
 				.add(new TwoOpt(data))

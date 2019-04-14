@@ -105,7 +105,7 @@ public class TSP {
 			nn.sort(Edge::compareTo);
 			candidate_list.put(i,
 					nn.stream()
-							.limit(15)
+							.limit(25)
 							.collect(Collectors.toCollection(ArrayList::new)));
 		}
 

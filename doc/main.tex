@@ -4,6 +4,8 @@
 \renewcommand{\familydefault}{\sfdefault}
 
 \usepackage{minted}
+\usepackage{parskip}
+
 \newminted[code]{java}{autogobble,
 breaklines, 
 frame=single,
@@ -17,6 +19,8 @@ frame=single,
 bgcolor=black,
 style=monokai,
 linenos}
+
+\setlength\parskip{\baselineskip}
 
 \newcommand{\ic}[1]{\mintinline[style=manni]{java}{#1}}
 
@@ -68,6 +72,32 @@ il tempo è inteso da quando il software inizia a quando finisce.
 \item Risoluzione dei problemi: effettuata mediante tests. Deve essere possibile
 eseguire un test per risolvere un problema.
 \end{itemize}
+
+\subsection{Problema del commesso viaggiatore (TSP)}
+Il problema che andremo a risolvere attraverso il nostro
+ algoritmo è quello del commesso viaggiatore.
+La descrizione può essere formalizzata come segue:
+un commesso viaggiatore necessita di visitare $n$ città, al
+massimo una volta, partendo da una città di partenza $A$ e tornando
+alla stessa dopo averle visitate tutte. Si chiede di trovare
+qual è il percorso ottimale (ossia il percorso più breve)
+che visiti tutte le città. 
+
+Il problema, di tipo NP-hard, viene espresso matematicamente nel modo seguente:
+dato un grafo pesato e completo $G = (V, E, w)$ con $n$ veritci, determinare il
+ciclo hamiltoniano con il costo più basso. \\
+Data una matrice di incidenza $C$ (dove $c_{i,j} \in \{0,1\}$),
+ed una matrice dei pesi $w$,
+la funzione obiettivo è la seguente:
+\begin{equation}
+    \min \ \sum_{i = 0}^n \sum_{j = 0}^n c_{i,j} \cdot w_{i,j}
+\end{equation}
+
+Dato che la computazione e verifica di tutte le $n!$ possibilità richiederebbe
+un tempo troppo elevato (ed il tempo per la risoluzione di un 
+problema è limitato a 3 minuti),
+nel nostro progetto ci accontenteremo di una "buona" soluzione,
+utilizzando dei metodi euristici.
 
 \pagebreak
 \section{Svolgimento del progetto}

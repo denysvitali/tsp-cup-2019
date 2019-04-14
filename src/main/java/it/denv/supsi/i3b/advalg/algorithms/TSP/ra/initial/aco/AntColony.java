@@ -10,6 +10,7 @@ import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 import java.util.Random;
 
 public class AntColony {
+	protected boolean USE_CL = false;
 	protected AcoType type;
 	public Random random;
 	private int nr_ants = 0;
@@ -64,7 +65,6 @@ public class AntColony {
 		switch (type){
 			case ACS:
 				my_epsilon = 1.0 / (this.data.getDimension() * cnn);
-				//my_epsilon = 0.4;
 				break;
 		}
 
@@ -132,6 +132,7 @@ public class AntColony {
 				}
 
 				RouteUtils.computePerformance(localBest, data);
+				assert(localBest.getLength() >= data.getBestKnown());
 				this.globalPheromoneUpdate();
 
 				// Reset ants
@@ -206,5 +207,10 @@ public class AntColony {
 
 	public double getCurrentP(int i, int j) {
 		return getPheromone()[i][j];
+	}
+
+	public AntColony setCL(boolean cl){
+		this.USE_CL = cl;
+		return this;
 	}
 }

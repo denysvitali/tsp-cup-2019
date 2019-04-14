@@ -1,8 +1,11 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco;
 
 import it.denv.supsi.i3b.advalg.Route;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Ant {
 	private AntColony colony;
@@ -11,10 +14,11 @@ public class Ant {
 	public int[] path;
 
 	private int visitedCount = 0;
-	private double[] probK;
 	private int currentCity = -3;
 	private int firstCity = -2;
 	private int id = -1;
+
+	private List<City> notVisited = new ArrayList<>();
 
 	private AntStatus status = AntStatus.STOPPED;
 
@@ -70,15 +74,14 @@ public class Ant {
 					double max = Double.MIN_VALUE;
 
 					int maxEl = firstCity;
-					for(int l = 0; l<colony.data.getDimension(); l++){
-						if(!visitedCities[l]) {
-							double v = colony.getCurrentP(currentCity, l)
-									* Math.pow(colony.heurN(currentCity, l),
-									AntColonySystem.BETA);
-							if (v > max) {
-								max = v;
-								maxEl = l;
-							}
+					for(City c : notVisited){
+						int l = c.getId();
+						double v = colony.getCurrentP(currentCity, l)
+								* Math.pow(colony.heurN(currentCity, l),
+								AntColonySystem.BETA);
+						if (v > max) {
+							max = v;
+							maxEl = l;
 						}
 					}
 					return maxEl;
@@ -86,48 +89,82 @@ public class Ant {
 					// J
 					/* J = random variable given by (4.1) with α = 1 */
 
-					int dim = this.colony.data.getDimension();
-					double prob[] = new double[dim];
-					double den = 0;
-
 					int i = currentCity;
-					for(int l=0; l<dim; l++){
-						if(!visitedCities[l]) {
+
+					if (colony.USE_CL) {
+						double den = 0;
+						int[] cl = colony.data.getCL(currentCity);
+						double[] prob = new double[cl.length];
+						for (int l = 0; l < cl.length; l++) {
+							if (!visitedCities[cl[l]]){
+								den +=
+										Math.pow(colony.getCurrentP(i, cl[l]),
+												AntColonySystem.ALPHA)
+												* Math.pow(colony.heurN(i, cl[l]),
+												AntColonySystem.BETA);
+							}
+						}
+
+						for (int j = 0; j < cl.length; j++) {
+							if (!visitedCities[cl[j]]){
+								prob[j] = Math.pow(colony.getCurrentP(i, cl[j]),
+										AntColonySystem.ALPHA)
+										* Math.pow(colony.heurN(i, cl[j]),
+										AntColonySystem.BETA) / den;
+							}
+						}
+
+						int nextCity = getRandomCityByProb(colony.random, prob);
+						if (nextCity == -1) {
+							return getNextUnvisitedCity();
+						}
+
+						return cl[nextCity];
+					} else {
+						double[] prob = new double[notVisited.size()];
+						double den = 0;
+						for (City c : notVisited) {
+							int l = c.getId();
 							den +=
 									Math.pow(colony.getCurrentP(i, l),
 											AntColonySystem.ALPHA)
 											* Math.pow(colony.heurN(i, l),
 											AntColonySystem.BETA);
 						}
-					}
 
-					for(int j=0; j<dim; j++){
-						if(!visitedCities[j]) {
-							prob[j] = Math.pow(colony.getCurrentP(i, j),
+						for (int j=0; j<notVisited.size(); j++) {
+							prob[j] = Math.pow(colony.getCurrentP(i, notVisited.get(j).getId()),
 									AntColonySystem.ALPHA)
-									* Math.pow(colony.heurN(i, j),
+									* Math.pow(colony.heurN(i, notVisited.get(j).getId()),
 									AntColonySystem.BETA) / den;
 						}
-					}
 
-					double rand = colony.random.nextDouble();
-					int nextCity = 0;
+						int nextCity = getRandomCityByProb(colony.random, prob);
 
-					double cur = 1.0;
-					while(rand <= 0 || nextCity == dim){
-						if(rand < cur){
-							return nextCity;
-						} else {
-							cur -= prob[nextCity];
-							nextCity++;
+						if(nextCity != -1){
+							return notVisited.get(nextCity).getId();
 						}
+
+						return getNextUnvisitedCity();
 					}
 
-					return getNextUnvisitedCity();
+					}
 				}
+				return -1;
+	}
+
+	public static int getRandomCityByProb(Random r, double[] prob) {
+		double rand = r.nextDouble() - 0.001;
+		for(int i=0; i<prob.length; i++){
+			rand -= prob[i];
+			if(0 >= rand){
+				return i;
+			}
 		}
 
 		return -1;
+
+		//throw new RuntimeException("This should never happen");
 	}
 
 	private void setStopped() {
@@ -141,9 +178,11 @@ public class Ant {
 	public void reset() {
 		this.visitedCount = 0;
 		visitedCities = new boolean[colony.data.getDimension()];
+		notVisited = new ArrayList<>();
 
 		for(int i=0; i<colony.data.getDimension(); i++){
 			visitedCities[i] = false;
+			notVisited.add(new City(i));
 		}
 
 		this.path = new int[colony.data.getDimension() + 1];
@@ -172,66 +211,18 @@ public class Ant {
 		}
 
 		this.visitedCities[city] = true;
+		this.notVisited.remove(new City(city));
 		this.path[visitedCount] = city;
 
 		currentCity = city;
-		probK = new double[colony.data.getDimension()];
 		visitedCount++;
-
-		// Local Update
-	}
-
-	private void calculateProbs() {
-		switch (colony.type){
-			case ACS:
-				int r = currentCity;
-
-				double sum = 0.0;
-				int[] cl = colony.data.getCL(currentCity);
-				double[] num = new double[cl.length];
-
-				if (cl.length == 0){
-					probK = new double[probK.length];
-					return;
-				}
-
-				for(int s=0; s<cl.length; s++){
-					if(!this.visitedCities[cl[s]]) {
-						num[s] = Math.pow(
-								colony.getCurrentP(r, cl[s]),
-								AntColonySystem.ALPHA);
-						num[s] *= Math.pow(
-								colony.heurN(r, cl[s]),
-								AntColonySystem.BETA
-						);
-						sum += num[s];
-					}
-				}
-
-				for(int s = 0; s<cl.length; s++){
-					if(!this.visitedCities[cl[s]]) {
-						int second = cl[s];
-						probK[second] = num[s] / sum;
-					} else {
-						probK[cl[s]] = 0.0;
-					}
-				}
-
-				break;
-		}
-	}
-
-	private Edge<Integer> randomUnvisitedEdge(int u){
-		int v = getNextUnvisitedCity();
-		return new Edge<>(u, v, colony.data.getDistances()[u][v]);
 	}
 
 	private int getNextUnvisitedCity(){
-		for(int i=0; i<visitedCities.length; i++){
-			if(!visitedCities[i]){
-				return i;
-			}
+		if(notVisited.size() > 0){
+			return notVisited.get(0).getId();
 		}
+
 		return -1;
 	}
 

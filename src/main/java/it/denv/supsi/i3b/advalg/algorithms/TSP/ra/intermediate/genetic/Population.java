@@ -1,46 +1,57 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic;
 
 import it.denv.supsi.i3b.advalg.Route;
+import it.denv.supsi.i3b.advalg.algorithms.NotImplementedException;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.ABCycle;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.EAX;
 
 import java.util.Arrays;
 import java.util.Random;
 
 public class Population {
-	private Individual[] individuals;
 	private TSPData data;
-	private boolean[] initialGenes;
 	private GeneticAlgorithm ga;
 	private Random r;
-	private int genesSize;
+
+	private Individual[] individuals;
+	private boolean[] initialGenes;
+	private int population_size = -1;
+	private int generation = 1;
+
+	private SwappablePath fittest;
+	private SwappablePath best_fit_generation;
+
 
 	public Population(GeneticAlgorithm ga, Route r, TSPData data){
 		this.ga = ga;
 		this.r = ga.getRandom();
 		this.data = data;
 		initialGenes = getGenes(r);
-		this.genesSize = initialGenes.length;
+		this.population_size = ga.getPopulationSize();
 
 		// Initial Population
-		this.individuals = new Individual[ga.getPopulationSize()];
-		for(int i=0; i<ga.getPopulationSize(); i++){
-			this.individuals[i] = new Individual(mutateGenes(initialGenes),
-					this);
+		this.individuals = new Individual[this.population_size];
+		for(int i=0; i<this.population_size; i++){
+			this.individuals[i] = new Individual(mutateGenes(initialGenes), this);
 		}
 	}
 
 	public boolean[] mutateGenes(boolean[] genes){
-		boolean[] mutatedGenes = new boolean[genes.length];
-		System.arraycopy(genes, 0, mutatedGenes, 0,
-				genes.length);
-		do {
-			for(int i=0; i<2; i++){
-				int mutationIndex = this.r.nextInt(genes.length);
-				mutatedGenes[mutationIndex] = !mutatedGenes[mutationIndex];
-			}
-		} while(!isValid(mutatedGenes));
+		// Mutation isn't implemented
 
-		return mutatedGenes;
+		return genes;
+	}
+
+	/*
+		Do a crossover of A and B using the EAX algorithm
+
+		@returns An Individual generated from parent A & parent B
+	 */
+	public Individual crossOver(Individual A, Individual B){
+		// EAX Crossover
+		return EAX.crossover(A, B, this);
 	}
 
 	public static boolean isValid(boolean[] mutatedGenes) {
@@ -141,12 +152,62 @@ public class Population {
 		 */
 
 		double totalFit = 0.0;
+		Individual[] current_generation = new Individual[population_size];
+
+		double[] probK = new double[population_size];
+
 		for(Individual i : individuals){
 			totalFit += i.getFit();
 		}
 
+		for(int i=0; i<individuals.length; i++){
+			probK[i] = individuals[i].getFit() / totalFit;
+		}
 
+		Individual[] offsprings = new Individual[population_size];
+
+		for(int i=0; i<population_size; i++){
+			Individual A = getRandomIndividual(individuals, probK);
+			Individual B = getRandomIndividual(individuals, probK);
+
+			// Given Two Parents, generate an offspring
+			offsprings[i] = crossOver(A, B);
+		}
+
+		this.generation += 1;
+		this.individuals = current_generation;
+
+		// TODO: Set the best_fit for this generation
+		best_fit_generation = null;
+
+		if(fittest == null || fittest.getLength() > best_fit_generation.getLength()){
+			fittest = best_fit_generation;
+		}
+
+		printGenerationStats();
 		return this;
+	}
+
+	private Individual getRandomIndividual(Individual[] individuals, double[] probK) {
+		double rand = r.nextDouble();
+
+		for(int i=0; i<individuals.length; i++){
+			if(rand <= 0){
+				return individuals[i];
+			}
+
+			rand -= probK[i];
+		}
+
+		return individuals[individuals.length-1];
+	}
+
+	private void printGenerationStats(){
+		System.out.println(
+				String.format("G: %d\tP: %d\t F: %d",
+						generation, this.individuals.length,
+						this.best_fit_generation.getLength())
+		);
 	}
 
 	/*
@@ -162,5 +223,9 @@ public class Population {
 	 */
 	public int[][] getIncidenceMatrix() {
 		return data.getDistances();
+	}
+
+	public Random getRandom() {
+		return r;
 	}
 }

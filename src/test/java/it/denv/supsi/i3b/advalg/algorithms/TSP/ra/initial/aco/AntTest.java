@@ -7,6 +7,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,26 +43,11 @@ class AntTest {
 	}
 
 	@Test
-	void getVisitableNodes() {
-	}
+	void testProbCity(){
+		double[] probList = new double[]{0.0, 1.0};
+		Random r = new Random(1);
 
-	@Test
-	void getTabuList() {
-	}
-
-	@Test
-	void getProb() {
-	}
-
-	@Test
-	void calculateProb() {
-	}
-
-	@Test
-	void getAntDecisionTable() {
-	}
-
-	@Test
-	void pathLength() {
+		int c = Ant.getRandomCityByProb(r, probList);
+		assertEquals(1, c);
 	}
 }

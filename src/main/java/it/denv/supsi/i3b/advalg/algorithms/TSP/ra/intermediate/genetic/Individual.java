@@ -4,7 +4,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 
 public class Individual {
 	private boolean[] genes;
-	private double fit;
+	private int fit;
 	private Population from;
 
 	public Individual(boolean[] genes, Population from){
@@ -12,7 +12,11 @@ public class Individual {
 		this.from = from;
 	}
 
-	int getFit(){
+	public int getFit(){
+		if(this.fit != -1){
+			return this.fit;
+		}
+
 		int[][] im = from.getIncidenceMatrix();
 		int fit = 0;
 
@@ -25,6 +29,11 @@ public class Individual {
 				idx++;
 			}
 		}
+		this.fit = fit;
 		return fit;
+	}
+
+	public boolean[] getGenes(){
+		return genes;
 	}
 }
