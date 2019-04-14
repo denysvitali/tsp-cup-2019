@@ -394,7 +394,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(
 								new AntColonySystem(
-										data.getDimension(), data)
+										9, data)
 										.setSolutionImprover(new TwoOpt(data)))
 		);
 
@@ -418,7 +418,7 @@ public class TSPRunnerTest {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 					.startWith(
-						new AntColonySystem(1, 10, data)
+						new AntColonySystem(1, 3, data)
 								.setSolutionImprover(new TwoOpt(data))
 					)
 				.add(new TwoOpt(data))
@@ -445,7 +445,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(
 								new AntColonySystem(
-										3, data)
+										2, data)
 										.setSolutionImprover(new TwoOpt(data)))
 				.add(new TwoOpt(data))
 		);
@@ -566,7 +566,8 @@ public class TSPRunnerTest {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
-						.add(new SimulatedAnnealing().setMode(SimulatedAnnealing.Mode.TwoOpt))
+						.add(new SimulatedAnnealing()
+								.setMode(SimulatedAnnealing.Mode.TwoOpt))
 		);
 
 		String path = tsp.writeRoute(r);

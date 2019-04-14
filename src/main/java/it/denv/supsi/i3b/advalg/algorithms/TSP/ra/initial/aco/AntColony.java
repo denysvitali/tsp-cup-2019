@@ -31,7 +31,7 @@ public class AntColony {
 	private Route bestRoute = null;
 	private Route localBest = null;
 
-	private double my_epsilon = -1;
+	private double my_epsilon = 0.4;
 
 	public AntColony(AcoType type, int ants, TSPData data){
 		this.type = type;
@@ -63,8 +63,8 @@ public class AntColony {
 
 		switch (type){
 			case ACS:
-				//my_epsilon = 1.0 / (this.data.getDimension() * cnn);
-				my_epsilon = 0.4;
+				my_epsilon = 1.0 / (this.data.getDimension() * cnn);
+				//my_epsilon = 0.4;
 				break;
 		}
 
@@ -195,7 +195,7 @@ public class AntColony {
 			case ACS:
 				pv[r][s] *= (1-this.my_epsilon);
 				pv[r][s] += this.my_epsilon * tau0;
-				pv[s][r] = pv[r][s];
+				//pv[s][r] = pv[r][s];
 				break;
 		}
 	}

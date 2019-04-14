@@ -66,9 +66,10 @@ public class Ant {
 
 				// Pseudorandom Proportional Rule
 				if(q <= AntColonySystem.q0){
+					// Choose the node w/ the highest Pheromone * Heur
 					double max = Double.MIN_VALUE;
-					int maxEl = firstCity;
 
+					int maxEl = firstCity;
 					for(int l = 0; l<colony.data.getDimension(); l++){
 						if(!visitedCities[l]) {
 							double v = colony.getCurrentP(currentCity, l)
@@ -80,19 +81,45 @@ public class Ant {
 							}
 						}
 					}
-
-					printStatus("MaxEl: " + maxEl + ", " + max);
 					return maxEl;
 				} else {
 					// J
 					/* J = random variable given by (4.1) with α = 1 */
 
-					double rand = colony.random.nextDouble();
-					for(int i=0; i < probK.length; i++){
-						rand -= probK[i];
+					int dim = this.colony.data.getDimension();
+					double prob[] = new double[dim];
+					double den = 0;
 
-						if(rand <= 0){
-							return i;
+					int i = currentCity;
+					for(int l=0; l<dim; l++){
+						if(!visitedCities[l]) {
+							den +=
+									Math.pow(colony.getCurrentP(i, l),
+											AntColonySystem.ALPHA)
+											* Math.pow(colony.heurN(i, l),
+											AntColonySystem.BETA);
+						}
+					}
+
+					for(int j=0; j<dim; j++){
+						if(!visitedCities[j]) {
+							prob[j] = Math.pow(colony.getCurrentP(i, j),
+									AntColonySystem.ALPHA)
+									* Math.pow(colony.heurN(i, j),
+									AntColonySystem.BETA) / den;
+						}
+					}
+
+					double rand = colony.random.nextDouble();
+					int nextCity = 0;
+
+					double cur = 1.0;
+					while(rand <= 0 || nextCity == dim){
+						if(rand < cur){
+							return nextCity;
+						} else {
+							cur -= prob[nextCity];
+							nextCity++;
 						}
 					}
 
@@ -149,8 +176,6 @@ public class Ant {
 
 		currentCity = city;
 		probK = new double[colony.data.getDimension()];
-		calculateProbs();
-		//printStatus("I'm at city " + city);
 		visitedCount++;
 
 		// Local Update
