@@ -95,7 +95,7 @@ public class GnuPlotUtils {
 		, bPath);
 	}
 
-	public static void plotABCycles(ABCycle[] cycles, TSPData data) {
+	public static void plotABCycles(ArrayList<ABCycle> cycles, TSPData data) {
 		try {
 			String[] color = new String[]{
 				"f44336",
@@ -116,11 +116,11 @@ public class GnuPlotUtils {
 			StringBuilder sb = new StringBuilder();
 			sb.append("plot ");
 
-			for (int i = 0; i < cycles.length; i++) {
+			for (int i = 0; i < cycles.size(); i++) {
 				if(i != 0){
 					sb.append(", ");
 				}
-				ABCycle currCycle = cycles[i];
+				ABCycle currCycle = cycles.get(i);
 				String f = File
 						.createTempFile("tsp-plot-abc", ".dat")
 						.getPath();

@@ -5,6 +5,7 @@
 
 \usepackage{minted}
 \usepackage{parskip}
+\usepackage{amsmath}
 
 \newminted[code]{java}{autogobble,
 breaklines, 
@@ -126,5 +127,16 @@ uso di Regular Expressions. Questo ha portato alla creazione della classe \ic{TS
 Una volta caricato un problema (tramite il metodo \ic{parseFile()}) viene restituita
 un'istanza della classe \ic{TSPData}. Questa classe contiene i file di problema che
 verranno poi utilizzati in qualsiasi algoritmo di risoluzione.
+
+\section{Algoritmi Utilizzati}
+
+\subsection{Genetic Algorithm}
+Per l'algoritmo genetico ho fatto uso di una funzione di crossover ampiamente
+discussa e rivisitata, ottimizzata per il TSP, chiamata EAX (Edge Assembly
+Crossover).
+
+// TODO
+
+$E_C := (E_A \setminus (\text{E-Set} \cap E_A)) \cup (\text{E-Set} \cap E_B)$
 
 \end{document}

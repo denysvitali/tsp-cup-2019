@@ -28,7 +28,7 @@ public class EAX {
 		} while(cycle != null);
 
 		if(DEBUG){
-			//GnuPlotUtils.plotABCycles(cycles, ga.getData());
+			//GnuPlotUtils.plotABCycles(abCycles, ga.getData());
 		}
 
 		return abCycles;
@@ -107,16 +107,30 @@ public class EAX {
 	}
 
 	public static Individual crossover(Individual A, Individual B, Population p) {
-		EAXGraph g = merge(A, B, p);
 		/*
+			0.	Let G_{AB} be the undirected multigraph (overlapped edges,
+				one from E_A and one from E_B, are distinguished) defined as
+				G_{AB} = (V, E_A \\union E_B). [1]
+
+			0.	Denote a pair of parents as Tour-A and Tour-B, and define
+				G_{AB} as a graph constructed by merging Tour-A and Tour-B [2]
+		 */
+
+		EAXGraph g = merge(A, B, p);
+
 		if(DEBUG) {
-			GnuPlotUtils.plotEAXGraph(g, p.getData());
-		}*/
+			//GnuPlotUtils.plotEAXGraph(g, p.getData());
+		}
 
 		/*
+			1.	Partition all edges of G_{AB} into AB-cycles, where an
+				AB-Cycle is defined as a cycle in G_{AB}, such that edges of
+				E_A and edges of E_B are alternately linked. [1]
+			--------------------------------------------------------------------
+
 		 	1. 	Divide edges on G_{AB} into AB-Cycles, where an AB-Cycle
 		 		is defined as a closed loop on G_{AB} that can be generated
-		 		by alternating tracing edges of tour-A and tour-B
+		 		by alternating tracing edges of tour-A and tour-B [2]
 		 	-------------------------------------------------------------------
 		 */
 		ArrayList<ABCycle> cycles = generateABCycles(g, p.getGA());
@@ -134,12 +148,18 @@ public class EAX {
 			2.	Select a subset of the AB-Cycles (E-Set)
 			-------------------------------------------------------------------
 				Construct an E-Set by selecting AB-Cycles according to a given
-				rule.
+				selection strategy, where an E-Set is defined as the union of
+				AB-cycles. Note that this selection strategy determines a
+				version of EAX. [1]
+
+				Construct an E-Set by selecting AB-Cycles according to a given
+				rule. [2]
+
 
 			a) 	Use EAX(heuristic)
 		 */
 
-		ArrayList<ABCycle> eSetHeur = EAX.heur(cycles, p);
+		//ArrayList<ABCycle> eSetHeur = EAX.heur(cycles, p);
 
 		/*
 			If no children that are better than both A and B are found
@@ -149,9 +169,35 @@ public class EAX {
 					are produced.
 		 */
 		ArrayList<ABCycle> eSetRand = EAX.rand(cycles, p.getRandom(), 0.5);
+		GnuPlotUtils.plotABCycles(eSetRand, p.getData());
 
-		// 3. Return the generated child
+		/*
+			3.	Generate an intermediate solution from p_A by removing
+				the edges of E_A and adding the edges of E_B in the E-Set,
+				i.e, generate an intermediate solution by
+				E_C := (E_A \setminus (\text{E-Set} \cap E_A)) \cup (\text{E-Set} \cap E_B)
+				An intermediate solution consists of one or more subtours. [1]
+		 */
+
+
+		/*
+			4.	Generate an offspring solution by connecting all subtours
+				into a tour (details are given later)
+
+			5.	If a further offspring solution is generated, then go to Step 2.
+				Otherwise, terminate the procedure.
+		 */
+
+		System.out.println("DONE");
+
 		throw new NotImplementedException();
+
+		/*
+			References:
+			[1] Nagata and Kobayashi: A Powerful Genetic Algorithm Using EAX for
+				the TSP
+			[2] PPSN IX: Yuichi Nagata: New EAX Crossover for Large TSP Instances
+		 */
 	}
 
 	private static EAXGraph merge(Individual a, Individual b, Population p) {
