@@ -38,7 +38,7 @@ public class NearestNeighbour extends RoutingAlgorithm {
 		int last = tour.getLast().getV();
 
 		tour.add(new Edge<>(last, startNode,
-				data.getDistances()[last][startNode - 1]));
+				data.getDistances()[last][startNode]));
 
 		ArrayList<Integer> arr = tour.stream()
 				.map(Edge::getU)
@@ -54,7 +54,7 @@ public class NearestNeighbour extends RoutingAlgorithm {
 				.orElse(0);
 
 		// Cleanup
-		tour = new LinkedList<>();
+		reset();
 
 		Route r = new Route(arr
 				.stream()
@@ -63,6 +63,10 @@ public class NearestNeighbour extends RoutingAlgorithm {
 				data);
 		r.setLength(length);
 		return r;
+	}
+
+	public void reset(){
+		tour = new LinkedList<>();
 	}
 
 	@Override

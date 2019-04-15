@@ -75,6 +75,9 @@ public class EAX {
 		boolean[] a_genes = a.getGenes();
 		boolean[] b_genes = b.getGenes();
 
+		System.out.println("A: " + a.prettyPrintGenes());
+		System.out.println("B: " + b.prettyPrintGenes());
+
 		// Do not merge two equal individuals
 		assert(!(Arrays.equals(a_genes, b_genes)));
 

@@ -4,6 +4,7 @@ import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.NotImplementedException;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.ABCycle;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.EAX;
 
@@ -33,8 +34,12 @@ public class Population {
 
 		// Initial Population
 		this.individuals = new Individual[this.population_size];
+
+		RandomNearestNeighbour rnn = new RandomNearestNeighbour(this.r, data);
 		for(int i=0; i<this.population_size; i++){
-			this.individuals[i] = new Individual(mutateGenes(initialGenes), this);
+			// Generate random individuals:
+			Route route = rnn.route(this.r.nextInt(data.getDimension()), data);
+			this.individuals[i] = new Individual(getGenes(route), this);
 		}
 	}
 
@@ -121,11 +126,9 @@ public class Population {
 		int n = path.length - 1;
 
 
-		int prev = path[0];
-		for(int i=1; i<path.length; i++){
-			incidMat[prev][path[i]] = true;
-			incidMat[path[i]][prev] = true;
-			prev = path[i];
+		for(int i=0; i<path.length-1; i++){
+			incidMat[path[i]][path[i+1]] = true;
+			incidMat[path[i+1]][path[i]] = true;
 		}
 
 		int dim = (n * n - n)/2;
@@ -169,6 +172,10 @@ public class Population {
 		for(int i=0; i<population_size; i++){
 			Individual A = getRandomIndividual(individuals, probK);
 			Individual B = getRandomIndividual(individuals, probK);
+
+			while(A == B){
+				B = getRandomIndividual(individuals, probK);
+			}
 
 			// Given Two Parents, generate an offspring
 			offsprings[i] = crossOver(A, B);

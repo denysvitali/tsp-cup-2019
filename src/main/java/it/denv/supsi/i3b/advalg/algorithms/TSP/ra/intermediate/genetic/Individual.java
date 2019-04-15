@@ -2,9 +2,11 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic;
 
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 
+import java.util.Arrays;
+
 public class Individual {
 	private boolean[] genes;
-	private int fit;
+	private int fit = -1;
 	private Population from;
 
 	public Individual(boolean[] genes, Population from){
@@ -35,5 +37,31 @@ public class Individual {
 
 	public boolean[] getGenes(){
 		return genes;
+	}
+
+	public String prettyPrintGenes() {
+		StringBuilder sb = new StringBuilder();
+		for(int i=0; i<genes.length; i++){
+			if(genes[i]){
+				sb.append("1");
+			} else {
+				sb.append("0");
+			}
+		}
+
+		return sb.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj){
+			return true;
+		}
+
+		if(obj instanceof Individual){
+			Individual o = (Individual) obj;
+			return Arrays.equals(this.genes, o.genes);
+		}
+		return false;
 	}
 }

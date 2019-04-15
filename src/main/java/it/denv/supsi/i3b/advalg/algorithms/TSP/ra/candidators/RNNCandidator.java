@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 public class RNNCandidator implements Candidator<Integer> {
 
 	private int size;
-	private int startNode;
 	private int seed = -1;
 	private Random random;
 	private TSPData data;
@@ -30,6 +29,16 @@ public class RNNCandidator implements Candidator<Integer> {
 
 		this.random = new Random(seed);
 	}
+
+	public RNNCandidator(Random r, int size, TSPData data){
+		this.random = r;
+		this.size = size;
+		this.data = data;
+		for(int i = 0; i < data.getDimension(); i++){
+			unvisitedNodes.add(i);
+		}
+	}
+
 	public RNNCandidator(int size, TSPData data){
 		this.size = size;
 		this.data = data;
@@ -70,6 +79,6 @@ public class RNNCandidator implements Candidator<Integer> {
 
 	@Override
 	public void setStartNode(int startNode) {
-		this.startNode = startNode;
+
 	}
 }
