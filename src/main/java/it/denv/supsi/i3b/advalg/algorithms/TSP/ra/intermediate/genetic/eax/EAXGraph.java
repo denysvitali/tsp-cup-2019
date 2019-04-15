@@ -38,4 +38,8 @@ public class EAXGraph {
 	public ArrayList<ABEdge> getCity(int idx){
 		return this.cities.get(idx);
 	}
+
+	public void removeEdge(ABEdge e) {
+		this.edges.remove(e);
+	}
 }

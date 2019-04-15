@@ -7,6 +7,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.Populatio
 import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -15,27 +16,35 @@ import java.util.Random;
 public class EAX {
 	private static final boolean DEBUG = true;
 
-	public static ABCycle[] generateABCycles(EAXGraph g, GeneticAlgorithm ga){
-		int numCycles = 10;
-		ABCycle[] cycles = new ABCycle[numCycles];
+	public static ArrayList<ABCycle> generateABCycles(EAXGraph g, GeneticAlgorithm ga){
+		ArrayList<ABCycle> abCycles = new ArrayList<>();
 
-		for(int i=0; i<numCycles; i++){
-			// Start City:
-			int sc = ga.getRandom().nextInt(ga.getDimension());
-			cycles[i] = generateABCycle(sc, g, ga);
-		}
+		ABCycle cycle;
+		do {
+			cycle = generateABCycle(g, ga);
+			if(cycle != null) {
+				abCycles.add(cycle);
+			}
+		} while(cycle != null);
 
 		if(DEBUG){
 			//GnuPlotUtils.plotABCycles(cycles, ga.getData());
 		}
 
-		return cycles;
+		return abCycles;
 	}
 
-	private static ABCycle generateABCycle(int sc, EAXGraph g, GeneticAlgorithm ga) {
+	private static ABCycle generateABCycle(EAXGraph g, GeneticAlgorithm ga) {
 		ABCycle cycle = new ABCycle();
+		Optional<ABEdge> firstEdge = g.getEdges().stream().findAny();
 
+		if(firstEdge.isEmpty()){
+			return null;
+		}
+
+		int sc = firstEdge.get().getU();
 		int currentCity = -1;
+
 		boolean lastA = false;
 
 		while(currentCity != sc){
@@ -67,26 +76,31 @@ public class EAX {
 			lastA = e.get().isA();
 		}
 
+		for(ABEdge e : cycle.getPath()){
+			int u = e.getU();
+			int v = e.getV();
+
+			g.getCity(u).remove(e);
+			g.getCity(v).remove(e);
+			g.removeEdge(e);
+		}
+
 		return cycle;
 	}
 
-	public static ABCycle[] rand(ABCycle[] cycles, Random r, double v) {
-		ABCycle[] endCycles = new ABCycle[cycles.length];
+	public static ArrayList<ABCycle> rand(ArrayList<ABCycle> cycles, Random r, double v) {
+		ArrayList<ABCycle> endCycles = new ArrayList<>();
 
-		int i=0;
-		if(r.nextDouble() > v){
-			endCycles[i] = cycles[i];
-			i++;
+		for(ABCycle c : cycles){
+			if(r.nextDouble() > v){
+				endCycles.add(c);
+			}
 		}
 
-
-		ABCycle[] returnCycle = new ABCycle[i];
-		System.arraycopy(endCycles, 0, returnCycle, 0, i);
-
-		return returnCycle;
+		return endCycles;
 	}
 
-	public static ABCycle[] heur(ABCycle[] cycles, Population population) {
+	public static ArrayList<ABCycle> heur(ArrayList<ABCycle> cycles, Population population) {
 		// TODO: Implement Heuristic EAX
 		//population.data.
 		throw new NotImplementedException();
@@ -105,18 +119,16 @@ public class EAX {
 		 		by alternating tracing edges of tour-A and tour-B
 		 	-------------------------------------------------------------------
 		 */
-		ABCycle[] cycles = generateABCycles(g, p.getGA());
+		ArrayList<ABCycle> cycles = generateABCycles(g, p.getGA());
+		ArrayList<ABCycle> newCycles = new ArrayList<>();
 
-
-		ArrayList<ABCycle> newCycles = new ArrayList<>(cycles.length);
 		for (ABCycle cycle : cycles) {
 			if (cycle.getPath().size() != 2) {
 				// AB-Cycles constructed of two edges are neglected.
 				newCycles.add(cycle);
 			}
 		}
-
-		cycles = (ABCycle[]) newCycles.toArray();
+		cycles = newCycles;
 
 		/*
 			2.	Select a subset of the AB-Cycles (E-Set)
@@ -127,7 +139,7 @@ public class EAX {
 			a) 	Use EAX(heuristic)
 		 */
 
-		ABCycle[] eSetHeur = heur(cycles, p);
+		ArrayList<ABCycle> eSetHeur = EAX.heur(cycles, p);
 
 		/*
 			If no children that are better than both A and B are found
@@ -136,7 +148,7 @@ public class EAX {
 					an improved child is found or 100 children
 					are produced.
 		 */
-		ABCycle[] eSetRand = EAX.rand(cycles, p.getRandom(), 0.5);
+		ArrayList<ABCycle> eSetRand = EAX.rand(cycles, p.getRandom(), 0.5);
 
 		// 3. Return the generated child
 		throw new NotImplementedException();

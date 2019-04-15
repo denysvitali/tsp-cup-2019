@@ -39,7 +39,7 @@ public class ABEdge {
 				return true;
 			}
 
-			// Symmetric TSP:
+			// Asymmetric TSP:
 			if(this.v == o.u && this.u == o.v){
 				return true;
 			}
