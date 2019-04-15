@@ -29,7 +29,7 @@ public class AntColony {
 	private double p0 = -1;
 	private double tau0 = -1;
 
-	private Route bestRoute = null;
+	private Route globalBest = null;
 	private Route localBest = null;
 
 	private double my_epsilon = 0.4;
@@ -127,8 +127,8 @@ public class AntColony {
 				}
 
 
-				if(bestRoute == null || localBest.getLength() < bestRoute.getLength()){
-					bestRoute = localBest;
+				if(globalBest == null || localBest.getLength() < globalBest.getLength()){
+					globalBest = localBest;
 				}
 
 				RouteUtils.computePerformance(localBest, data);
@@ -143,7 +143,7 @@ public class AntColony {
 			}
 		}
 
-		return bestRoute;
+		return globalBest;
 	}
 
 	protected double heurN(int i, int j){
@@ -157,31 +157,24 @@ public class AntColony {
 		//timeTick();
 		double[][] pv = getPheromone();
 
-		int bestLength = localBest.getLength();
+		int bestLength = globalBest.getLength();
 
-		for(int i=0; i<data.getDimension(); i++){
-			for(int j=0; j<data.getDimension(); j++){
+		switch(type) {
+			case ACS:
+				/*
+					In ACS only the globally best ant (i.e., the ant
+					which constructed the shortest tour from the
+					beginning of the trial) is allowed to
+					deposit pheromone.
+				 */
 
-				switch(type){
-					case ACS:
-						/*
-							In ACS only the globally best ant (i.e., the ant
-							which constructed the shortest tour from the
-							beginning of the trial) is allowed to
-							deposit pheromone.
-						 */
-
-						double deltaT;
-
-						if(localBest.hasArc(i, j)){
-							deltaT = Math.pow(bestLength, -1);
-							pv[i][j] = (1-AntColonySystem.PD) * pv[i][j] +
-									AntColonySystem.PD * deltaT;
-							//pv[j][i] = pv[i][j];
-						}
-						break;
+				int[] bestPath = globalBest.getPath();
+				for (int i = 0; i < bestPath.length - 1; i++) {
+					double deltaT = Math.pow(bestLength, -1);
+					pv[bestPath[i]][bestPath[i + 1]] = (1 - AntColonySystem.PD)
+							* pv[bestPath[i]][bestPath[i + 1]] +
+							AntColonySystem.PD * deltaT;
 				}
-			}
 		}
 	}
 
@@ -194,8 +187,8 @@ public class AntColony {
 		double[][] pv = getPheromone();
 		switch(type) {
 			case ACS:
-				pv[r][s] *= (1-this.my_epsilon);
-				pv[r][s] += this.my_epsilon * tau0;
+				pv[r][s] *= (1-AntColonySystem.PE);
+				pv[r][s] += AntColonySystem.PE * tau0;
 				//pv[s][r] = pv[r][s];
 				break;
 		}

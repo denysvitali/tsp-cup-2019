@@ -111,6 +111,8 @@ public class Ant {
 										AntColonySystem.ALPHA)
 										* Math.pow(colony.heurN(i, cl[j]),
 										AntColonySystem.BETA) / den;
+							} else {
+								prob[j] = 0.0;
 							}
 						}
 
