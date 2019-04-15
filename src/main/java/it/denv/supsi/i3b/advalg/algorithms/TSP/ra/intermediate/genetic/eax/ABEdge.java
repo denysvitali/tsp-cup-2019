@@ -22,4 +22,29 @@ public class ABEdge {
 	public boolean isA(){
 		return isA;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj){
+			return true;
+		}
+
+		if(obj instanceof ABEdge){
+			ABEdge o = (ABEdge) obj;
+			if(this.isA != o.isA){
+				return false;
+			}
+
+			if(this.u == o.u && this.v == o.v){
+				return true;
+			}
+
+			// Symmetric TSP:
+			if(this.v == o.u && this.u == o.v){
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

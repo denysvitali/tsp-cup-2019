@@ -239,4 +239,8 @@ public class Population {
 	public TSPData getData(){
 		return data;
 	}
+
+	public GeneticAlgorithm getGA() {
+		return this.ga;
+	}
 }
