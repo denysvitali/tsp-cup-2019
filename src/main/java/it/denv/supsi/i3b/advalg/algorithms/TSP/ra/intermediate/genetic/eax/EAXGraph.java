@@ -12,4 +12,8 @@ public class EAXGraph {
 	public void addEdge(ABEdge a){
 		this.edges.add(a);
 	}
+
+	public ArrayList<ABEdge> getEdges() {
+		return edges;
+	}
 }

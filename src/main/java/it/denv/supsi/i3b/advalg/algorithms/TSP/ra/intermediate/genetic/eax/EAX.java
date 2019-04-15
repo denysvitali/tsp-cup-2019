@@ -3,10 +3,15 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax;
 import it.denv.supsi.i3b.advalg.algorithms.NotImplementedException;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.Individual;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.Population;
+import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Random;
 
 public class EAX {
+	private static final boolean DEBUG = true;
+
 	public static ABCycle[] generateABCycles(Individual A, Individual B){
 		ABCycle[] cycles = new ABCycle[10];
 
@@ -38,7 +43,11 @@ public class EAX {
 	}
 
 	public static Individual crossover(Individual A, Individual B, Population p) {
-		EAXGraph g = merge(A, B);
+		EAXGraph g = merge(A, B, p);
+
+		if(DEBUG) {
+			GnuPlotUtils.plotEAXGraph(g, p.getData());
+		}
 
 		// 1. Generate AB-Cycles
 		ABCycle[] cycles = generateABCycles(A, B);
@@ -62,13 +71,18 @@ public class EAX {
 		throw new NotImplementedException();
 	}
 
-	private static EAXGraph merge(Individual a, Individual b) {
+	private static EAXGraph merge(Individual a, Individual b, Population p) {
 		boolean[] a_genes = a.getGenes();
 		boolean[] b_genes = b.getGenes();
+
+		// Do not merge two equal individuals
+		assert(!(Arrays.equals(a_genes, b_genes)));
+
 		EAXGraph g = new EAXGraph();
 
-		// Parse Genes
 		/*
+			Parse Genes
+
 			Given a path (e.g: 1, 2, 6, 3, 5, 4, 1),
 			the incidence matrix is the following:
 
@@ -97,11 +111,38 @@ public class EAX {
 			6	X X X X X X
 
 		*/
-		for(int i=0; i<a_genes.length; i++){
-			//g.addEdge(new ABEdge(i));
+
+		ABEdge[] edges_a = getEdges(a_genes, true, p);
+		ABEdge[] edges_b = getEdges(b_genes, false, p);
+
+		for(ABEdge e : edges_a){
+			g.addEdge(e);
 		}
 
+		for(ABEdge e : edges_b){
+			g.addEdge(e);
+		}
 
 		return g;
+	}
+
+	private static ABEdge[] getEdges(boolean[] genes, boolean is_A, Population p) {
+		int n = p.getDimension();
+		ABEdge[] edges = new ABEdge[n];
+
+		int k = 0;
+		int l = 0;
+		for(int i=0; i<p.getDimension(); i++){
+			for(int j=i+1; j<p.getDimension(); j++){
+				if(genes[k]){
+					edges[l] = new ABEdge(i, j, is_A);
+					l++;
+				}
+				k++;
+			}
+		}
+
+		return edges;
+
 	}
 }

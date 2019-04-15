@@ -228,4 +228,8 @@ public class Population {
 	public Random getRandom() {
 		return r;
 	}
+
+	public TSPData getData(){
+		return data;
+	}
 }
