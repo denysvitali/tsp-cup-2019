@@ -10,8 +10,8 @@ The 19th Algorithms Cup is organized by [Luca Maria Gambardella](http://people.i
 ### Simulated Annealing
 ### Ant Colony Optimization
 ### Genetic Algorithm (w/ EAX)
-### Nearest Neighbour
-### Random Nearest Neighbour
+### Nearest Neighbor
+### Random Nearest Neighbor
 
 ## Performance
 
