@@ -1,15 +1,20 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ABCycle {
-	private ArrayList<ABEdge> path;
+	private List<ABEdge> path;
 
 	public ABCycle(){
 		path = new ArrayList<>();
 	}
 
-	public ArrayList<ABEdge> getPath() {
+	public ABCycle(List<ABEdge> edgeList){
+		this.path = edgeList;
+	}
+
+	public List<ABEdge> getPath() {
 		return path;
 	}
 

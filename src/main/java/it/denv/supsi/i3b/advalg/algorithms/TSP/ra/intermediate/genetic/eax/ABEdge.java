@@ -4,11 +4,19 @@ public class ABEdge {
 	private boolean isA = true;
 	private int u = -1;
 	private int v = -1;
+	private ABEdge ref = null;
 
 	public ABEdge(int u, int v, boolean isA){
 		this.u = u;
 		this.v = v;
 		this.isA = isA;
+	}
+
+	public ABEdge(int u, int v, boolean isA, ABEdge ref){
+		this.u = u;
+		this.v = v;
+		this.isA = isA;
+		this.ref = ref;
 	}
 
 	public int getU() {
@@ -21,6 +29,10 @@ public class ABEdge {
 
 	public boolean isA(){
 		return isA;
+	}
+
+	public void setRef(ABEdge ref) {
+		this.ref = ref;
 	}
 
 	@Override
@@ -46,5 +58,14 @@ public class ABEdge {
 		}
 
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return u + "->" + v + "(" + (isA ? "A" : "B") + ")";
+	}
+
+	public ABEdge getRef() {
+		return ref;
 	}
 }

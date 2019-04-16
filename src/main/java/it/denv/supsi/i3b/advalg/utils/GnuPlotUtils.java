@@ -6,6 +6,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.ABCyc
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.ABEdge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.EAXGraph;
 
+import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -153,7 +154,7 @@ public class GnuPlotUtils {
 						.append("\" using 1:2 with l t \"")
 						.append(i)
 						.append("\" lt rgb \"#")
-						.append(color[i]).append("\"");
+						.append(color[i % color.length]).append("\"");
 			}
 
 			gnuplotExecute(sb.toString());

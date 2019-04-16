@@ -1,6 +1,7 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax;
 
 import it.denv.supsi.i3b.advalg.algorithms.NotImplementedException;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.GeneticAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.Individual;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.Population;
@@ -18,8 +19,8 @@ public class EAX {
 
 	public static ArrayList<ABCycle> generateABCycles(EAXGraph g, GeneticAlgorithm ga){
 		ArrayList<ABCycle> abCycles = new ArrayList<>();
-
 		ABCycle cycle;
+
 		do {
 			cycle = generateABCycle(g, ga);
 			if(cycle != null) {
@@ -34,49 +35,99 @@ public class EAX {
 		return abCycles;
 	}
 
-	private static ABCycle generateABCycle(EAXGraph g, GeneticAlgorithm ga) {
-		ABCycle cycle = new ABCycle();
-		Optional<ABEdge> firstEdge = g.getEdges().stream().findAny();
+	private static ABCycle getCycle(ArrayList<ABEdge> edges) {
+		for(int i=0; i<edges.size(); i++) {
+			int startCity = edges.get(i).getU();
 
-		if(firstEdge.isEmpty()){
+			for(int j=i; j<edges.size(); j++){
+				if(edges.get(j).getV() == startCity){
+					return new ABCycle(edges.subList(i,j+1));
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/*public static boolean containsABCycle(ArrayList<ABEdge> edges){
+
+		for(int i=0; i<edges.size(); i++) {
+			int startCity = edges.get(i).getU();
+
+			for(int j=i; j<edges.size(); j++){
+				if(edges.get(j).getV() == startCity){
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}*/
+
+	public static ABCycle generateABCycle(EAXGraph g, GeneticAlgorithm ga) {
+		ABCycle cycle = null;
+		ArrayList<ABEdge> edges = g.getEdges();
+		ArrayList<ABEdge> tmpEdges = new ArrayList<>();
+
+		if(edges.size() == 0){
 			return null;
 		}
 
-		int sc = firstEdge.get().getU();
-		int currentCity = -1;
+		ABEdge startEdge = edges.get(ga.getRandom().nextInt(edges.size()));
+		boolean lastA = startEdge.isA();
+		tmpEdges.add(startEdge);
+		int length = 1;
 
-		boolean lastA = false;
+		int currentCity = startEdge.getV();
 
-		while(currentCity != sc){
-			if(currentCity == -1){
-				currentCity = sc;
+		while(length % 2 != 0 || (cycle = getCycle(tmpEdges)) == null){
+			Optional<ABEdge> e;
+
+			if(lastA){
+				e = g.getCity(currentCity)
+						.stream().filter(a -> !a.isA()).findAny();
+			} else {
+				e = g.getCity(currentCity)
+						.stream().filter(a -> a.isA()).findAny();
 			}
 
-			boolean finalLastA = lastA;
-			Optional<ABEdge> e = g.getCity(currentCity).stream()
-					.filter(a -> a.isA() != finalLastA)
-					.filter(a -> !cycle.contains(a))
-					.findAny();
-
 			if(e.isEmpty()){
-				e = g.getCity(currentCity).stream()
-						.filter(a -> !cycle.contains(a))
+				// Get another edge, if possible
+				boolean finalLastA = lastA;
+				e = edges.stream().filter(a -> a.isA() == finalLastA)
 						.findAny();
+
+				if(e.isEmpty()){
+					break;
+				}
 			}
 
-			if(e.isEmpty()){
-				throw new RuntimeException("Invalid AB Cycle!");
+			ABEdge edge = e.get();
+			lastA = edge.isA();
+			length++;
+
+			int prevCity = currentCity;
+			if(currentCity == edge.getU()){
+				currentCity = edge.getV();
+				// Normal edge
+				tmpEdges.add(edge);
+			} else {
+				currentCity = edge.getU();
+				// Reverse Edge, set Ref!
+				tmpEdges.add(new ABEdge(prevCity, currentCity,
+						edge.isA(), edge));
 			}
+		}
 
-			cycle.add(e.get());
-			int nextCity = 	e.get().getU() == currentCity ?
-							e.get().getV() : e.get().getU();
-
-			currentCity = nextCity;
-			lastA = e.get().isA();
+		if(cycle == null){
+			return null;
 		}
 
 		for(ABEdge e : cycle.getPath()){
+			if(e.getRef() != null){
+				e = e.getRef();
+			}
+
 			int u = e.getU();
 			int v = e.getV();
 
