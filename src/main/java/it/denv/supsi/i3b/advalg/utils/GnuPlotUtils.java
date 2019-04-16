@@ -121,37 +121,24 @@ public class GnuPlotUtils {
 				if(i != 0){
 					sb.append(", ");
 				}
-				ABCycle currCycle = cycles.get(i);
 				String f = File
 						.createTempFile("tsp-plot-abc", ".dat")
 						.getPath();
 
-				Set<Integer> cities = new HashSet<>();
-
-				for(ABEdge e : currCycle.getPath()) {
-					cities.add(e.getU());
-					cities.add(e.getV());
-				}
-
 				OutputStreamWriter os = new OutputStreamWriter(
 						new FileOutputStream(f));
 
-				Coordinate first = null;
-				for(Integer c : cities) {
-					Coordinate coord = coords.get(c);
-					if(first == null){
-						first = coord;
-					}
+				for(ABEdge e : cycles.get(i).getPath()) {
+					Coordinate coord = coords.get(e.getU());
+					Coordinate coord2 = coords.get(e.getV());
 					os.write(String.format("%f %f\n", coord.getX(), coord.getY()));
+					os.write(String.format("%f %f\n\n", coord2.getX(), coord2.getY()));
 				}
 
-				if(first != null) {
-					os.write(String.format("%f %f\n", first.getX(), first.getY()));
-				}
 				os.flush();
 				sb.append("\"")
 						.append(f)
-						.append("\" using 1:2 with l t \"")
+						.append("\" every :::0::1 with lp t \"")
 						.append(i)
 						.append("\" lt rgb \"#")
 						.append(color[i % color.length]).append("\"");

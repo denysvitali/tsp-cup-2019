@@ -25,4 +25,8 @@ public class ABCycle {
 	public boolean contains(ABEdge e){
 		return path.contains(e);
 	}
+
+	public void addAll(List<ABEdge> l){
+		this.path.addAll(l);
+	}
 }

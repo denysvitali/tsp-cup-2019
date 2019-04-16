@@ -6,6 +6,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.GeneticAl
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.Individual;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.Population;
 import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
+import it.denv.supsi.i3b.advalg.utils.PyPlotUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -134,6 +135,12 @@ public class EAX {
 			g.getCity(u).remove(e);
 			g.getCity(v).remove(e);
 			g.removeEdge(e);
+
+			if(e.isA()){
+				g.removeFromA(e);
+			} else {
+				g.removeFromB(e);
+			}
 		}
 
 		return cycle;
@@ -168,6 +175,7 @@ public class EAX {
 		 */
 
 		EAXGraph g = merge(A, B, p);
+		EAXGraph g2 = g.clone();
 
 		if(DEBUG) {
 			//GnuPlotUtils.plotEAXGraph(g, p.getData());
@@ -220,7 +228,6 @@ public class EAX {
 					are produced.
 		 */
 		ArrayList<ABCycle> eSetRand = EAX.rand(cycles, p.getRandom(), 0.5);
-		GnuPlotUtils.plotABCycles(eSetRand, p.getData());
 
 		/*
 			3.	Generate an intermediate solution from p_A by removing
@@ -228,7 +235,55 @@ public class EAX {
 				i.e, generate an intermediate solution by
 				E_C := (E_A \setminus (\text{E-Set} \cap E_A)) \cup (\text{E-Set} \cap E_B)
 				An intermediate solution consists of one or more subtours. [1]
-		 */
+		*/
+
+		ArrayList<ABCycle> eSet = eSetRand; // TODO: Fix
+		ArrayList<ABCycle> intermediateSol = new ArrayList<>();
+
+		ArrayList<ABEdge> eSetIntersectA = new ArrayList<>();
+		ArrayList<ABEdge> eSetIntersectB = new ArrayList<>();
+
+		// TODO: RECHECK! E-SET!!!!
+
+		for(ABCycle set : eSet){
+			ABCycle intermediate = new ABCycle();
+
+			// E_A \setminus (\text{E-Set} \cap E_A) :
+			ArrayList<ABEdge> eAMinusEsetA = (ArrayList<ABEdge>) g2.getAList().clone();
+
+			for(ABEdge s : set.getPath()){
+				if(!s.isA()){
+					continue;
+				}
+
+				// Only A edges
+
+				if(s.getRef() != null){
+					s = s.getRef();
+				}
+
+				eAMinusEsetA.remove(s);
+			}
+
+			// E-Set \cap E_B:
+			ArrayList<ABEdge> eSetIntersetcEB = new ArrayList<>();
+
+			for(ABEdge s : set.getPath()){
+				if(s.isA()){
+					continue;
+				}
+				eSetIntersetcEB.add(s);
+			}
+
+			intermediate.addAll(eAMinusEsetA);
+			intermediate.addAll(eSetIntersetcEB);
+
+			intermediateSol.add(intermediate);
+		}
+
+
+		PyPlotUtils.plotABCycles(intermediateSol, p.getData());
+
 
 
 		/*
