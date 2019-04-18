@@ -66,7 +66,6 @@ public class TwoOpt implements ILS {
 		 */
 
 		int best_gain;
-		int d[][] = data.getDistances();
 
 		do {
 			best_gain = 0;

@@ -10,10 +10,7 @@ import it.denv.supsi.i3b.advalg.utils.PyPlotUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 public class EAX {
 	private static final boolean DEBUG = true;
@@ -34,20 +31,6 @@ public class EAX {
 		}
 
 		return abCycles;
-	}
-
-	private static ABCycle getCycle(ArrayList<ABEdge> edges) {
-		for(int i=0; i<edges.size(); i++) {
-			int startCity = edges.get(i).getU();
-
-			for(int j=i; j<edges.size(); j++){
-				if(edges.get(j).getV() == startCity){
-					return new ABCycle(edges.subList(i,j+1));
-				}
-			}
-		}
-
-		return null;
 	}
 
 	/*public static boolean containsABCycle(ArrayList<ABEdge> edges){
@@ -81,7 +64,7 @@ public class EAX {
 
 		int currentCity = startEdge.getV();
 
-		while(length % 2 != 0 || (cycle = getCycle(tmpEdges)) == null){
+		while(length % 2 != 0 || (cycle = ABCycle.getCycle(tmpEdges)) == null){
 			Optional<ABEdge> e;
 
 			if(lastA){
@@ -197,7 +180,10 @@ public class EAX {
 
 		for (ABCycle cycle : cycles) {
 			if (cycle.getPath().size() != 2) {
-				// AB-Cycles constructed of two edges are neglected.
+				/*
+					AB-Cycles constructed of two edges are neglected because
+					they're "ineffective".
+				 */
 				newCycles.add(cycle);
 			}
 		}
@@ -227,7 +213,7 @@ public class EAX {
 					an improved child is found or 100 children
 					are produced.
 		 */
-		ArrayList<ABCycle> eSetRand = EAX.rand(cycles, p.getRandom(), 0.5);
+		ArrayList<ABCycle> randABCycles = EAX.rand(cycles, p.getRandom(), 0.5);
 
 		/*
 			3.	Generate an intermediate solution from p_A by removing
@@ -237,54 +223,63 @@ public class EAX {
 				An intermediate solution consists of one or more subtours. [1]
 		*/
 
-		ArrayList<ABCycle> eSet = eSetRand; // TODO: Fix
-		ArrayList<ABCycle> intermediateSol = new ArrayList<>();
+		/*
+		 	E-Set is an union of edges from the selected AB-Cycles.
+		 */
+		HashSet<ABEdge> eSet = new HashSet<>(); // TODO: Fix
 
-		ArrayList<ABEdge> eSetIntersectA = new ArrayList<>();
-		ArrayList<ABEdge> eSetIntersectB = new ArrayList<>();
-
-		// TODO: RECHECK! E-SET!!!!
-
-		for(ABCycle set : eSet){
-			ABCycle intermediate = new ABCycle();
-
-			// E_A \setminus (\text{E-Set} \cap E_A) :
-			ArrayList<ABEdge> eAMinusEsetA = (ArrayList<ABEdge>) g2.getAList().clone();
-
-			for(ABEdge s : set.getPath()){
-				if(!s.isA()){
-					continue;
+		for(ABCycle c : randABCycles){
+			for(ABEdge e : c.getPath()){
+				if(e.getRef() != null){
+					e = e.getRef();
 				}
 
-				// Only A edges
+				eSet.add(e);
+			}
+		}
 
-				if(s.getRef() != null){
-					s = s.getRef();
-				}
+		ArrayList<ABEdge> eRight = new ArrayList<>();
+		ArrayList<ABEdge> eLeft = new ArrayList<>(g2.getAList());
 
-				eAMinusEsetA.remove(s);
+		for(ABEdge edge : eSet){
+			if(!edge.isA()){
+				continue;
 			}
 
-			// E-Set \cap E_B:
-			ArrayList<ABEdge> eSetIntersetcEB = new ArrayList<>();
+			// E-Set \cap E_A
 
-			for(ABEdge s : set.getPath()){
-				if(s.isA()){
-					continue;
-				}
-				eSetIntersetcEB.add(s);
+			if(edge.getRef() != null){
+				edge = edge.getRef();
 			}
 
-			intermediate.addAll(eAMinusEsetA);
-			intermediate.addAll(eSetIntersetcEB);
+			eLeft.remove(edge);
 
-			intermediateSol.add(intermediate);
+			// E_A \setminus (E-Set \cap E_A)
+		}
+
+		for(ABEdge edge : eSet){
+			if(edge.isA()){
+				continue;
+			}
+
+			if(edge.getRef() != null){
+				edge = edge.getRef();
+			}
+
+			eRight.add(edge);
 		}
 
 
-		PyPlotUtils.plotABCycles(intermediateSol, p.getData());
+		ABCycle intermediate = new ABCycle();
+		intermediate.addAll(eLeft);
+		intermediate.addAll(eRight);
 
+		PyPlotUtils.plotABCycle(intermediate, p.getData());
 
+		// Given an intermediate solution, get the subtours
+		ArrayList<ABCycle> subtours = intermediate.intoSubtours();
+		PyPlotUtils.plotABCycles(subtours, p.getData());
+		subtours.stream().map(ABCycle::getPath).forEach(System.out::println);
 
 		/*
 			4.	Generate an offspring solution by connecting all subtours
@@ -295,7 +290,6 @@ public class EAX {
 		 */
 
 		System.out.println("DONE");
-
 		throw new NotImplementedException();
 
 		/*

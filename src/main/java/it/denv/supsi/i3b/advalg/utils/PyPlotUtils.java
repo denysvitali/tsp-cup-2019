@@ -58,4 +58,10 @@ public class PyPlotUtils {
 			ex.printStackTrace();
 		}
 	}
+
+	public static void plotABCycle(ABCycle intermediateSol, TSPData data) {
+		ArrayList<ABCycle> cycles = new ArrayList<>();
+		cycles.add(intermediateSol);
+		plotABCycles(cycles, data);
+	}
 }

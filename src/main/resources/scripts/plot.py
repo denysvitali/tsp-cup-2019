@@ -26,7 +26,7 @@ def plotFile(path):
                 coords.append((x,y))
         lines.append(coords)
 
-    lc = mc.LineCollection(lines, linewidths=2)
+    lc = mc.LineCollection(lines, linewidths=1)
     fig, ax = pl.subplots()
     ax.add_collection(lc)
     ax.autoscale()

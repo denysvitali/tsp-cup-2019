@@ -6,6 +6,7 @@
 \usepackage{minted}
 \usepackage{parskip}
 \usepackage{amsmath}
+\usepackage{mathtools}
 
 \newminted[code]{java}{autogobble,
 breaklines, 
@@ -20,6 +21,8 @@ frame=single,
 bgcolor=black,
 style=monokai,
 linenos}
+
+\newcommand{\mvar}[1]{\textrm{\textit{#1}}}
 
 \setlength\parskip{\baselineskip}
 
@@ -135,8 +138,20 @@ Per l'algoritmo genetico ho fatto uso di una funzione di crossover ampiamente
 discussa e rivisitata, ottimizzata per il TSP, chiamata EAX (Edge Assembly
 Crossover).
 
-// TODO
+I cicli AB sono selezionati tramite una funzione \ic{EAX.rand()} ed
+\ic{EAX.heur()} creando un \mvar{E-Set}.
+Successivamente dall'\mvar{E-Set} viene generato un'insieme $E_C$ nel modo seguente: 
 
-$E_C := (E_A \setminus (\text{E-Set} \cap E_A)) \cup (\text{E-Set} \cap E_B)$
+\begin{equation}
+    E_C := (E_A \cap \bar{D}) \cup (E_B \cap D)
+\end{equation}
+dove $D$ è l'\mvar{E-Set}.
+
+Alternativamente, ed in modo equivalente, si può definire $E_C$ nel modo seguente:
+
+\begin{equation}
+    E_C := (E_A \setminus (\mvar{E-set} \cap E_A)) \cup
+    (\mvar{E-Set} \cap E_B)
+\end{equation}
 
 \end{document}

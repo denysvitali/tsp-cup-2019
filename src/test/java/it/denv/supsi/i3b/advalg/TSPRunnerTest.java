@@ -634,6 +634,33 @@ public class TSPRunnerTest {
 	}
 
 	@Test
+	public void ch130GA() throws IOException {
+		String filePath = Utils.getTestFile("/problems/ch130.tsp");
+		assertNotNull(filePath);
+
+		TSPLoader loader = new TSPLoader(filePath);
+		TSPData data = loader.load();
+
+		TSP tsp = new TSP();
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(data))
+						.add(new TwoOpt(data))
+						.add(new GeneticAlgorithm(data))
+		);
+
+		String path = tsp.writeRoute(r);
+
+		System.out.println(
+				GnuPlotUtils.getPlotCommand(path)
+		);
+
+		System.out.println("Route length: " + r.getLength());
+
+		assertTrue(r.getLength() >= data.getBestKnown());
+	}
+
+	@Test
 	public void pcb442SimAn() throws IOException {
 		String filePath = Utils.getTestFile("/problems/pcb442.tsp");
 		assertNotNull(filePath);
@@ -853,7 +880,7 @@ public class TSPRunnerTest {
 		TSP tsp = new TSP();
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new NearestNeighbour(data))
+						.startWith(new RandomNearestNeighbour(data))
 						.add(new TwoOpt(data))
 						.add(new SimulatedAnnealing().setMode(SimulatedAnnealing.Mode.TwoOpt))
 		);

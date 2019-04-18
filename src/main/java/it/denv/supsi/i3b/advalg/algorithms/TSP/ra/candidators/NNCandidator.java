@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 public class NNCandidator implements Candidator<Integer> {
 
 	private int size;
-	private int startNode;
 	private TSPData data;
 	private TreeSet<Integer> tabuList = new TreeSet<>();
 	private TreeSet<Integer> unvisitedNodes = new TreeSet<>();
@@ -49,7 +48,11 @@ public class NNCandidator implements Candidator<Integer> {
 
 	@Override
 	public void setStartNode(int startNode) {
-		this.startNode = startNode;
 		this.unvisitedNodes.remove(startNode);
+	}
+
+	@Override
+	public int getSeed() {
+		return -1;
 	}
 }

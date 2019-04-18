@@ -30,8 +30,9 @@ public class RandomNearestNeighbour extends NearestNeighbour {
 		super(data);
 		this.data = data;
 		this.r = new Random();
-		System.out.println(this.getClass().getName() + "'s seed is " +
-				((RNNCandidator) this.candidator).getSeed());
+
+		System.out.println(getClass().getName() + "'s seed is " +
+				this.candidator.getSeed());
 		reset();
 	}
 
