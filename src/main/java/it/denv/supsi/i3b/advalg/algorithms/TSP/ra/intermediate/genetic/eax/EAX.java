@@ -158,6 +158,9 @@ public class EAX {
 		 */
 
 		EAXGraph g = merge(A, B, p);
+
+		assert(g.getEdges().size() <= p.getDimension() * 2);
+
 		EAXGraph g2 = g.clone();
 
 		if(DEBUG) {
@@ -226,7 +229,7 @@ public class EAX {
 		/*
 		 	E-Set is an union of edges from the selected AB-Cycles.
 		 */
-		HashSet<ABEdge> eSet = new HashSet<>(); // TODO: Fix
+		HashSet<ABEdge> eSet = new HashSet<>();
 
 		for(ABCycle c : randABCycles){
 			for(ABEdge e : c.getPath()){
@@ -269,6 +272,7 @@ public class EAX {
 			eRight.add(edge);
 		}
 
+		assert(eLeft.size() + eRight.size() == p.getDimension());
 
 		ABCycle intermediate = new ABCycle();
 		intermediate.addAll(eLeft);
@@ -277,7 +281,8 @@ public class EAX {
 		PyPlotUtils.plotABCycle(intermediate, p.getData());
 
 		// Given an intermediate solution, get the subtours
-		ArrayList<ABCycle> subtours = intermediate.intoSubtours();
+		List<ABCycle> subtours = intermediate.intoSubtours();
+		assert(subtours.size() > 0);
 		PyPlotUtils.plotABCycles(subtours, p.getData());
 		subtours.stream().map(ABCycle::getPath).forEach(System.out::println);
 
@@ -346,6 +351,14 @@ public class EAX {
 
 		ABEdge[] edges_a = getEdges(a_genes, true, p);
 		ABEdge[] edges_b = getEdges(b_genes, false, p);
+
+		assert(edges_a.length == p.getDimension());
+		assert(edges_b.length == p.getDimension());
+
+		List<ABCycle> abGenes = new ArrayList<>();
+		abGenes.add(new ABCycle(Arrays.asList(edges_a)));
+		abGenes.add(new ABCycle(Arrays.asList(edges_b)));
+		PyPlotUtils.plotABCycles(abGenes, p.getData());
 
 		for(ABEdge e : edges_a){
 			g.addEdge(e);

@@ -19,6 +19,10 @@ public class ABEdge {
 		this.ref = ref;
 	}
 
+	public static ABEdge getInverted(ABEdge e){
+		return new ABEdge(e.v, e.u, e.isA, e);
+	}
+
 	public int getU() {
 		return u;
 	}

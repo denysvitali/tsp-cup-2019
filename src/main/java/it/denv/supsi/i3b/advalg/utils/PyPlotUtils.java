@@ -9,9 +9,10 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.EAXGr
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class PyPlotUtils {
-	public static void plotABCycles(ArrayList<ABCycle> cycles, TSPData data) {
+	public static void plotABCycles(List<ABCycle> cycles, TSPData data) {
 		try {
 			ArrayList<Coordinate> coords = new ArrayList<>(data.getCoordinates()
 					.values());
