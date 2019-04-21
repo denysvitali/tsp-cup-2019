@@ -73,20 +73,6 @@ public class SwappablePathTest {
 	}
 
 	@Test
-	public void doubleBridge1() {
-		SwappablePath sp1 = new SwappablePath(new int[]{1, 2, 3, 4, 5, 6, 7, 8});
-		int[] expected = new int[]{1, 2, 7, 8, 5, 6, 3, 4};
-
-
-		SwappablePath db = sp1.doubleBridge(2, 4, 6);
-
-		System.out.println("Expected: " + Arrays.toString(expected) + "\n" +
-				"Obtained: " + Arrays.toString(db.getPathArr()));
-
-		assertArrayEquals(expected, db.getPathArr());
-	}
-
-	@Test
 	void twoOptSwap () {
 		SwappablePath sp1 = new SwappablePath(new int[]{0,2,1,3});
 		int[] expected = new int[]{0,1,2,3};

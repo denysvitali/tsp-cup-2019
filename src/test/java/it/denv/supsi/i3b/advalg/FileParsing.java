@@ -26,12 +26,12 @@ public class FileParsing {
 
 		assertEquals("ch130", data.getName());
 		assertNotNull(data.getCoordinates());
-		assertEquals(130, data.getDimension());
+		assertEquals(130, data.getDim());
 		assertEquals(6110, data.getBestKnown());
 		assertEquals(ProblemType.TSP, data.getType());
 		assertEquals(EdgeWeightType.EUC_2D, data.getEwt());
 		assertEquals("130 city problem (Churritz)", data.getComment());
-		assertEquals(data.getDimension(), data.getCoordinates().size());
+		assertEquals(data.getDim(), data.getCoordinates().size());
 
 		assertEquals(209.1887938487, data.getCoordinates().get(8).getX());
 		assertEquals(691.0262291948, data.getCoordinates().get(8).getY());
@@ -47,11 +47,11 @@ public class FileParsing {
 
 		assertEquals("d198", data.getName());
 		assertNotNull(data.getCoordinates());
-		assertEquals(198, data.getDimension());
+		assertEquals(198, data.getDim());
 		assertEquals(15780, data.getBestKnown());
 		assertEquals(ProblemType.TSP, data.getType());
 		assertEquals("Drilling problem (Reinelt)", data.getComment());
-		assertEquals(data.getDimension(), data.getCoordinates().size());
+		assertEquals(data.getDim(), data.getCoordinates().size());
 
 		assertEquals(551.2, data.getCoordinates().get(1).getX());
 		assertEquals(996.4, data.getCoordinates().get(1).getY());
@@ -67,11 +67,11 @@ public class FileParsing {
 
 		assertEquals("eil76", data.getName());
 		assertNotNull(data.getCoordinates());
-		assertEquals(76, data.getDimension());
+		assertEquals(76, data.getDim());
 		assertEquals(538, data.getBestKnown());
 		assertEquals(ProblemType.TSP, data.getType());
 		assertEquals("76-city problem (Christofides/Eilon)", data.getComment());
-		assertEquals(data.getDimension(), data.getCoordinates().size());
+		assertEquals(data.getDim(), data.getCoordinates().size());
 
 		assertEquals(36, data.getCoordinates().get(1).getX());
 		assertEquals(26, data.getCoordinates().get(1).getY());

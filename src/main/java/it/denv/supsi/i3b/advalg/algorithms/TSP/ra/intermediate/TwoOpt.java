@@ -74,8 +74,7 @@ public class TwoOpt implements ILS {
 			int[] msp = sp.getPathArr();
 
 			for(int i=1; i< path.length - 2; i++){
-
-				for(int j=i; j< path.length-1; j++){
+				for(int j=i+1; j<path.length - 1; j++){
 					int gain = cg(msp, i, j);
 
 					if(gain < best_gain){

@@ -69,10 +69,6 @@ public class Route {
 		return new SwappablePath(getPath());
 	}
 
-	public int getStartNode() {
-		return path[0];
-	}
-
 	public ArrayList<Coordinate> getCoords(){
 		ArrayList<Coordinate> coords = new ArrayList<>(data.getCoordinates().values());
 		return Arrays.stream(path)
@@ -81,7 +77,7 @@ public class Route {
 	}
 
 	public double compareTo(int bestKnown) {
-		return this.length * 1.0 / bestKnown - 1;
+		return this.getLength() * 1.0/bestKnown;
 	}
 
 	public void setLength(int length){
@@ -93,22 +89,12 @@ public class Route {
 	}
 
 	public boolean isValid() {
-		Set<Integer> cities = new HashSet<>();
-
-		for (int i=0; i<path.length-1; i++) {
-			if(cities.contains(path[i])){
-				return false;
-			}
-			cities.add(path[i]);
-		}
-
-		return path[0] == path[path.length-1];
-
+		return getSP().isValid();
 	}
 
 	private void genMatrix(){
 		// Generate incidence matrix
-		incidenceMat = new int[data.getDimension()][data.getDimension()];
+		incidenceMat = new int[data.getDim()][data.getDim()];
 		for(int i=1; i<path.length-1; i++){
 			incidenceMat[i-1][i] = 1;
 			incidenceMat[i][i-1] = 1;

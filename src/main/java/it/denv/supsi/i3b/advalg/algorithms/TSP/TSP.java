@@ -127,7 +127,7 @@ public class TSP {
 		 */
 
 		HashMap<Integer, int[]> clHM = new HashMap<>();
-		for(int i=0; i<data.getDimension(); i++){
+		for(int i = 0; i<data.getDim(); i++){
 			clHM.put(i, candidate_list.get(i).stream().mapToInt(Edge::getV)
 				.toArray()
 			);

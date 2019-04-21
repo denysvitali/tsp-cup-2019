@@ -1,6 +1,12 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra;
 
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
+import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
+import it.denv.supsi.i3b.advalg.utils.PyPlotUtils;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SwappablePath {
 	private int[] path;
@@ -19,7 +25,6 @@ public class SwappablePath {
 			return new_route;
 		}
 		*/
-
 		int[] np = new int[this.path.length];
 
 		for(int i=0; i<p; i++){
@@ -36,8 +41,10 @@ public class SwappablePath {
 			np[i] = path[i];
 		}
 
+		SwappablePath newSP = new SwappablePath(np);
+		assert newSP.isValid();
 
-		return new SwappablePath(np);
+		return newSP;
 	}
 
 	public SwappablePath[] threeOptSwap(int i, int j, int k){
@@ -97,21 +104,41 @@ public class SwappablePath {
 
 	}
 
-	public SwappablePath doubleBridge(int A, int B, int C){
-		assert(A < B && B < C);
-		assert(B-A == C-B);
-
-
+	public SwappablePath doubleBridge(int[] cutPoints) {
 		int[] fp = new int[path.length];
 		int pos = 0;
-		System.arraycopy(path, 0, fp, pos, A);
-		pos+= A;
-		System.arraycopy(path, C, fp, pos, path.length - C);
-		pos += path.length - C;
-		System.arraycopy(path, B, fp, pos, C - B);
-		pos += C-B;
-		System.arraycopy(path, A, fp, pos, B - A);
 
+		/*
+			OLD:
+			A-B-C-D
+
+			NEW:
+			A-D-C-B
+		 */
+		assert (cutPoints.length == 4);
+		Arrays.sort(cutPoints);
+
+		assert (cutPoints[0] > 0);
+		assert (cutPoints[3] < path.length);
+
+		int A = cutPoints[0];
+		int B = cutPoints[1];
+		int C = cutPoints[2];
+		int D = cutPoints[3];
+
+		System.arraycopy(path, 0, fp, pos, A);
+		pos += A;
+
+		System.arraycopy(path, C, fp, pos, D - C);
+		pos += D - C;
+
+		System.arraycopy(path, B, fp, pos, C - B);
+		pos += C -B;
+
+		System.arraycopy(path, A, fp, pos, B - A);
+		pos += B - A;
+
+		System.arraycopy(path, D, fp, pos, path.length - D);
 
 		return new SwappablePath(fp);
 	}
@@ -140,5 +167,19 @@ public class SwappablePath {
 
 	public int getLength() {
 		return length;
+	}
+
+	public boolean isValid() {
+		Set<Integer> cities = new HashSet<>();
+
+		for (int i=0; i<path.length-1; i++) {
+			if(cities.contains(path[i])){
+				System.err.println(path[i] + " already visited!");
+				return false;
+			}
+			cities.add(path[i]);
+		}
+
+		return path[0] == path[path.length-1];
 	}
 }

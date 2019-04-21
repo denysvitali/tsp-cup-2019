@@ -14,17 +14,18 @@ public class TSPData {
 	protected String name;
 	protected ProblemType type = ProblemType.TSP;
 	protected String comment = "";
+	String filePath = "";
 	protected int dimension;
-	protected EdgeWeightType ewt;
+	EdgeWeightType ewt;
 	protected int best_known = 0;
-	protected HashMap<Integer, Coordinate> coordinates = new HashMap<>();
-	protected HashMap<Integer, int[]> nearest = new HashMap<>();
+	HashMap<Integer, Coordinate> coordinates = new HashMap<>();
+	private HashMap<Integer, int[]> nearest = new HashMap<>();
 	protected ArrayList<Edge<Integer>> edges = new ArrayList<>();
 	private boolean init = false;
 
 
-	protected int[][] distances;
-	protected int startNode = -1;
+	private int[][] distances;
+	private int startNode = -1;
 
 	protected TSPData(){
 
@@ -42,7 +43,7 @@ public class TSPData {
 		return comment;
 	}
 
-	public int getDimension() {
+	public int getDim() {
 		return dimension;
 	}
 
@@ -96,5 +97,9 @@ public class TSPData {
 
 	public boolean getInit() {
 		return this.init;
+	}
+
+	public String getFilePath() {
+		return this.filePath;
 	}
 }

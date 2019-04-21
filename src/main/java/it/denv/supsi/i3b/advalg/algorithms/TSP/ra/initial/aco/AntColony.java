@@ -64,16 +64,16 @@ public class AntColony {
 
 		switch (type){
 			case ACS:
-				my_epsilon = 1.0 / (this.data.getDimension() * cnn);
+				my_epsilon = 1.0 / (this.data.getDim() * cnn);
 				break;
 		}
 
-		double[][] iPV = new double[data.getDimension()][data.getDimension()];
+		double[][] iPV = new double[data.getDim()][data.getDim()];
 
-		for(int i=0; i<data.getDimension(); i++){
+		for(int i = 0; i<data.getDim(); i++){
 			iPV[i][i] = Double.MAX_VALUE;
 
-			for(int j=i; j<data.getDimension(); j++){
+			for(int j = i; j<data.getDim(); j++){
 				iPV[i][j] = this.p0;
 				iPV[j][i] = this.p0;
 			}

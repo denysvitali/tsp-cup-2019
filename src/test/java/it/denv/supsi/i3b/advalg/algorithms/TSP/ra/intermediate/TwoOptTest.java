@@ -11,9 +11,6 @@ import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,7 +34,7 @@ class TwoOptTest {
 		assertNotEquals(-1, r2.getLength());
 		assertEquals(565, r2.getLength());
 
-		assertEquals(data.getDimension()+1, r2.getPath().length);
+		assertEquals(data.getDim()+1, r2.getPath().length);
 		assertFalse(r2.getLength() < data.getBestKnown());
 
 

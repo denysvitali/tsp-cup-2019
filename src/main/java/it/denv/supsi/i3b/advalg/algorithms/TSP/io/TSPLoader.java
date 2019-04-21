@@ -23,6 +23,7 @@ public class TSPLoader {
 		if(!loaded){
 			fis = new BufferedInputStream(new FileInputStream(path));
 			tspData = parseFile();
+			tspData.filePath = path;
 			loaded = true;
 		}
 
@@ -57,8 +58,6 @@ public class TSPLoader {
 
 	private TSPData parseFile() throws IOException {
 		TSPData data = new TSPData();
-
-		int c = -2;
 
 		// KV Section
 		HashMap<String, String> hm = new HashMap<>();

@@ -23,7 +23,7 @@ public class RNNCandidator implements Candidator<Integer> {
 		this.size = size;
 		this.data = data;
 		this.seed = seed;
-		for(int i = 0; i < data.getDimension(); i++){
+		for(int i = 0; i < data.getDim(); i++){
 			unvisitedNodes.add(i);
 		}
 
@@ -34,7 +34,7 @@ public class RNNCandidator implements Candidator<Integer> {
 		this.random = r;
 		this.size = size;
 		this.data = data;
-		for(int i = 0; i < data.getDimension(); i++){
+		for(int i = 0; i < data.getDim(); i++){
 			unvisitedNodes.add(i);
 		}
 	}
@@ -42,7 +42,7 @@ public class RNNCandidator implements Candidator<Integer> {
 	public RNNCandidator(int size, TSPData data){
 		this.size = size;
 		this.data = data;
-		for(int i = 0; i < data.getDimension(); i++){
+		for(int i = 0; i < data.getDim(); i++){
 			unvisitedNodes.add(i);
 		}
 

@@ -21,7 +21,7 @@ public class TestShuffler extends RoutingAlgorithm {
 	public Route route(int startNode, TSPData data) {
 		ArrayList<Integer> path = new ArrayList<>();
 
-		for(int i=0; i<data.getDimension(); i++){
+		for(int i = 0; i<data.getDim(); i++){
 			path.add(i);
 		}
 
@@ -30,7 +30,7 @@ public class TestShuffler extends RoutingAlgorithm {
 
 		int[] newPath = path.stream().mapToInt(Integer::intValue).toArray();
 
-		assert(newPath.length == data.getDimension() + 1);
+		assert(newPath.length == data.getDim() + 1);
 
 		Route r = new Route(newPath, data);
 		return r;

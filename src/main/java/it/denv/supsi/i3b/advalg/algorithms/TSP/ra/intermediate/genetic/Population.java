@@ -1,15 +1,12 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic;
 
 import it.denv.supsi.i3b.advalg.Route;
-import it.denv.supsi.i3b.advalg.algorithms.NotImplementedException;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.ABCycle;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.EAX;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class Population {
@@ -40,7 +37,7 @@ public class Population {
 		TwoOpt twoOpt = new TwoOpt(data);
 		for(int i=0; i<this.population_size; i++){
 			// Generate random individuals:
-			Route route = rnn.route(this.r.nextInt(data.getDimension()), data);
+			Route route = rnn.route(this.r.nextInt(data.getDim()), data);
 			route = twoOpt.improve(route);
 			this.individuals[i] = new Individual(getGenes(route), this);
 		}
@@ -225,7 +222,7 @@ public class Population {
 		E.g: 130 for ch130
 	 */
 	public int getDimension() {
-		return data.getDimension();
+		return data.getDim();
 	}
 
 	/*

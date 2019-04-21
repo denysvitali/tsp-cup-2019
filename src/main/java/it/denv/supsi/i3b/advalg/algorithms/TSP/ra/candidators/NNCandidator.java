@@ -18,7 +18,7 @@ public class NNCandidator implements Candidator<Integer> {
 	public NNCandidator(int size, TSPData data){
 		this.size = size;
 		this.data = data;
-		for(int i = 0; i < data.getDimension(); i++){
+		for(int i = 0; i < data.getDim(); i++){
 			if(data.getStartNode() != i){
 				unvisitedNodes.add(i);
 			}

@@ -62,7 +62,7 @@ public class Ant {
 		switch(colony.type){
 			case ACS:
 
-				if(visitedCount == colony.data.getDimension()){
+				if(visitedCount == colony.data.getDim()){
 					return firstCity;
 				}
 
@@ -179,15 +179,15 @@ public class Ant {
 
 	public void reset() {
 		this.visitedCount = 0;
-		visitedCities = new boolean[colony.data.getDimension()];
+		visitedCities = new boolean[colony.data.getDim()];
 		notVisited = new ArrayList<>();
 
-		for(int i=0; i<colony.data.getDimension(); i++){
+		for(int i = 0; i<colony.data.getDim(); i++){
 			visitedCities[i] = false;
 			notVisited.add(new City(i));
 		}
 
-		this.path = new int[colony.data.getDimension() + 1];
+		this.path = new int[colony.data.getDim() + 1];
 
 		firstCity = getRandomCity();
 		currentCity = -1;
@@ -229,11 +229,11 @@ public class Ant {
 	}
 
 	private int getRandomCity() {
-		return colony.random.nextInt(colony.data.getDimension());
+		return colony.random.nextInt(colony.data.getDim());
 	}
 
 	public Route getRoute() {
-		path[colony.data.getDimension()] = firstCity;
+		path[colony.data.getDim()] = firstCity;
 
 		return new Route(path, colony.data);
 	}

@@ -76,7 +76,7 @@ public class GeneticAlgorithm implements ILS {
 	}
 
 	public int getDimension() {
-		return this.data.getDimension();
+		return this.data.getDim();
 	}
 
 	public TSPData getData() {

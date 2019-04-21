@@ -6,7 +6,6 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
-import java.util.Arrays;
 import java.util.Random;
 
 
@@ -108,6 +107,9 @@ public class SimulatedAnnealing implements ILS {
 		double temperature = START_TEMPERATURE;
 
 		SwappablePath best = route.getSP();
+
+		assert best.isValid();
+
 		SwappablePath current = best;
 
 		TwoOpt twoOpt = new TwoOpt(data);
@@ -122,7 +124,9 @@ public class SimulatedAnnealing implements ILS {
 		}
 
 		double start = System.currentTimeMillis();
-		double max_runtime = 1000 * 60 * 3;
+
+		// TODO: Chang me
+		double max_runtime = 1000 * 60 * 3; // 5 Seconds
 
 		while (temperature > 0.2) {
 			for (int i = 0; i < r; i++) {
@@ -133,21 +137,24 @@ public class SimulatedAnnealing implements ILS {
 
 				switch (mode) {
 					case TwoOpt:
-						int[] twoOptN = getRandomNumbers(2,
-								data.getDimension());
+						int[] twoOptN;
+						do{
+							twoOptN = getRandomNumbers(2, data.getDim());
+						} while(twoOptN[0] == twoOptN[1] || twoOptN[0] > twoOptN[1]
+						|| twoOptN[0] == 0);
 
 						sp = current.twoOptSwap(twoOptN[0], twoOptN[1]);
 						break;
 
 					case ThreeOpt:
-						int[] threeOptN = getRandomOffsettedNumbers(3, data.getDimension());
+						int[] threeOptN = getRandomOffsettedNumbers(3, data.getDim());
 						sp = current.threeOptSwap(threeOptN[0], threeOptN[1], threeOptN[2])
 								[random.nextInt(2)];
 						break;
 
 					case DoubleBridge:
-						int[] dbN = getRandomOffsettedNumbers(3, data.getDimension());
-						sp = current.doubleBridge(dbN[0], dbN[1], dbN[2]);
+						int[] dbN = getRandomOffsettedNumbers(4, data.getDim());
+						sp = current.doubleBridge(dbN);
 						break;
 				}
 
@@ -155,7 +162,6 @@ public class SimulatedAnnealing implements ILS {
 
 				// improvedSP = local_opt(n)
 
-				assert twoOpt != null;
 				improvedSP = twoOpt.improveSP(sp);
 
 				assert(improvedSP != null);
@@ -181,6 +187,11 @@ public class SimulatedAnnealing implements ILS {
 				} else if (delta < 0 || x < Math.exp(-delta / temperature)) {
 					current = improvedSP;
 				}
+			}
+
+
+			if(best.getLength() == data.getBestKnown()){
+				break;
 			}
 
 			long now = System.currentTimeMillis();

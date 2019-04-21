@@ -16,7 +16,7 @@ public class TSPSolution {
 	public TSPSolution(TSPData data, Route route){
 		outName = data.getName() + ".tour";
 		comment = data.getComment() + " (" + route.getLength() + ")";
-		dimension = data.getDimension();
+		dimension = data.getDim();
 		r = route;
 	}
 
