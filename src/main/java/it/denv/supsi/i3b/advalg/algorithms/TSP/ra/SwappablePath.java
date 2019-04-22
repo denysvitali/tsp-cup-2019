@@ -1,8 +1,6 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra;
 
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
-import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
-import it.denv.supsi.i3b.advalg.utils.PyPlotUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,6 +23,7 @@ public class SwappablePath {
 			return new_route;
 		}
 		*/
+
 		int[] np = new int[this.path.length];
 
 		for(int i=0; i<p; i++){
@@ -42,8 +41,6 @@ public class SwappablePath {
 		}
 
 		SwappablePath newSP = new SwappablePath(np);
-		assert newSP.isValid();
-
 		return newSP;
 	}
 

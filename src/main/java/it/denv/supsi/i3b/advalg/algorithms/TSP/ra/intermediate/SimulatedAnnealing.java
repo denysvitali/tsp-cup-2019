@@ -6,6 +6,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -92,7 +93,7 @@ public class SimulatedAnnealing implements ILS {
 
 	private int[] getRandomOffsettedNumbers(int size, int maxLength){
 		int[] numbers = new int[size];
-		int randomOffset = (int) (random.nextDouble() * (maxLength/size - 1) + 1);
+		int randomOffset = (int) (random.nextDouble() * (maxLength/size - 1) + 2);
 		int prev = 0;
 		for (int a = 0; a < numbers.length; a++) {
 			numbers[a] = prev + randomOffset;
@@ -107,9 +108,6 @@ public class SimulatedAnnealing implements ILS {
 		double temperature = START_TEMPERATURE;
 
 		SwappablePath best = route.getSP();
-
-		assert best.isValid();
-
 		SwappablePath current = best;
 
 		TwoOpt twoOpt = new TwoOpt(data);
@@ -126,7 +124,7 @@ public class SimulatedAnnealing implements ILS {
 		double start = System.currentTimeMillis();
 
 		// TODO: Chang me
-		double max_runtime = 1000 * 60 * 3; // 5 Seconds
+		double max_runtime = 1000 * 60 * 1; // 5 Seconds
 
 		while (temperature > 0.2) {
 			for (int i = 0; i < r; i++) {

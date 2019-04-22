@@ -10,12 +10,32 @@ import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 import java.util.Random;
 
 public class AntColony {
-	protected boolean USE_CL = false;
+	protected boolean USE_CL = true;
 	protected AcoType type;
 	public Random random;
 	private int nr_ants = 0;
 	protected TSPData data;
 	private int seed;
+
+
+	/*
+		Params
+	*/
+
+	// Relative importance of heuristic
+	public double ALPHA = 1;
+
+	// Relative importance of pheromone
+	public double BETA = 5;
+
+	// Pheromone Decay (PD, ρ)
+	public double PD = 0.1;
+
+	/*
+		Pheromone Evaporation (PE, ξ)
+	 */
+	public double PE = 0.1;
+	public double q0 = 0.88;
 
 	private ILS ILS = null;
 
@@ -31,8 +51,6 @@ public class AntColony {
 
 	private Route globalBest = null;
 	private Route localBest = null;
-
-	private double my_epsilon = 0.4;
 
 	public AntColony(AcoType type, int ants, TSPData data){
 		this.type = type;
@@ -64,7 +82,6 @@ public class AntColony {
 
 		switch (type){
 			case ACS:
-				my_epsilon = 1.0 / (this.data.getDim() * cnn);
 				break;
 		}
 
@@ -94,7 +111,8 @@ public class AntColony {
 	public Route run() {
 		int runs = 0;
 
-		while(runs < 10 * 1000){
+		while(runs < 10 * 1000 && globalBest == null ||
+				globalBest.getLength() != data.getBestKnown()){
 
 			boolean runEnd = false;
 			for(int i=0; i<this.nr_ants; i++){
@@ -171,9 +189,9 @@ public class AntColony {
 				int[] bestPath = globalBest.getPath();
 				for (int i = 0; i < bestPath.length - 1; i++) {
 					double deltaT = Math.pow(bestLength, -1);
-					pv[bestPath[i]][bestPath[i + 1]] = (1 - AntColonySystem.PD)
+					pv[bestPath[i]][bestPath[i + 1]] = (1 - this.PD)
 							* pv[bestPath[i]][bestPath[i + 1]] +
-							AntColonySystem.PD * deltaT;
+							this.PD * deltaT;
 				}
 		}
 	}
@@ -187,8 +205,8 @@ public class AntColony {
 		double[][] pv = getPheromone();
 		switch(type) {
 			case ACS:
-				pv[r][s] *= (1-AntColonySystem.PE);
-				pv[r][s] += AntColonySystem.PE * tau0;
+				pv[r][s] *= (1-this.PE);
+				pv[r][s] += this.PE * tau0;
 				//pv[s][r] = pv[r][s];
 				break;
 		}

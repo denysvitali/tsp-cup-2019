@@ -69,7 +69,7 @@ public class Ant {
 				double q = colony.random.nextDouble();
 
 				// Pseudorandom Proportional Rule
-				if(q <= AntColonySystem.q0){
+				if(q <= colony.q0){
 					// Choose the node w/ the highest Pheromone * Heur
 					double max = Double.MIN_VALUE;
 
@@ -78,7 +78,7 @@ public class Ant {
 						int l = c.getId();
 						double v = colony.getCurrentP(currentCity, l)
 								* Math.pow(colony.heurN(currentCity, l),
-								AntColonySystem.BETA);
+								colony.BETA);
 						if (v > max) {
 							max = v;
 							maxEl = l;
@@ -99,29 +99,28 @@ public class Ant {
 							if (!visitedCities[cl[l]]){
 								den +=
 										Math.pow(colony.getCurrentP(i, cl[l]),
-												AntColonySystem.ALPHA)
+												colony.ALPHA)
 												* Math.pow(colony.heurN(i, cl[l]),
-												AntColonySystem.BETA);
+												colony.BETA);
 							}
 						}
 
 						for (int j = 0; j < cl.length; j++) {
 							if (!visitedCities[cl[j]]){
 								prob[j] = Math.pow(colony.getCurrentP(i, cl[j]),
-										AntColonySystem.ALPHA)
+										colony.ALPHA)
 										* Math.pow(colony.heurN(i, cl[j]),
-										AntColonySystem.BETA) / den;
+										colony.BETA) / den;
 							} else {
 								prob[j] = 0.0;
 							}
 						}
 
 						int nextCity = getRandomCityByProb(colony.random, prob);
-						if (nextCity == -1) {
-							return getNextUnvisitedCity();
+						if (nextCity != -1) {
+							return cl[nextCity];
 						}
-
-						return cl[nextCity];
+						return getNextUnvisitedCity();
 					} else {
 						double[] prob = new double[notVisited.size()];
 						double den = 0;
@@ -129,16 +128,16 @@ public class Ant {
 							int l = c.getId();
 							den +=
 									Math.pow(colony.getCurrentP(i, l),
-											AntColonySystem.ALPHA)
+											colony.ALPHA)
 											* Math.pow(colony.heurN(i, l),
-											AntColonySystem.BETA);
+											colony.BETA);
 						}
 
 						for (int j=0; j<notVisited.size(); j++) {
 							prob[j] = Math.pow(colony.getCurrentP(i, notVisited.get(j).getId()),
-									AntColonySystem.ALPHA)
+									colony.ALPHA)
 									* Math.pow(colony.heurN(i, notVisited.get(j).getId()),
-									AntColonySystem.BETA) / den;
+									colony.BETA) / den;
 						}
 
 						int nextCity = getRandomCityByProb(colony.random, prob);
@@ -156,7 +155,7 @@ public class Ant {
 	}
 
 	public static int getRandomCityByProb(Random r, double[] prob) {
-		double rand = r.nextDouble() - 0.001;
+		double rand = r.nextDouble();
 		for(int i=0; i<prob.length; i++){
 			rand -= prob[i];
 			if(0 >= rand){
@@ -222,7 +221,8 @@ public class Ant {
 
 	private int getNextUnvisitedCity(){
 		if(notVisited.size() > 0){
-			return notVisited.get(0).getId();
+			int nextCity = notVisited.get(0).getId();
+			return nextCity;
 		}
 
 		return -1;

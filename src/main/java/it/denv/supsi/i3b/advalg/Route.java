@@ -77,7 +77,7 @@ public class Route {
 	}
 
 	public double compareTo(int bestKnown) {
-		return this.getLength() * 1.0/bestKnown;
+		return this.getLength() * 1.0/bestKnown - 1;
 	}
 
 	public void setLength(int length){

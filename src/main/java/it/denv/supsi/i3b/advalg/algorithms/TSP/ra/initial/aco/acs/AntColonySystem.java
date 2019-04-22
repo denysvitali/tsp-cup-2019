@@ -9,34 +9,53 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AntColony;
 
 public class AntColonySystem extends RoutingAlgorithm {
 	// Relative importance of heuristic
-	public static final double ALPHA = 1;
+	public double ALPHA = 1;
 
 	// Relative importance of pheromone
-	public static final double BETA = 15;
+	public double BETA = 6;
 
 	// Pheromone Decay (PD, ρ)
-	public static final double PD = 0.5;
+	public double PD = 0.1;
 
 	/*
 		Pheromone Evaporation (PE, ξ)
 	 */
-	public static final double PE = 0.1;
+	public double PE = 0.1;
+	public double q0 = 0.75;
 
-	public static final double q0 = 0.6;
 	private AntColony ac;
-	private ILS ILS = null;
 
 
 	public AntColonySystem(int seed, int amount_ants, TSPData data) {
 		this.ac = new AntColony(AcoType.ACS, seed, amount_ants, data);
+		ac.ALPHA = ALPHA;
+		ac.BETA = BETA;
+		ac.PD = PD;
+		ac.PE = PE;
+		ac.q0 = q0;
 	}
 
 	public AntColonySystem(int amount_ants, TSPData data) {
 		this.ac = new AntColony(AcoType.ACS, amount_ants, data);
+		ac.ALPHA = ALPHA;
+		ac.BETA = BETA;
+		ac.PD = PD;
+		ac.PE = PE;
+		ac.q0 = q0;
+	}
+
+	public AntColonySystem(int seed, int amount_ants, TSPData data,
+						   double alpha, double beta, double pd,
+						   double pe, double q0){
+		this.ac = new AntColony(AcoType.ACS, seed, amount_ants, data);
+		ac.ALPHA = alpha;
+		ac.BETA = beta;
+		ac.PD = pd;
+		ac.PE = pe;
+		ac.q0 = q0;
 	}
 
 	public AntColonySystem setSolutionImprover(ILS ILS){
-		this.ILS = ILS;
 		this.ac.setSolutionImprover(ILS);
 		return this;
 	}

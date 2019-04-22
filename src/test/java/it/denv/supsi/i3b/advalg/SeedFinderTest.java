@@ -7,6 +7,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
 import org.junit.jupiter.api.Test;
@@ -42,14 +43,21 @@ public class SeedFinderTest {
 		}
 	}
 
-	private interface Thunk { void apply(int seed); };
+	private interface Thunk { void apply(int seed); }
+	private interface ACSThunk { void apply(int seed,
+											int nr_ants,
+											double alpha,
+											double beta,
+											double pd, double pe,
+											double q0); }
 
 	private static TSPData loadProblem(String pName) throws IOException {
 		String filePath = Utils.getTestFile("/problems/" + pName + ".tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
-		return loader.load();
+		TSPData d =	loader.load();
+		return d;
 	}
 
 	private static void runThreaded(Thunk f) {
@@ -62,6 +70,47 @@ public class SeedFinderTest {
 				f.apply(finalI);
 			});
 		}
+
+		try {
+			exec.awaitTermination(10, TimeUnit.HOURS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void runACSThreaded(ACSThunk f) {
+		ExecutorService exec =
+				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+		for(int i=0; i<5; i++) {
+			int seed = i;
+			for(int nr_ants = 1; nr_ants<10; nr_ants++){
+				// Ants
+
+				for(double beta = 0.5; beta < 5.0; beta += 0.5){
+					for(double pd = 0.0; pd < 1.0; pd+=0.1){
+						for(double pe = 0.05; pe < 1; pe+= 0.1){
+							for(double q0=0.1; q0<1; q0 += 0.1){
+								int finalNr_ants = nr_ants;
+								double finalAlpha = 1.0;
+								double finalBeta = beta;
+								double finalPd = pd;
+								double finalPe = pe;
+								double finalQ = q0;
+
+								exec.submit(()->{
+									f.apply(seed, finalNr_ants, finalAlpha,
+											finalBeta,
+											finalPd, finalPe, finalQ);
+								});
+							}
+						}
+					}
+				}
+			}
+		}
+
+		System.out.println("Starting ACS...");
 
 		try {
 			exec.awaitTermination(10, TimeUnit.HOURS);
@@ -176,6 +225,33 @@ public class SeedFinderTest {
 	}
 
 	@Test
+	public static void u1060_ACS(int seed,
+								 int amount_ants,
+								 double alpha, double beta,
+								 double pd, double pe, double q0) {
+		try {
+			TSPData data = loadProblem("u1060");
+
+			File f = new File("/tmp/tsp-u1060-acs_" + GIT_COMMIT + ".json");
+
+			AntColonySystem acs =
+					new AntColonySystem(seed, amount_ants, data,
+							alpha, beta, pd, pe, q0);
+
+			OutputStreamWriter ob = new OutputStreamWriter(
+					new BufferedOutputStream(new FileOutputStream(f, true)));
+			runProblem(data,
+					ob,
+					(new CompositeRoutingAlgorithm())
+							.startWith(acs)
+			);
+			ob.flush();
+		} catch(IOException ex){
+
+		}
+	}
+
+	@Test
 	public void ch130SA_SF() {
 		runThreaded(SeedFinderTest::ch130SA);
 	}
@@ -190,5 +266,9 @@ public class SeedFinderTest {
 		runThreaded(SeedFinderTest::ch130SA3O);
 	}
 
+	@Test
+	public void u1060_ACS_SF() {
+		runACSThreaded(SeedFinderTest::u1060_ACS);
+	}
 
 }
