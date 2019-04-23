@@ -49,8 +49,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void ch130() throws IOException {
-		ch130_ACS(1, 20);
-		//ch130_SA_DB(1);
+	  // ch130_ACS(1, 20);
+		ch130_SA_DB(1);
 	}
 
 	private void ch130_SA_DB(int seed) throws IOException {
@@ -137,7 +137,7 @@ public class TSPRunnerTest {
 
 	@Test
 	public void fl1577() throws IOException {
-		fl1577_ACS(1, 3);
+		fl1577_ACS(1, 5);
 		//fl1577_SA(1);
 	}
 
@@ -171,6 +171,110 @@ public class TSPRunnerTest {
 		validateResult(tsp, r, data);
 	}
 
+	@Test
+	public void kroA100() throws IOException {
+		kroA100_SA(1);
+	}
+
+	private void kroA100_ACS(int seed, int amount) throws IOException {
+		TSPData data = getProblemData("kroA100");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new AntColonySystem(seed, amount, data)
+								.setSolutionImprover(new TwoOpt(data)))
+		);
+
+		validateResult(tsp, r, data);
+	}
+
+	private void kroA100_SA(int seed) throws IOException {
+		TSPData data = getProblemData("kroA100");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(seed, data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing(seed)
+						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
+		);
+
+		validateResult(tsp, r, data);
+	}
+
+	@Test
+	public void lin318() throws IOException {
+		lin318_SA(1);
+	}
+
+	private void lin318_ACS(int seed, int amount) throws IOException {
+		TSPData data = getProblemData("lin318");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new AntColonySystem(seed, amount, data)
+								.setSolutionImprover(new TwoOpt(data)))
+		);
+
+		validateResult(tsp, r, data);
+	}
+
+	private void lin318_SA(int seed) throws IOException {
+		TSPData data = getProblemData("lin318");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(seed, data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing(seed)
+						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
+		);
+
+		validateResult(tsp, r, data);
+	}
+
+	@Test
+	public void pcb442() throws IOException {
+		pcb442_ACS(2, 3);
+	}
+
+	private void pcb442_ACS(int seed, int amount) throws IOException {
+		TSPData data = getProblemData("pcb442");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new AntColonySystem(seed, amount, data)
+								.setSolutionImprover(new TwoOpt(data)))
+		);
+
+		validateResult(tsp, r, data);
+	}
+
+	private void pcb442_SA(int seed) throws IOException {
+		TSPData data = getProblemData("pcb442");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(seed, data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing(seed)
+						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
+		);
+
+		validateResult(tsp, r, data);
+	}
 	//////////////////////////////////////////////////////
 
 	@Test
@@ -920,57 +1024,6 @@ public class TSPRunnerTest {
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
-	@Test
-	public void lin318() throws IOException {
-		String filePath = Utils.getTestFile("/problems/lin318.tsp");
-		assertNotNull(filePath);
-
-		TSPLoader loader = new TSPLoader(filePath);
-		TSPData data = loader.load();
-
-		TSP tsp = new TSP();
-		Route r = tsp.run(data,
-				(new CompositeRoutingAlgorithm())
-						.startWith(new NearestNeighbour(data))
-						.add(new TwoOpt(data))
-						.add(new SimulatedAnnealing())
-		);
-
-		String path = tsp.writeRoute(r);
-
-		System.out.println(
-				GnuPlotUtils.getPlotCommand(path)
-		);
-
-		RouteUtils.computePerformance(r, data);
-		assertTrue(r.getLength() >= data.getBestKnown());
-	}
-
-	@Test
-	public void lin318SA_DB() throws IOException {
-		String filePath = Utils.getTestFile("/problems/lin318.tsp");
-		assertNotNull(filePath);
-
-		TSPLoader loader = new TSPLoader(filePath);
-		TSPData data = loader.load();
-
-		TSP tsp = new TSP();
-		Route r = tsp.run(data,
-				(new CompositeRoutingAlgorithm())
-						.startWith(new NearestNeighbour(data))
-						.add(new TwoOpt(data))
-						.add(new SimulatedAnnealing().setMode(SimulatedAnnealing.Mode.DoubleBridge))
-		);
-
-		String path = tsp.writeRoute(r);
-
-		System.out.println(
-				GnuPlotUtils.getPlotCommand(path)
-		);
-
-		RouteUtils.computePerformance(r, data);
-		assertTrue(r.getLength() >= data.getBestKnown());
-	}
 
 	@Test
 	public void lin318SA_2O() throws IOException {

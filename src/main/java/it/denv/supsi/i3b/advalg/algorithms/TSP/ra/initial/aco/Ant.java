@@ -71,20 +71,7 @@ public class Ant {
 				// Pseudorandom Proportional Rule
 				if(q <= colony.q0){
 					// Choose the node w/ the highest Pheromone * Heur
-					double max = Double.MIN_VALUE;
-
-					int maxEl = firstCity;
-					for(City c : notVisited){
-						int l = c.getId();
-						double v = colony.getCurrentP(currentCity, l)
-								* Math.pow(colony.heurN(currentCity, l),
-								colony.BETA);
-						if (v > max) {
-							max = v;
-							maxEl = l;
-						}
-					}
-					return maxEl;
+          return getBestNext(currentCity);
 				} else {
 					// J
 					/* J = random variable given by (4.1) with α = 1 */
@@ -92,55 +79,31 @@ public class Ant {
 					int i = currentCity;
 
 					if (colony.USE_CL) {
-						double den = 0;
+						double sum_prob = 0;
 						int[] cl = colony.data.getCL(currentCity);
 						double[] prob = new double[cl.length];
 						for (int l = 0; l < cl.length; l++) {
 							if (!visitedCities[cl[l]]){
-								den +=
-										Math.pow(colony.getCurrentP(i, cl[l]),
-												colony.ALPHA)
-												* Math.pow(colony.heurN(i, cl[l]),
-												colony.BETA);
+								prob[l] += colony.getChoiceInfo(i, l);
+                sum_prob += prob[l];
 							}
 						}
 
-						for (int j = 0; j < cl.length; j++) {
-							if (!visitedCities[cl[j]]){
-								prob[j] = Math.pow(colony.getCurrentP(i, cl[j]),
-										colony.ALPHA)
-										* Math.pow(colony.heurN(i, cl[j]),
-										colony.BETA) / den;
-							} else {
-								prob[j] = 0.0;
-							}
-						}
+            if(sum_prob == 0.0){
+              return getBestNext(i);
+            }
 
-						int nextCity = getRandomCityByProb(colony.random, prob);
-						if (nextCity != -1) {
-							return cl[nextCity];
-						}
-						return getNextUnvisitedCity();
+						int nextCity = getRandomCityByProb(colony.random, prob, sum_prob);
+						return cl[nextCity];
 					} else {
 						double[] prob = new double[notVisited.size()];
-						double den = 0;
-						for (City c : notVisited) {
-							int l = c.getId();
-							den +=
-									Math.pow(colony.getCurrentP(i, l),
-											colony.ALPHA)
-											* Math.pow(colony.heurN(i, l),
-											colony.BETA);
-						}
-
+						double sum_prob = 0;
 						for (int j=0; j<notVisited.size(); j++) {
-							prob[j] = Math.pow(colony.getCurrentP(i, notVisited.get(j).getId()),
-									colony.ALPHA)
-									* Math.pow(colony.heurN(i, notVisited.get(j).getId()),
-									colony.BETA) / den;
+							prob[j] = colony.getChoiceInfo(i, j);
+							sum_prob += prob[j];
 						}
 
-						int nextCity = getRandomCityByProb(colony.random, prob);
+						int nextCity = getRandomCityByProb(colony.random, prob, sum_prob);
 
 						if(nextCity != -1){
 							return notVisited.get(nextCity).getId();
@@ -152,6 +115,34 @@ public class Ant {
 					}
 				}
 				return -1;
+	}
+
+  public int getBestNext(int currentCity){
+    double v = 0.0;
+    int nc = -1;
+    for(int j=0; j<colony.data.getDim(); j++){
+      if(!visitedCities[j]){
+        if(colony.getChoiceInfo(currentCity, j) > v){
+          v = colony.getChoiceInfo(currentCity, j);
+          nc = j;
+        }
+      }
+    }
+    return nc;
+  }
+
+	public static int getRandomCityByProb(Random random, double[] prob, double sumProb) {
+		double r = random.nextDouble() * sumProb;
+    int j = 0;
+    double p = prob[j];
+
+    while(p<r){
+      j++;
+      p+= prob[j];
+    }
+		return j;
+
+		//throw new RuntimeException("This should never happen");
 	}
 
 	public static int getRandomCityByProb(Random r, double[] prob) {
