@@ -141,7 +141,8 @@ public class SimulatedAnnealing implements ILS {
 						} while(twoOptN[0] == twoOptN[1] || twoOptN[0] > twoOptN[1]
 						|| twoOptN[0] == 0);
 
-						sp = current.twoOptSwap(twoOptN[0], twoOptN[1]);
+						sp = current;
+						current.twoOptSwap(twoOptN[0], twoOptN[1]);
 						break;
 
 					case ThreeOpt:

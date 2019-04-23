@@ -56,6 +56,7 @@ public class TwoOpt implements ILS {
 		return new Route(sp, data);
 	}
 
+	// http://www.cs.colostate.edu/~cs314/yr2018sp/more_progress/slides/CS314-S4-Sprint4.pdf
 	public SwappablePath improveSP(SwappablePath sp){
 		int[] path = sp.getPathArr();
 		/*
@@ -65,30 +66,24 @@ public class TwoOpt implements ILS {
 			- Advanced search algorithms, Gambardella, 70
 		 */
 
-		int best_gain;
+		int n = sp.getPathArr().length - 1;
+		assert(n > 4);
+		int[][] d = data.getDistances();
 
-		do {
-			best_gain = 0;
-			int best_i = -1;
-			int best_j = -1;
-			int[] msp = sp.getPathArr();
-
-			for(int i=1; i< path.length - 2; i++){
-				for(int j=i+1; j<path.length - 1; j++){
-					int gain = cg(msp, i, j);
-
-					if(gain < best_gain){
-						best_gain = gain;
-						best_i = i;
-						best_j = j;
+		boolean improvement = true;
+		while(improvement){
+			improvement = false;
+			for(int i=0; i < n - 3; i++){
+				for(int k = i + 2; k <= n-1; k++){
+					int delta = -d[path[i]][path[i+1]] - d[path[k]][path[k+1]]
+							+ d[path[i]][path[k]] + d[path[i+1]][path[k+1]];
+					if(delta < 0){
+						sp.twoOptSwap(i+1,k);
+						improvement = true;
 					}
 				}
 			}
-
-			if(best_gain < 0) {
-				sp = sp.twoOptSwap(best_i, best_j);
-			}
-		} while(best_gain < 0);
+		}
 
 		return sp;
 	}

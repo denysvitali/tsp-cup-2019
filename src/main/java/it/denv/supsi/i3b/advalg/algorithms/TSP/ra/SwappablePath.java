@@ -14,34 +14,13 @@ public class SwappablePath {
 		this.path = path;
 	}
 
-	public SwappablePath twoOptSwap(int p, int q){
-		/*
-		2optSwap(route, i, k) {
-			1. take route[0] to route[i-1] and add them in order to new_route
-			2. take route[i] to route[k] and add them in reverse order to new_route
-			3. take route[k+1] to end and add them in order to new_route
-			return new_route;
+	public void twoOptSwap(int i1, int k){
+		while(i1 < k){
+			int temp = path[i1];
+			path[i1] = path[k];
+			path[k] = temp;
+			i1++; k--;
 		}
-		*/
-
-		int[] np = new int[this.path.length];
-
-		for(int i=0; i<p; i++){
-			np[i] = path[i];
-		}
-
-		int dec = 0;
-		for(int i=p; i<=q; i++){
-			np[i] = path[(q - dec)];
-			dec++;
-		}
-
-		for(int i=q+1; i<this.path.length; i++){
-			np[i] = path[i];
-		}
-
-		SwappablePath newSP = new SwappablePath(np);
-		return newSP;
 	}
 
 	public SwappablePath[] threeOptSwap(int i, int j, int k){

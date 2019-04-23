@@ -49,7 +49,7 @@ public class TSPRunnerTest {
 
 	@Test
 	public void ch130() throws IOException {
-		ch130_ACS(1, 2);
+		ch130_ACS(1, 20);
 		//ch130_SA_DB(1);
 	}
 
@@ -84,7 +84,22 @@ public class TSPRunnerTest {
 
 	@Test
 	public void d198() throws IOException {
-		d198_ACS(6, 22);
+		//d198_ACS(6, 22);
+		d198_SA(1);
+	}
+
+	private void d198_SA(int seed) throws IOException {
+		TSPData data = getProblemData("d198");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(seed, data))
+				.add(new SimulatedAnnealing(seed))
+		);
+
+		validateResult(tsp, r, data);
 	}
 
 	private void d198_ACS(int seed, int amount) throws IOException {
@@ -200,10 +215,7 @@ public class TSPRunnerTest {
 
 		String path = tsp.writeRoute(r);
 
-		System.out.println(
-				GnuPlotUtils.getPlotCommand(path)
-		);
-
+		GnuPlotUtils.plot(path);
 		System.out.println("Route length: " + r.getLength());
 
 		assertTrue(r.getLength() >= data.getBestKnown());

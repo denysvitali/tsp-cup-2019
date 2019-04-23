@@ -11,9 +11,9 @@ public class SwappablePathTest {
 	@Test
 	public void twoOptSwap1() {
 		SwappablePath sp1 = new SwappablePath(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 0});
-		SwappablePath sp2 = sp1.twoOptSwap(3, 6); // Swap Edge 1-2 w/ Edge 3-4
+		sp1.twoOptSwap(3, 6); // Swap Edge 1-2 w/ Edge 3-4
 
-		assertArrayEquals(new int[]{0, 1, 2, 6, 5, 4, 3, 7, 0}, sp2.getPathArr());
+		assertArrayEquals(new int[]{0, 1, 2, 6, 5, 4, 3, 7, 0}, sp1.getPathArr());
 	}
 
 	@Test
@@ -77,10 +77,10 @@ public class SwappablePathTest {
 		SwappablePath sp1 = new SwappablePath(new int[]{0,2,1,3});
 		int[] expected = new int[]{0,1,2,3};
 
-		SwappablePath sp2 = sp1.twoOptSwap(1,2);
+		sp1.twoOptSwap(1,2);
 		System.out.println("Expected: " + Arrays.toString(expected) + "\n" +
-				"Obtained: " + Arrays.toString(sp2.getPathArr()));
-		assertArrayEquals(expected, sp2.getPathArr());
+				"Obtained: " + Arrays.toString(sp1.getPathArr()));
+		assertArrayEquals(expected, sp1.getPathArr());
 
 	}
 }
