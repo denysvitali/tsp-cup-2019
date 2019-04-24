@@ -7,6 +7,7 @@
 \usepackage{parskip}
 \usepackage{amsmath}
 \usepackage{mathtools}
+\usepackage{hyperref}
 
 \newminted[code]{java}{autogobble,
 breaklines, 
@@ -23,10 +24,14 @@ style=monokai,
 linenos}
 
 \newcommand{\mvar}[1]{\textrm{\textit{#1}}}
-
 \setlength\parskip{\baselineskip}
-
 \newcommand{\ic}[1]{\mintinline[style=manni]{java}{#1}}
+
+\newenvironment{itm}{
+\begin{itemize}
+  \setlength{\itemsep}{2pt}
+  \setlength{\parskip}{2pt}
+}{\end{itemize}}
 
 \begin{document}
 
@@ -63,10 +68,24 @@ corso di laurea in ingegneria informatica.
 Lo scopo del progetto è quello di risolvere 10 problemi di TSP (originati dalla
 libreria TSPLIB) forniteci ad inizio corso sfruttando uno o più algoritmi
 sviluppati in Java.
+Nello specifico, i problemi da risolvere provengono dalla libreria TSPLIB, e
+sono i seguenti:
+\begin{itm}
+\item ch130
+\item d198
+\item eil76
+\item fl1577
+\item kroA100
+\item lin318
+\item pcb442
+\item pr439
+\item rat783
+\item u1060
+\end{itm}
 
 \subsection{Requisiti}
 Di seguito vengono riportati i requisiti per un corretto svolgimento della coppa:
-\begin{itemize}
+\begin{itm}
 \item Limite di tempo: massimo 3 minuti per problema,
 il tempo è inteso da quando il software inizia a quando finisce.
 \item 10 problemi (forniti in un file .zip ad inizio corso)
@@ -75,7 +94,7 @@ il tempo è inteso da quando il software inizia a quando finisce.
 \item Esecuzione replicabile: è necessario salvare eventuali seed e parametri da usare
 \item Risoluzione dei problemi: effettuata mediante tests. Deve essere possibile
 eseguire un test per risolvere un problema.
-\end{itemize}
+\end{itm}
 
 \subsection{Problema del commesso viaggiatore (TSP)}
 Il problema che andremo a risolvere attraverso il nostro
@@ -88,8 +107,9 @@ qual è il percorso ottimale (ossia il percorso più breve)
 che visiti tutte le città. 
 
 Il problema, di tipo NP-hard, viene espresso matematicamente nel modo seguente:
-dato un grafo pesato e completo $G = (V, E, w)$ con $n$ veritci, determinare il
-ciclo hamiltoniano con il costo più basso. \\
+dato un grafo pesato e completo $G = (V, E, w)$ con $n$ vertici, determinare il
+ciclo hamiltoniano con il costo minore.
+
 Data una matrice di incidenza $C$ (dove $c_{i,j} \in \{0,1\}$),
 ed una matrice dei pesi $w$,
 la funzione obiettivo è la seguente:
@@ -133,7 +153,92 @@ verranno poi utilizzati in qualsiasi algoritmo di risoluzione.
 
 \section{Algoritmi Utilizzati}
 
-\subsection{Genetic Algorithm}
+\subsection{Costruttivi}
+Gli algoritmi di tipo costruttivo sono raggruppati nel package: \texttt{TSP.ra.initial}
+
+\subsubsection{Nearest Neighbour}
+L'algoritmo di Nearest Neighbour,
+ritorna il percorso generato partendo dal nodo di partenza scelto ed utilizzando
+il nodo più vicino nel percorso. Questo algoritmo è utilizzato quale inizializzatore
+per gli algoritmi basati su Simulated Annealing.
+
+\subsubsection{Random Nearest Neighbour}
+L'algoritmo di Random Nearest Neighbour funziona in modo analogo a quello di Nearest
+Neighbour, con la sola differenza che, al momento della scelta del prossimo nodo da
+visitare, prende in considerazione più archi e ne sceglie uno in modo casuale.
+
+\pagebreak
+\subsection{Ottimizzazione Locale}
+Gli algoritmi di ottimizzazione locale sono raggruppati nel package \texttt{TSP.ra.intermediate},
+insieme ad alcuni di quelli meta-euristici.
+L'idea della suddivisione è data dal fatto che, dato un algoritmo costruttivo ("initial"),
+è possibile combinare uno o più ottimizzatori locali ("intermediate" / ILS\footnote{Intermediate Local Search})
+con limitazioni di tempo e parametrizzazioni particolari.
+
+È così possibile, grazie all'organizzazione delle classi, eseguire il seguente snippet
+in un test per combinare a piacere gli algoritmi implementati:
+
+\begin{figure}[h]
+\begin{code}
+private void fl1577_SA(int seed) throws IOException {
+    TSPData data = getProblemData("fl1577");
+    TSP tsp = new TSP();
+    tsp.init(data);
+
+    Route r = tsp.run(data,
+            (new CompositeRoutingAlgorithm())
+                    .startWith(new RandomNearestNeighbour(seed, data))
+                    .add(new TwoOpt(data))
+                    .add(new SimulatedAnnealing(seed)
+                    .setMode(SimulatedAnnealing.Mode.DoubleBridge))
+    );
+
+    validateResult(tsp, r, data);
+}
+\end{code}
+\caption{Esecuzione di fl1577 tramite RNN, 2-opt e Simulated Annealing in modalità Double Bridge}
+\end{figure}
+
+\subsubsection{Two Opt}
+L'algoritmo di 2-opt (anche chiamato 2-exchange) è stato implementato seguendo
+i consigli ed il codice fornito dal \href
+{http://www.cs.colostate.edu/~cs314/yr2018sp/more_progress/slides/CS314-S4-Sprint4.pdf}{CS Department of the Colorado State University}.
+La mia \href{https://github.com/denysvitali/tsp-cup-2019/blob/master/src/main/java/it/denv/supsi/i3b/advalg/algorithms/TSP/ra/SwappablePath.java#L13-L41}
+{prima implementazione} risultava parecchio lenta, in quanto creavo un nuovo array
+ed un nuovo oggetto ad ogni 2-Opt swap.
+
+Inoltre, nelle mie versioni precedenti ad ogni iterazione
+di 2-Opt calcolavo la lunghezza finale del percorso anziché il guadagno. Ciò comportava
+a numerosi calcoli inutili, che sono stati ridotti grazie al miglioramento apportato
+dalla regola della diseguaglianza triangolare. 
+
+\subsubsection{Three Opt}
+Nel mio solver è anche presente un'implementazione di 3-opt,
+questa non viene però utilizzata in nessuna delle mie risoluzioni. 
+
+\subsubsection{Double Bridge}
+Al fine di sfruttare una mossa di perturbazione per l'algoritmo di Simulated Annealing
+ho implementato la mossa di Double Bridge (una specifica mossa 4-opt che non è reversibile
+da delle mosse 2-opt).
+
+\subsection{Meta euristici}
+\subsubsection{Ant Colony Optimization - ACS}
+Seguendo alcuni consigli e direttive date da "Ant Colony Optimization" \cite{aco}
+ho implementato l'algoritmo di Ant Colony System utilizzando i seguenti parametri:
+
+\begin{table}
+\begin{tabular}{|l|l|}
+    \hline
+    $\alpha$ & 1 \\
+    $\beta$ & 2 \\
+    $\rho$ & 0.1 \\
+    $\varepsilon$ & 0.1 \\
+    $q_0$ & 0.98 \\
+    \hline
+\end{tabular}
+\caption{Parametri per ACS}
+\end{table}
+\subsubsection{Genetic Algorithm}
 Per l'algoritmo genetico ho fatto uso di una funzione di crossover ampiamente
 discussa e rivisitata, ottimizzata per il TSP, chiamata EAX (Edge Assembly
 Crossover).
@@ -153,5 +258,40 @@ Alternativamente, ed in modo equivalente, si può definire $E_C$ nel modo seguen
     E_C := (E_A \setminus (\mvar{E-set} \cap E_A)) \cup
     (\mvar{E-Set} \cap E_B)
 \end{equation}
+
+\subsubsection{Simulated Annealing}
+\pagebreak
+\section{Esecuzione}
+Per eseguire il solver è necessario utilizzare Maven ed utilizzare Java 11.
+Una volta clonata la repository (da https://github.com/denysvitali/tsp-cup-2019)
+è necessario eseguire il seguente comando:
+\begin{code}
+mvn -Dtest=TSPRunnerTest#ch130 test
+\end{code}
+dove \texttt{ch130} corrisponde al nome del problema da risolvere.
+
+\section{Risultati Ottenuti}
+La piattaforma utilizzata quale piattaforma di benchmarking è la seguente:
+
+\begin{tabular}{|l|l|}
+    \hline
+    \textbf{OS} & Arch Linux \\
+    \textbf{Kernel} & \texttt{5.1.0-rc6-mainline x86\_64} \\
+    \textbf{CPU} & Intel Core i7-6700HQ CPU @ 2.60GHz \\
+    \textbf{RAM} & 32 GB \\
+    \hline
+\end{tabular}
+
+
+
+\section{Conclusioni}
+
+\pagebreak
+\begin{thebibliography}{9}
+\bibitem{aco}
+Marco Dorigo, Thomas Stützle,
+\textit{Ant Colony Optimization}, 2004.
+
+\end{thebibliography}
 
 \end{document}

@@ -84,8 +84,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void d198() throws IOException {
-		//d198_ACS(6, 22);
-		d198_SA(1);
+		d198_ACS(-1, 8);
+		//d198_SA(-1);
 	}
 
 	private void d198_SA(int seed) throws IOException {
@@ -93,11 +93,21 @@ public class TSPRunnerTest {
 		TSP tsp = new TSP();
 		tsp.init(data);
 
+		SimulatedAnnealing sa;
+
+		if(seed == -1){
+			sa = new SimulatedAnnealing();
+		} else {
+			sa = new SimulatedAnnealing(seed);
+		}
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new RandomNearestNeighbour(seed, data))
-				.add(new SimulatedAnnealing(seed))
+						.startWith(new NearestNeighbour(data))
+				.add(sa)
 		);
+
+		System.out.println("Seed is " + sa.getSeed());
 
 		validateResult(tsp, r, data);
 	}
@@ -107,11 +117,20 @@ public class TSPRunnerTest {
 		TSP tsp = new TSP();
 		tsp.init(data);
 
+		AntColonySystem acs;
+		if(seed == -1){
+			acs = new AntColonySystem(amount, data);
+		} else {
+			acs = new AntColonySystem(seed, amount, data);
+		}
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new AntColonySystem(seed, amount, data)
+						.startWith(acs
 								.setSolutionImprover(new TwoOpt(data)))
 		);
+
+		System.out.println("Seed is " + acs.getSeed());
 
 		validateResult(tsp, r, data);
 	}
@@ -137,7 +156,7 @@ public class TSPRunnerTest {
 
 	@Test
 	public void fl1577() throws IOException {
-		fl1577_ACS(1, 5);
+		fl1577_ACS(-1, 3);
 		//fl1577_SA(1);
 	}
 
@@ -146,11 +165,19 @@ public class TSPRunnerTest {
 		TSP tsp = new TSP();
 		tsp.init(data);
 
+		AntColonySystem acs;
+		if(seed == -1){
+			acs = new AntColonySystem(amount, data);
+		} else {
+			acs = new AntColonySystem(seed, amount, data);
+		}
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new AntColonySystem(seed, amount, data)
-								.setSolutionImprover(new TwoOpt(data)))
+						.startWith(acs.setSolutionImprover(new TwoOpt(data)))
 		);
+
+		System.out.println("Seed is " + acs.getSeed());
 
 		validateResult(tsp, r, data);
 	}
@@ -307,6 +334,50 @@ public class TSPRunnerTest {
 
 	private void pr439_SA(int seed) throws IOException {
 		TSPData data = getProblemData("pr439");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(seed, data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing(seed)
+								.setMode(SimulatedAnnealing.Mode.DoubleBridge))
+		);
+
+		validateResult(tsp, r, data);
+	}
+
+	@Test
+	public void rat783() throws IOException {
+		//rat783_ACS(-1,3);
+		rat783_SA(1);
+	}
+
+	private void rat783_ACS(int seed, int amount) throws IOException {
+		TSPData data = getProblemData("rat783");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		AntColonySystem acs;
+		if(seed == -1){
+			acs = new AntColonySystem(amount, data);
+		} else {
+			acs = new AntColonySystem(seed, amount, data);
+		}
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(acs.setSolutionImprover(new TwoOpt(data)))
+		);
+
+
+		System.out.println("Seed is " + acs.getSeed());
+		validateResult(tsp, r, data);
+	}
+
+	private void rat783_SA(int seed) throws IOException {
+		TSPData data = getProblemData("rat783");
 		TSP tsp = new TSP();
 		tsp.init(data);
 

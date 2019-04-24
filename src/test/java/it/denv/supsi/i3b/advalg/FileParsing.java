@@ -53,8 +53,8 @@ public class FileParsing {
 		assertEquals("Drilling problem (Reinelt)", data.getComment());
 		assertEquals(data.getDim(), data.getCoordinates().size());
 
-		assertEquals(551.2, data.getCoordinates().get(1).getX());
-		assertEquals(996.4, data.getCoordinates().get(1).getY());
+		assertEquals(551.2, data.getCoordinates().get(2).getX());
+		assertEquals(996.4, data.getCoordinates().get(2).getY());
 	}
 
 	@Test

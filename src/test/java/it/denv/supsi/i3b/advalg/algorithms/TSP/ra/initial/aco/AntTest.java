@@ -4,6 +4,7 @@ import it.denv.supsi.i3b.advalg.Utils;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.TSP;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.ACSParams;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -18,7 +19,8 @@ class AntTest {
 		TSPLoader tspLoader = new TSPLoader(
 				Utils.getTestFile("/problems/eil76.tsp"));
 		TSPData data = tspLoader.load();
-		Ant a = new Ant(new AntColony(AcoType.ACS , 1, data));
+		Ant a = new Ant(new AntColony(AcoType.ACS, ACSParams.getInstance(),
+				1, data));
 		//assertEquals(0, a.getTabuList().size());
 
 		a.visit(1);
@@ -33,7 +35,8 @@ class AntTest {
 		TSPData data = tspLoader.load();
 		TSP tsp = new TSP();
 		tsp.init(data);
-		Ant a = new Ant(new AntColony(AcoType.ACS , 0, 1, data));
+		Ant a = new Ant(new AntColony(AcoType.ACS, ACSParams.getInstance(),
+				0, 1, data));
 		assertEquals(1, a.getVisited());
 		//assertEquals(24, a.getTabuList().get(0));
 
@@ -43,7 +46,7 @@ class AntTest {
 	}
 
 	@Test
-	void testProbCity(){
+	void testProbCity() {
 		double[] probList = new double[]{0.0, 1.0};
 		Random r = new Random(1);
 

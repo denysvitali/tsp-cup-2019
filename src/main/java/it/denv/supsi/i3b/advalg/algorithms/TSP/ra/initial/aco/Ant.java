@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Ant {
-	private AntColony colony;
+	protected AntColony colony;
 
 	private boolean[] visitedCities;
 	public int[] path;
@@ -69,7 +69,7 @@ public class Ant {
 				double q = colony.random.nextDouble();
 
 				// Pseudorandom Proportional Rule
-				if (q <= colony.q0) {
+				if (q <= colony.getParams().getQ0()) {
 					// Choose the node w/ the highest Pheromone * Heur
 					return getBestNext(currentCity);
 				} else {

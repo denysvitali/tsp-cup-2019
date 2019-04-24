@@ -123,8 +123,8 @@ public class SimulatedAnnealing implements ILS {
 
 		double start = System.currentTimeMillis();
 
-		// TODO: Chang me
-		double max_runtime = 1000 * 60 * 1; // 5 Seconds
+		// TODO: Change me
+		double max_runtime = 1000 * 60 * 2 + 1000 * 50; // 2min 50 sec
 
 		while (temperature > 0.2) {
 			for (int i = 0; i < r; i++) {
@@ -194,9 +194,9 @@ public class SimulatedAnnealing implements ILS {
 			}
 
 			long now = System.currentTimeMillis();
-			RouteUtils.computePerformance(current, data);
+			RouteUtils.computePerformance(best, data);
 
-			temperature = START_TEMPERATURE * (1 - (now - start) / max_runtime);
+			temperature = START_TEMPERATURE * (1-(now - start)/max_runtime);
 			System.out.println("Temperature is " + temperature);
 		}
 

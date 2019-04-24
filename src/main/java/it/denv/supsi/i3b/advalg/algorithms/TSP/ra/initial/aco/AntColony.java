@@ -4,7 +4,6 @@ import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
 import java.util.Random;
@@ -16,26 +15,6 @@ public class AntColony {
 	private int nr_ants = 0;
 	protected TSPData data;
 	private int seed;
-
-
-	/*
-		Params
-	*/
-
-	// Relative importance of heuristic
-	public double ALPHA = 1;
-
-	// Relative importance of pheromone
-	public double BETA = 5;
-
-	// Pheromone Decay (PD, ρ)
-	public double PD = 0.1;
-
-	/*
-		Pheromone Evaporation (PE, ξ)
-	 */
-	public double PE = 0.1;
-	public double q0 = 0.88;
 
 	private ILS ILS = null;
 
@@ -53,13 +32,17 @@ public class AntColony {
 	private Route globalBest = null;
 	private Route localBest = null;
 
-	public AntColony(AcoType type, int ants, TSPData data) {
+	private ACOParams params;
+
+	public AntColony(AcoType type, ACOParams params, int ants, TSPData data) {
 		this.type = type;
+		this.params = params;
 		initAC((int) (Math.random() * 1000), ants, data);
 	}
 
-	public AntColony(AcoType type, int seed, int ants, TSPData data) {
+	public AntColony(AcoType type, ACOParams params, int seed, int ants, TSPData data) {
 		this.type = type;
+		this.params = params;
 		initAC(seed, ants, data);
 	}
 
@@ -105,7 +88,7 @@ public class AntColony {
 
 			for (int j = i; j < data.getDim(); j++) {
 				this.choiceInfo[i][j] = iPV[i][j] *
-						Math.pow(1.0 / d[i][j], this.BETA);
+						Math.pow(1.0 / d[i][j], params.getBeta());
 				this.choiceInfo[j][i] = this.choiceInfo[i][j];
 			}
 		}
@@ -138,7 +121,6 @@ public class AntColony {
 					runEnd = true;
 				}
 			}
-			//this.timeTick();
 
 			if (runEnd) {
 				Route[] routes = new Route[ants.length];
@@ -165,7 +147,10 @@ public class AntColony {
 					globalBest = localBest;
 				}
 
-				RouteUtils.computePerformance(localBest, data);
+				if(runs % 100 == 0){
+					System.out.println("Iter " + runs);
+					RouteUtils.computePerformance(localBest, data);
+				}
 				assert (localBest.getLength() >= data.getBestKnown());
 
 				//this.pheromoneEvaporation();
@@ -185,7 +170,7 @@ public class AntColony {
 	private void pheromoneEvaporation() {
 		for (int i = 0; i < data.getDim(); i++) {
 			for (int j = i; j < data.getDim(); j++) {
-				pheromone[i][j] = (1.0 - this.PD) * pheromone[i][j]
+				pheromone[i][j] = (1.0 - params.getPD()) * pheromone[i][j]
 				+ this.p0;
 				pheromone[j][i] = pheromone[i][j];
 			}
@@ -221,10 +206,10 @@ public class AntColony {
 					double deltaT = Math.pow(bestLength, -1);
 					int p = bestPath[i];
 					int q = bestPath[i+1];
-					pv[p][q] = (1 - this.PD) * pv[p][q] + this.PD * deltaT;
+					pv[p][q] = (1 - params.getPD()) * pv[p][q] + params.getPD() * deltaT;
 					pv[q][p] = pv[p][q];
 
-					ci[p][q] = pv[p][q] * Math.pow(1.0 / d[p][q], this.BETA);
+					ci[p][q] = pv[p][q] * Math.pow(1.0 / d[p][q], params.getBeta());
 					ci[q][p] = ci[p][q];
 				}
 		}
@@ -249,11 +234,11 @@ public class AntColony {
 		int[][] d = data.getDistances();
 		switch (type) {
 			case ACS:
-				pv[r][s] *= (1-this.PE);
-				pv[r][s] += this.PE * tau0;
+				pv[r][s] *= (1-params.getPE());
+				pv[r][s] += params.getPE() * tau0;
 				pv[s][r] = pv[r][s];
 
-				ci[r][s] = pv[r][s] * Math.pow(1.0 / d[r][s], this.BETA);
+				ci[r][s] = pv[r][s] * Math.pow(1.0 / d[r][s], params.getBeta());
 				ci[s][r] = ci[r][s];
 				break;
 		}
@@ -270,5 +255,9 @@ public class AntColony {
 	public AntColony setCL(boolean cl) {
 		this.USE_CL = cl;
 		return this;
+	}
+
+	public ACOParams getParams() {
+		return params;
 	}
 }
