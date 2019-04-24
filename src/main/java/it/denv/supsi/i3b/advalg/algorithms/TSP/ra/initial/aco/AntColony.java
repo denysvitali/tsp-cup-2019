@@ -26,7 +26,7 @@ public class AntColony {
 	public double ALPHA = 1;
 
 	// Relative importance of pheromone
-	public double BETA = 2;
+	public double BETA = 5;
 
 	// Pheromone Decay (PD, ρ)
 	public double PD = 0.1;
@@ -35,7 +35,7 @@ public class AntColony {
 		Pheromone Evaporation (PE, ξ)
 	 */
 	public double PE = 0.1;
-	public double q0 = 0.98;
+	public double q0 = 0.88;
 
 	private ILS ILS = null;
 
@@ -45,7 +45,7 @@ public class AntColony {
 
 	private Ant[] ants;
 	private double[][] pheromone;
-  private double[][] choiceInfo; // Combined Pheromone + Heur
+	private double[][] choiceInfo; // Combined Pheromone + Heur
 
 	private double p0 = -1;
 	private double tau0 = -1;
@@ -53,21 +53,21 @@ public class AntColony {
 	private Route globalBest = null;
 	private Route localBest = null;
 
-	public AntColony(AcoType type, int ants, TSPData data){
+	public AntColony(AcoType type, int ants, TSPData data) {
 		this.type = type;
 		initAC((int) (Math.random() * 1000), ants, data);
 	}
 
-	public AntColony(AcoType type, int seed, int ants, TSPData data){
+	public AntColony(AcoType type, int seed, int ants, TSPData data) {
 		this.type = type;
 		initAC(seed, ants, data);
 	}
 
-	public void setSolutionImprover(ILS ILS){
+	public void setSolutionImprover(ILS ILS) {
 		this.ILS = ILS;
 	}
 
-	private void initAC(int seed, int ants, TSPData data){
+	private void initAC(int seed, int ants, TSPData data) {
 		this.nr_ants = ants;
 		this.data = data;
 		this.ants = new Ant[this.nr_ants];
@@ -77,11 +77,11 @@ public class AntColony {
 		this.cnn = new NearestNeighbour(data)
 				.route(1, data)
 				.getLength();
-		this.p0 = (nr_ants * 1.0) / cnn;
+		this.p0 = 1.0 / (nr_ants * cnn);
 
 		this.tau0 = this.p0;
 
-		switch (type){
+		switch (type) {
 			case ACS:
 				break;
 		}
@@ -89,30 +89,30 @@ public class AntColony {
 		double[][] iPV = new double[data.getDim()][data.getDim()];
 		this.choiceInfo = new double[data.getDim()][data.getDim()];
 
-		for(int i = 0; i<data.getDim(); i++){
+		for (int i = 0; i < data.getDim(); i++) {
 			iPV[i][i] = Double.MAX_VALUE;
 
-			for(int j = i; j<data.getDim(); j++){
+			for (int j = i; j < data.getDim(); j++) {
 				iPV[i][j] = this.p0;
 				iPV[j][i] = this.p0;
 			}
 		}
 
-    int[][] d = data.getDistances();
+		int[][] d = data.getDistances();
 
-    for(int i=0; i<data.getDim(); i++){
-      this.choiceInfo[i][i] = Double.MAX_VALUE;
+		for (int i = 0; i < data.getDim(); i++) {
+			this.choiceInfo[i][i] = Double.MAX_VALUE;
 
-      for(int j = i; j<data.getDim(); j++){
-        this.choiceInfo[i][j] = iPV[i][j] * 
-          Math.pow(1.0 / d[i][j], this.BETA);
-        this.choiceInfo[j][i] = this.choiceInfo[i][j];
-      }
-    }
+			for (int j = i; j < data.getDim(); j++) {
+				this.choiceInfo[i][j] = iPV[i][j] *
+						Math.pow(1.0 / d[i][j], this.BETA);
+				this.choiceInfo[j][i] = this.choiceInfo[i][j];
+			}
+		}
 
 		this.pheromone = iPV;
 
-		for(int i=0; i<nr_ants; i++){
+		for (int i = 0; i < nr_ants; i++) {
 			this.ants[i] = new Ant(this);
 			this.ants[i].setId(i);
 		}
@@ -125,22 +125,25 @@ public class AntColony {
 	public Route run() {
 		int runs = 0;
 
-		while(runs < 10 * 1000 && globalBest == null ||
-				globalBest.getLength() != data.getBestKnown()){
+		long start = System.currentTimeMillis();
+		long expectedEnd = start + 1000 * 60; // 2 Minutes and 50 seconds
+
+		while (System.currentTimeMillis() < expectedEnd || (globalBest == null &&
+				globalBest.getLength() != data.getBestKnown())) {
 
 			boolean runEnd = false;
-			for(int i=0; i<this.nr_ants; i++){
+			for (int i = 0; i < this.nr_ants; i++) {
 				this.ants[i].step();
-				if(this.ants[i].getStatus() == AntStatus.STOPPED){
+				if (this.ants[i].getStatus() == AntStatus.STOPPED) {
 					runEnd = true;
 				}
 			}
 			//this.timeTick();
 
-			if(runEnd) {
+			if (runEnd) {
 				Route[] routes = new Route[ants.length];
 
-				if(ILS != null) {
+				if (ILS != null) {
 					routes = new Route[ants.length];
 					for (int i = 0; i < ants.length; i++) {
 						routes[i] = ILS.route(ants[i].getRoute(), data);
@@ -158,18 +161,18 @@ public class AntColony {
 				}
 
 
-				if(globalBest == null || localBest.getLength() < globalBest.getLength()){
+				if (globalBest == null || localBest.getLength() < globalBest.getLength()) {
 					globalBest = localBest;
 				}
 
 				RouteUtils.computePerformance(localBest, data);
-				assert(localBest.getLength() >= data.getBestKnown());
+				assert (localBest.getLength() >= data.getBestKnown());
 
-        this.pheromoneEvaporation();
+				//this.pheromoneEvaporation();
 				this.globalPheromoneUpdate();
 
 				// Reset ants
-				for(Ant ant : ants){
+				for (Ant ant : ants) {
 					ant.reset();
 				}
 				runs++;
@@ -179,21 +182,17 @@ public class AntColony {
 		return globalBest;
 	}
 
-  private void pheromoneEvaporation(){
-    int[][] d = data.getDistances();
-    for(int i=0; i<data.getDim(); i++){
-      for(int j=i; j<data.getDim(); j++){
-        pheromone[i][j] = (1.0 - this.PD) * pheromone[i][j];
-        pheromone[j][i] = pheromone[i][j];
+	private void pheromoneEvaporation() {
+		for (int i = 0; i < data.getDim(); i++) {
+			for (int j = i; j < data.getDim(); j++) {
+				pheromone[i][j] = (1.0 - this.PD) * pheromone[i][j]
+				+ this.p0;
+				pheromone[j][i] = pheromone[i][j];
+			}
+		}
+	}
 
-        this.choiceInfo[i][j] = pheromone[i][j] * 
-          Math.pow(1.0 / d[i][j], this.BETA);
-        this.choiceInfo[j][i] = this.choiceInfo[i][j];
-      }
-    }
-  }
-
-	protected double heurN(int i, int j){
+	protected double heurN(int i, int j) {
 		return 1.0 / data.getDistances()[i][j];
 	}
 
@@ -208,7 +207,7 @@ public class AntColony {
 
 		int bestLength = globalBest.getLength();
 
-		switch(type) {
+		switch (type) {
 			case ACS:
 				/*
 					In ACS only the globally best ant (i.e., the ant
@@ -220,27 +219,26 @@ public class AntColony {
 				int[] bestPath = globalBest.getPath();
 				for (int i = 0; i < bestPath.length - 1; i++) {
 					double deltaT = Math.pow(bestLength, -1);
-					pv[bestPath[i]][bestPath[i + 1]] = (1 - this.PD)
-							* pv[bestPath[i]][bestPath[i + 1]] +
-							this.PD * deltaT;
-          pv[bestPath[i+1]][bestPath[i]] = pv[bestPath[i]][bestPath[i+1]];
+					int p = bestPath[i];
+					int q = bestPath[i+1];
+					pv[p][q] = (1 - this.PD) * pv[p][q] + this.PD * deltaT;
+					pv[q][p] = pv[p][q];
 
-          ci[bestPath[i]][bestPath[i+1]] = pv[bestPath[i]][bestPath[i+1]] 
-            * Math.pow(1.0/d[bestPath[i]][bestPath[i+1]], this.BETA);
-          ci[bestPath[i+1]][bestPath[i]] = ci[bestPath[i+1]][bestPath[i]];
+					ci[p][q] = pv[p][q] * Math.pow(1.0 / d[p][q], this.BETA);
+					ci[q][p] = ci[p][q];
 				}
 		}
 	}
 
-  double[][] getChoiceInfo() {
-    return this.choiceInfo;
-  }
+	double[][] getChoiceInfo() {
+		return this.choiceInfo;
+	}
 
-  double getChoiceInfo(int i, int j){
-    return this.choiceInfo[i][j];
-  }
+	double getChoiceInfo(int i, int j) {
+		return this.choiceInfo[i][j];
+	}
 
-	protected void localUpdate(int r, int s){
+	protected void localUpdate(int r, int s) {
 		/*
 			While building a solution (i.e., a tour) of the TSP, ants visit
 			edges and change their pheromone level by applying the local
@@ -248,15 +246,15 @@ public class AntColony {
 		 */
 		double[][] pv = getPheromone();
 		double[][] ci = getChoiceInfo();
-    int[][] d = data.getDistances();
-		switch(type) {
+		int[][] d = data.getDistances();
+		switch (type) {
 			case ACS:
 				pv[r][s] *= (1-this.PE);
 				pv[r][s] += this.PE * tau0;
 				pv[s][r] = pv[r][s];
 
-        ci[r][s] = pv[r][s] * Math.pow(1.0/d[r][s], this.BETA);
-        ci[s][r] = ci[r][s];
+				ci[r][s] = pv[r][s] * Math.pow(1.0 / d[r][s], this.BETA);
+				ci[s][r] = ci[r][s];
 				break;
 		}
 	}
@@ -269,7 +267,7 @@ public class AntColony {
 		return getPheromone()[i][j];
 	}
 
-	public AntColony setCL(boolean cl){
+	public AntColony setCL(boolean cl) {
 		this.USE_CL = cl;
 		return this;
 	}

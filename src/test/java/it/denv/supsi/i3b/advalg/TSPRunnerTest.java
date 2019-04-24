@@ -243,7 +243,7 @@ public class TSPRunnerTest {
 
 	@Test
 	public void pcb442() throws IOException {
-		pcb442_ACS(2, 3);
+		pcb442_ACS(3, 10);
 	}
 
 	private void pcb442_ACS(int seed, int amount) throws IOException {
@@ -271,6 +271,51 @@ public class TSPRunnerTest {
 						.add(new TwoOpt(data))
 						.add(new SimulatedAnnealing(seed)
 						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
+		);
+
+		validateResult(tsp, r, data);
+	}
+
+
+	@Test
+	public void pr439() throws IOException {
+		pr439_ACS(-1,12);
+		//pr439_SA(1);
+	}
+
+	private void pr439_ACS(int seed, int amount) throws IOException {
+		TSPData data = getProblemData("pr439");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		AntColonySystem acs;
+		if(seed == -1){
+			acs = new AntColonySystem(amount, data);
+		} else {
+			acs = new AntColonySystem(seed, amount, data);
+		}
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(acs.setSolutionImprover(new TwoOpt(data)))
+		);
+
+
+		System.out.println("Seed is " + acs.getSeed());
+		validateResult(tsp, r, data);
+	}
+
+	private void pr439_SA(int seed) throws IOException {
+		TSPData data = getProblemData("pr439");
+		TSP tsp = new TSP();
+		tsp.init(data);
+
+		Route r = tsp.run(data,
+				(new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(seed, data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing(seed)
+								.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 		);
 
 		validateResult(tsp, r, data);
