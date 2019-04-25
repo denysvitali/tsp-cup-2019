@@ -49,8 +49,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void ch130() throws IOException {
-	  // ch130_ACS(1, 20);
-		ch130_SA_DB(1);
+	  	ch130_ACS(-1, 20);
+		//ch130_SA_DB(1);
 	}
 
 	private void ch130_SA_DB(int seed) throws IOException {
@@ -73,19 +73,27 @@ public class TSPRunnerTest {
 		TSP tsp = new TSP();
 		tsp.init(data);
 
+		AntColonySystem acs;
+		if(seed == -1){
+			acs = new AntColonySystem(amount, data);
+		} else {
+			acs = new AntColonySystem(seed, amount, data);
+		}
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new AntColonySystem(seed, amount, data)
-								.setSolutionImprover(new TwoOpt(data)))
+						.startWith(acs.setSolutionImprover(new TwoOpt(data)))
 		);
+
+		System.out.println("Seed is " + acs.getSeed());
 
 		validateResult(tsp, r, data);
 	}
 
 	@Test
 	public void d198() throws IOException {
-		d198_ACS(-1, 8);
-		//d198_SA(-1);
+		//d198_ACS(-1, 100);
+		d198_SA(-1);
 	}
 
 	private void d198_SA(int seed) throws IOException {
@@ -103,7 +111,7 @@ public class TSPRunnerTest {
 
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new NearestNeighbour(data))
+						.startWith(new RandomNearestNeighbour(data))
 				.add(sa)
 		);
 
@@ -235,21 +243,31 @@ public class TSPRunnerTest {
 
 	@Test
 	public void lin318() throws IOException {
-		lin318_SA(1);
+		//lin318_SA(1);
+		lin318_ACS(-1, 3);
 	}
 
-	private void lin318_ACS(int seed, int amount) throws IOException {
+	protected Route lin318_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("lin318");
 		TSP tsp = new TSP();
 		tsp.init(data);
 
+		AntColonySystem acs;
+		if(seed == -1){
+			acs = new AntColonySystem(amount, data);
+		} else {
+			acs = new AntColonySystem(seed, amount, data);
+		}
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new AntColonySystem(seed, amount, data)
-								.setSolutionImprover(new TwoOpt(data)))
+						.startWith(acs.setSolutionImprover(new TwoOpt(data)))
 		);
 
+		System.out.println("Seed is " + acs.getSeed());
+
 		validateResult(tsp, r, data);
+		return r;
 	}
 
 	private void lin318_SA(int seed) throws IOException {
@@ -350,8 +368,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void rat783() throws IOException {
-		//rat783_ACS(-1,3);
-		rat783_SA(1);
+		rat783_ACS(-1,3);
+		//rat783_SA(1);
 	}
 
 	private void rat783_ACS(int seed, int amount) throws IOException {

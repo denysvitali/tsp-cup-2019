@@ -109,9 +109,9 @@ public class AntColony {
 		int runs = 0;
 
 		long start = System.currentTimeMillis();
-		long expectedEnd = start + 1000 * 60; // 2 Minutes and 50 seconds
+		long expectedEnd = start + 1000 * 60 * 2 + 1000 * 50; // 2 Minutes and 50 seconds
 
-		while (System.currentTimeMillis() < expectedEnd || (globalBest == null &&
+		while (System.currentTimeMillis() < expectedEnd && (globalBest == null ||
 				globalBest.getLength() != data.getBestKnown())) {
 
 			boolean runEnd = false;

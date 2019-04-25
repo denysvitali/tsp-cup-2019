@@ -72,16 +72,26 @@ public class TwoOpt implements ILS {
 
 		boolean improvement = true;
 		while(improvement){
+			int best_i = -1;
+			int best_j = -1;
+			int best_improvement = Integer.MAX_VALUE;
+
 			improvement = false;
 			for(int i=0; i < n - 3; i++){
 				for(int k = i + 2; k <= n-1; k++){
 					int delta = -d[path[i]][path[i+1]] - d[path[k]][path[k+1]]
 							+ d[path[i]][path[k]] + d[path[i+1]][path[k+1]];
-					if(delta < 0){
-						sp.twoOptSwap(i+1,k);
+					if(delta < 0 && delta < best_improvement){
+						best_improvement = delta;
+						best_i = i+1;
+						best_j = k;
 						improvement = true;
 					}
 				}
+			}
+
+			if(improvement){
+				sp.twoOptSwap(best_i,best_j);
 			}
 		}
 
