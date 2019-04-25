@@ -270,6 +270,21 @@ public class SeedFinderTest {
 	}
 
 	@Test
+	public void fl1577ACS_SF() {
+		runACSThreaded(runACS("fl1577"));
+	}
+
+	@Test
+	public void pr439ACS_SF() {
+		runACSThreaded(runACS("pr439"));
+	}
+
+	@Test
+	public void pcb442ACS_SF() {
+		runACSThreaded(runACS("pcb442"));
+	}
+
+	@Test
 	public void u1060SA_SF() {
 		runThreaded(SeedFinderTest::u1060SA);
 	}
