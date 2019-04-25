@@ -84,6 +84,8 @@ public class SeedFinderTest {
 			}
 		}
 
+		exec.shutdown();
+
 		try {
 			exec.awaitTermination(10, TimeUnit.HOURS);
 		} catch (InterruptedException e) {
@@ -92,7 +94,6 @@ public class SeedFinderTest {
 	}
 
 	private static void runProblem(TSP tsp, TSPData data, OutputStreamWriter os, CompositeRoutingAlgorithm alg) throws IOException {
-		System.out.println("Hello pt.2");
 		long time_before = System.nanoTime();
 		Route r = tsp.run(data, alg);
 		long time_after = System.nanoTime();
@@ -230,7 +231,6 @@ public class SeedFinderTest {
 	private static ACSThunk runACS(String problem){
 			return (seed, ants) -> {
 				try {
-					System.out.println("Loading...");
 					TSPData data = loadProblem(problem);
 					TSP tsp = new TSP();
 					tsp.init(data);
@@ -246,7 +246,6 @@ public class SeedFinderTest {
 					cra.add(new TwoOpt(data));
 
 					runProblem(tsp, data, ob, cra);
-					System.out.println("runProblem end");
 					ob.flush();
 				} catch(IOException ex){
 					ex.printStackTrace();
