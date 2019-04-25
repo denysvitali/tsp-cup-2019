@@ -259,8 +259,18 @@ public class SeedFinderTest {
 	}*/
 
 	@Test
-	public void ch130ACO_SF() {
+	public void ch130ACS_SF() {
 		runACSThreaded(runACS("ch130"));
+	}
+
+	@Test
+	public void lin318ACS_SF() {
+		runACSThreaded(runACS("lin318"));
+	}
+
+	@Test
+	public void u1060ACS_SF() {
+		runACSThreaded(runACS("u1060"));
 	}
 
 	@Test
@@ -284,13 +294,12 @@ public class SeedFinderTest {
 	}
 
 	@Test
-	public void u1060SA_SF() {
-		runThreaded(SeedFinderTest::u1060SA);
+	public void d198ACS_SF() {
+		runACSThreaded(runACS("d198"));
 	}
 
 	@Test
-	public void ch130SA3O_SF() {
-		//runThreaded(SeedFinderTest::ch130SA3O);
+	public void u1060SA_SF() {
+		runThreaded(SeedFinderTest::u1060SA);
 	}
-
 }
