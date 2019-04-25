@@ -91,8 +91,8 @@ public class SeedFinderTest {
 		}
 	}
 
-	private static void runProblem(TSPData data, OutputStreamWriter os, CompositeRoutingAlgorithm alg) throws IOException {
-		TSP tsp = new TSP();
+	private static void runProblem(TSP tsp, TSPData data, OutputStreamWriter os, CompositeRoutingAlgorithm alg) throws IOException {
+		System.out.println("Hello pt.2");
 		long time_before = System.nanoTime();
 		Route r = tsp.run(data, alg);
 		long time_after = System.nanoTime();
@@ -136,7 +136,7 @@ public class SeedFinderTest {
 				"\"seed\": " + ra.getSeed() + "}");
 	}
 
-	@Test
+	/*@Test
 	public static void ch130SA(int seed) {
 		try {
 			TSPData data = loadProblem("ch130");
@@ -155,8 +155,8 @@ public class SeedFinderTest {
 		} catch(IOException ex){
 
 		}
-	}
-
+	}*/
+/*
 	@Test
 	public static void ch130SA3O(int seed) {
 		try {
@@ -177,25 +177,26 @@ public class SeedFinderTest {
 		} catch(IOException ex){
 
 		}
-	}
+	}*/
 
 	@Test
 	public static void u1060SA(int seed) {
 		try {
+			TSP tsp = new TSP();
 			TSPData data = loadProblem("u1060");
+			tsp.init(data);
 
 			File f = new File("/tmp/tsp-u1060-sa_" + GIT_COMMIT + ".json");
 
 			OutputStreamWriter ob = new OutputStreamWriter(
 					new BufferedOutputStream(new FileOutputStream(f, true)));
-			runProblem(data,
-					ob,
-					(new CompositeRoutingAlgorithm())
-							.startWith(new RandomNearestNeighbour(seed, data))
-							.add(new TwoOpt(data))
-							.add(new SimulatedAnnealing(seed)
-									.setMode(SimulatedAnnealing.Mode.TwoOpt))
-			);
+			CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
+					.startWith(new RandomNearestNeighbour(seed, data))
+					.add(new TwoOpt(data))
+					.add(new SimulatedAnnealing(seed)
+							.setMode(SimulatedAnnealing.Mode.TwoOpt));
+
+			runProblem(tsp, data, ob, cra);
 			ob.flush();
 		} catch(IOException ex){
 
@@ -208,7 +209,9 @@ public class SeedFinderTest {
 								 double alpha, double beta,
 								 double pd, double pe, double q0) {
 		try {
+			TSP tsp = new TSP();
 			TSPData data = loadProblem("u1060");
+			tsp.init(data);
 
 			File f = new File("/tmp/tsp-u1060-acs_" + GIT_COMMIT + ".json");
 
@@ -217,7 +220,7 @@ public class SeedFinderTest {
 							alpha, beta, pd, pe, q0);
 
 			OutputStreamWriter ob = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(f, true)));
-			runProblem(data, ob, (new CompositeRoutingAlgorithm()).startWith(acs));
+			runProblem(tsp, data, ob, (new CompositeRoutingAlgorithm()).startWith(acs));
 			ob.flush();
 		} catch(IOException ex){
 
@@ -229,16 +232,20 @@ public class SeedFinderTest {
 				try {
 					System.out.println("Loading...");
 					TSPData data = loadProblem(problem);
+					TSP tsp = new TSP();
+					tsp.init(data);
 					File f = new File("/tmp/tsp-" + problem + "-acs_" + GIT_COMMIT + ".json");
 
 					OutputStreamWriter ob = new OutputStreamWriter(
 							new BufferedOutputStream(new FileOutputStream(f, true)));
-					runProblem(data,
-							ob,
-							(new CompositeRoutingAlgorithm())
-									.startWith(new AntColonySystem(seed, ants, data))
-									.add(new TwoOpt(data))
-					);
+					CompositeRoutingAlgorithm cra =
+							(new CompositeRoutingAlgorithm());
+
+					cra.startWith(new AntColonySystem(seed, ants, data)
+					.setSolutionImprover(new TwoOpt(data)));
+					cra.add(new TwoOpt(data));
+
+					runProblem(tsp, data, ob, cra);
 					System.out.println("runProblem end");
 					ob.flush();
 				} catch(IOException ex){
@@ -269,7 +276,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void ch130SA3O_SF() {
-		runThreaded(SeedFinderTest::ch130SA3O);
+		//runThreaded(SeedFinderTest::ch130SA3O);
 	}
 
 }
