@@ -76,7 +76,7 @@ public class SeedFinderTest {
 		ExecutorService exec =
 		Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-		for(int i=0; i<5; i++){
+		for(int i=0; i<1000; i++){
 			for(int m=1; m<4; m++){
 				int finalI = i;
 				int finalM = m;
