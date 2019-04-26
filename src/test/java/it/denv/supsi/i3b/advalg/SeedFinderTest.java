@@ -78,8 +78,8 @@ public class SeedFinderTest {
 		ExecutorService exec =
 		Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-		for (int i = 0; i < 1000; i++) {
-			for(double beta = 1; beta < 10; beta++) {
+		for (int i = 0; i < 30; i++) {
+			for(double beta = 1; beta < 10; beta+=0.1) {
 				for (int m = 1; m < 4; m++) {
 					int finalI = i;
 					int finalM = m;
@@ -185,6 +185,10 @@ public class SeedFinderTest {
 
 					ACSParams params = new ACSParams();
 					params.setBeta(beta);
+
+					System.out.println(String.format("Run ACS w/ %d ants, " +
+							"B = %.2f, Seed = %d",
+							ants, beta, seed));
 
 					cra.startWith(new AntColonySystem(params, seed, ants, data)
 					.setSolutionImprover(new TwoOpt(data)));
