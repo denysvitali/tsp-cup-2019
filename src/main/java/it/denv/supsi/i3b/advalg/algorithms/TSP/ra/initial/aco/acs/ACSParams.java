@@ -7,7 +7,7 @@ public class ACSParams implements ACOParams {
 	double ALPHA = 1;
 
 	// Relative importance of pheromone
-	double BETA = 5;
+	double BETA = 2;
 
 	// Pheromone Decay (PD, ρ)
 	double PD = 0.1;
