@@ -36,15 +36,15 @@ linenos}
 \begin{document}
 
 \begin{titlepage}
-\centering
+    \centering
     {\scshape Scuola Universitaria della Svizzera Italiana (SUPSI)\par}
     \vspace{0.5cm}
     {C08003 - Advanced Algorithms and Optimization\par}
     \vspace{5cm}
     {
-    {\fontsize{1.5cm}{1.5cm}\selectfont 19\textsuperscript{th} Algorithms Cup\par}
-    \vspace{1cm}
-    {\Large Solving the Travelling Salesman Problem (TSP) with Java \par}
+        {\fontsize{1.5cm}{1.5cm}\selectfont 19\textsuperscript{th} Algorithms Cup\par}
+        \vspace{1cm}
+        {\Large Solving the Travelling Salesman Problem (TSP) with Java \par}
     }
     \vspace{8cm}
     {\large Denys Vitali\par}
@@ -61,7 +61,7 @@ linenos}
 Il presente documento contiene le informazioni riguardanti il mio metodo di
 risoluzione del problema del commesso viaggiatore (Travelling salesman problem, TSP).
 Questo progetto è un requisito del corso di
-\textit{Algoritmi Avanzati ed Ottimizzazione (C08003)}, tenuto presso la 
+\textit{Algoritmi Avanzati ed Ottimizzazione (C08003)}, tenuto presso la
 \textit{Scuola Universitaria Professionale della Svizzera Italiana (SUPSI)} durante il
 corso di laurea in ingegneria informatica.
 \subsection{Scopo}
@@ -71,40 +71,40 @@ sviluppati in Java.
 Nello specifico, i problemi da risolvere provengono dalla libreria TSPLIB, e
 sono i seguenti:
 \begin{itm}
-\item ch130
-\item d198
-\item eil76
-\item fl1577
-\item kroA100
-\item lin318
-\item pcb442
-\item pr439
-\item rat783
-\item u1060
+    \item ch130
+    \item d198
+    \item eil76
+    \item fl1577
+    \item kroA100
+    \item lin318
+    \item pcb442
+    \item pr439
+    \item rat783
+    \item u1060
 \end{itm}
 
 \subsection{Requisiti}
 Di seguito vengono riportati i requisiti per un corretto svolgimento della coppa:
 \begin{itm}
-\item Limite di tempo: massimo 3 minuti per problema,
-il tempo è inteso da quando il software inizia a quando finisce.
-\item 10 problemi (forniti in un file .zip ad inizio corso)
-\item Linguaggio di programmazione: Java
-\item Obbligatorio l'utilizzo di Maven, vietato l'utilizzo di librerie esterne
-\item Esecuzione replicabile: è necessario salvare eventuali seed e parametri da usare
-\item Risoluzione dei problemi: effettuata mediante tests. Deve essere possibile
-eseguire un test per risolvere un problema.
+    \item Limite di tempo: massimo 3 minuti per problema,
+    il tempo è inteso da quando il software inizia a quando finisce.
+    \item 10 problemi (forniti in un file .zip ad inizio corso)
+    \item Linguaggio di programmazione: Java
+    \item Obbligatorio l'utilizzo di Maven, vietato l'utilizzo di librerie esterne
+    \item Esecuzione replicabile: è necessario salvare eventuali seed e parametri da usare
+    \item Risoluzione dei problemi: effettuata mediante tests. Deve essere possibile
+    eseguire un test per risolvere un problema.
 \end{itm}
 
 \subsection{Problema del commesso viaggiatore (TSP)}
 Il problema che andremo a risolvere attraverso il nostro
- algoritmo è quello del commesso viaggiatore.
+algoritmo è quello del commesso viaggiatore.
 La descrizione può essere formalizzata come segue:
 un commesso viaggiatore necessita di visitare $n$ città, al
 massimo una volta, partendo da una città di partenza $A$ e tornando
 alla stessa dopo averle visitate tutte. Si chiede di trovare
 qual è il percorso ottimale (ossia il percorso più breve)
-che visiti tutte le città. 
+che visiti tutte le città.
 
 Il problema, di tipo NP-hard, viene espresso matematicamente nel modo seguente:
 dato un grafo pesato e completo $G = (V, E, w)$ con $n$ vertici, determinare il
@@ -118,7 +118,7 @@ la funzione obiettivo è la seguente:
 \end{equation}
 
 Dato che la computazione e verifica di tutte le $n!$ possibilità richiederebbe
-un tempo troppo elevato (ed il tempo per la risoluzione di un 
+un tempo troppo elevato (ed il tempo per la risoluzione di un
 problema è limitato a 3 minuti),
 nel nostro progetto ci accontenteremo di una "buona" soluzione,
 utilizzando dei metodi euristici.
@@ -131,17 +131,17 @@ forniti, in quanto questi venivano forniti in un formato proprietario che sfrutt
 struttura seguente:
 
 \begin{tsp}
-NAME: ch130
-TYPE: TSP
-COMMENT: 130 city problem (Churritz)
-DIMENSION: 130
-EDGE_WEIGHT_TYPE: EUC_2D
-BEST_KNOWN : 6110
-NODE_COORD_SECTION
-1 334.5909245845 161.7809319139
-2 397.6446634067 262.8165330708
-(...)
-EOF
+    NAME: ch130
+    TYPE: TSP
+    COMMENT: 130 city problem (Churritz)
+    DIMENSION: 130
+    EDGE_WEIGHT_TYPE: EUC_2D
+    BEST_KNOWN : 6110
+    NODE_COORD_SECTION
+    1 334.5909245845 161.7809319139
+    2 397.6446634067 262.8165330708
+    (...)
+    EOF
 \end{tsp}
 
 Al fine di sfruttare al meglio il tempo a disposizione per i runs ho deciso di spendere
@@ -179,24 +179,24 @@ con limitazioni di tempo e parametrizzazioni particolari.
 in un test per combinare a piacere gli algoritmi implementati:
 
 \begin{figure}[h]
-\begin{code}
-private void fl1577_SA(int seed) throws IOException {
-    TSPData data = getProblemData("fl1577");
-    TSP tsp = new TSP();
-    tsp.init(data);
+    \begin{code}
+        private void fl1577_SA(int seed) throws IOException {
+                TSPData data = getProblemData("fl1577");
+                TSP tsp = new TSP();
+                tsp.init(data);
 
-    Route r = tsp.run(data,
-            (new CompositeRoutingAlgorithm())
-                    .startWith(new RandomNearestNeighbour(seed, data))
-                    .add(new TwoOpt(data))
-                    .add(new SimulatedAnnealing(seed)
-                    .setMode(SimulatedAnnealing.Mode.DoubleBridge))
-    );
+                Route r = tsp.run(data,
+                (new CompositeRoutingAlgorithm())
+                .startWith(new RandomNearestNeighbour(seed, data))
+                .add(new TwoOpt(data))
+                .add(new SimulatedAnnealing(seed)
+                .setMode(SimulatedAnnealing.Mode.DoubleBridge))
+                );
 
-    validateResult(tsp, r, data);
-}
-\end{code}
-\caption{Esecuzione di fl1577 tramite RNN, 2-opt e Simulated Annealing in modalità Double Bridge}
+                validateResult(tsp, r, data);
+            }
+    \end{code}
+    \caption{Esecuzione di fl1577 tramite RNN, 2-opt e Simulated Annealing in modalità Double Bridge}
 \end{figure}
 
 \subsubsection{Two Opt}
@@ -210,11 +210,11 @@ ed un nuovo oggetto ad ogni 2-Opt swap.
 Inoltre, nelle mie versioni precedenti ad ogni iterazione
 di 2-Opt calcolavo la lunghezza finale del percorso anziché il guadagno. Ciò comportava
 a numerosi calcoli inutili, che sono stati ridotti grazie al miglioramento apportato
-dalla regola della diseguaglianza triangolare. 
+dalla regola della diseguaglianza triangolare.
 
 \subsubsection{Three Opt}
 Nel mio solver è anche presente un'implementazione di 3-opt,
-questa non viene però utilizzata in nessuna delle mie risoluzioni. 
+questa non viene però utilizzata in nessuna delle mie risoluzioni.
 
 \subsubsection{Double Bridge}
 Al fine di sfruttare una mossa di perturbazione per l'algoritmo di Simulated Annealing
@@ -223,20 +223,24 @@ da delle mosse 2-opt).
 
 \subsection{Meta euristici}
 \subsubsection{Ant Colony Optimization - ACS}
-Seguendo alcuni consigli e direttive date da "Ant Colony Optimization" \cite{aco}
-ho implementato l'algoritmo di Ant Colony System utilizzando i seguenti parametri:
+Seguendo alcuni consigli e direttive su alcuni libri e paper relativi all'argomento
+\cite{aco} \cite{aco-paper} ho implementato l'algoritmo di Ant Colony System utilizzando i seguenti parametri:
 
 \begin{table}
-\begin{tabular}{|l|l|}
-    \hline
-    $\alpha$ & 1 \\
-    $\beta$ & 2 \\
-    $\rho$ & 0.1 \\
-    $\varepsilon$ & 0.1 \\
-    $q_0$ & 0.98 \\
-    \hline
-\end{tabular}
-\caption{Parametri per ACS}
+    \begin{center}
+        \begin{tabular}{|l|l|l|}
+            \hline
+            Parametro & Descrizione & Valore \\
+            \hline
+            $\alpha$      & Importanza del feromone &  1    \\
+            $\beta$       & Importanza dell'euristica & 2    \\
+            $\rho$        & Deterioramento del feromone & 0.1  \\
+            $\varepsilon$ & Evaporazione del feromone & 0.1  \\
+            $q_0$         & Fattore di esplorazione & 0.98 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Parametri per ACS}
 \end{table}
 \subsubsection{Genetic Algorithm}
 Per l'algoritmo genetico ho fatto uso di una funzione di crossover ampiamente
@@ -245,7 +249,7 @@ Crossover).
 
 I cicli AB sono selezionati tramite una funzione \ic{EAX.rand()} ed
 \ic{EAX.heur()} creando un \mvar{E-Set}.
-Successivamente dall'\mvar{E-Set} viene generato un'insieme $E_C$ nel modo seguente: 
+Successivamente dall'\mvar{E-Set} viene generato un'insieme $E_C$ nel modo seguente:
 
 \begin{equation}
     E_C := (E_A \cap \bar{D}) \cup (E_B \cap D)
@@ -266,7 +270,7 @@ Per eseguire il solver è necessario utilizzare Maven ed utilizzare Java 11.
 Una volta clonata la repository (da https://github.com/denysvitali/tsp-cup-2019)
 è necessario eseguire il seguente comando:
 \begin{code}
-mvn -Dtest=TSPRunnerTest#ch130 test
+    mvn -Dtest=TSPRunnerTest#ch130 test
 \end{code}
 dove \texttt{ch130} corrisponde al nome del problema da risolvere.
 
@@ -275,10 +279,10 @@ La piattaforma utilizzata quale piattaforma di benchmarking è la seguente:
 
 \begin{tabular}{|l|l|}
     \hline
-    \textbf{OS} & Arch Linux \\
+    \textbf{OS}     & Arch Linux                          \\
     \textbf{Kernel} & \texttt{5.1.0-rc6-mainline x86\_64} \\
-    \textbf{CPU} & Intel Core i7-6700HQ CPU @ 2.60GHz \\
-    \textbf{RAM} & 32 GB \\
+    \textbf{CPU}    & Intel Core i7-6700HQ CPU @ 2.60GHz  \\
+    \textbf{RAM}    & 32 GB                               \\
     \hline
 \end{tabular}
 
@@ -288,10 +292,15 @@ La piattaforma utilizzata quale piattaforma di benchmarking è la seguente:
 
 \pagebreak
 \begin{thebibliography}{9}
-\bibitem{aco}
-Marco Dorigo, Thomas Stützle,
-\textit{Ant Colony Optimization}, 2004.
+    \bibitem{aco}
+    Marco Dorigo, Thomas Stützle,
+    \textit{Ant Colony Optimization}, 2004.
 
+    \bibitem{aco-paper}
+    Marco Dorigo, Luca Maria Gambardella,
+    IEEE Transactions On Evolutionary Computation, Vol. 1, No. 1
+    \textit{Ant Colony System: A Cooperative Learning Approach to the Traveling Salesman Problem},
+    1997.
 \end{thebibliography}
 
 \end{document}
