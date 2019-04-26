@@ -7,7 +7,9 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.ACOParams;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AntColony;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.ACSParams;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
@@ -45,7 +47,7 @@ public class SeedFinderTest {
 	}
 
 	private interface Thunk { void apply(int seed); }
-	private interface ACSThunk { void apply(int seed, int nr_ants); }
+	private interface ACSThunk { void apply(int seed, int nr_ants, double beta); }
 
 	private static TSPData loadProblem(String pName) throws IOException {
 		String filePath = Utils.getTestFile("/problems/" + pName + ".tsp");
@@ -76,11 +78,14 @@ public class SeedFinderTest {
 		ExecutorService exec =
 		Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-		for(int i=0; i<1000; i++){
-			for(int m=1; m<4; m++){
-				int finalI = i;
-				int finalM = m;
-				exec.submit(()-> f.apply(finalI, finalM));
+		for (int i = 0; i < 1000; i++) {
+			for(double beta = 1; beta < 10; beta++) {
+				for (int m = 1; m < 4; m++) {
+					int finalI = i;
+					int finalM = m;
+					double finalBeta = beta;
+					exec.submit(() -> f.apply(finalI, finalM, finalBeta));
+				}
 			}
 		}
 
@@ -124,8 +129,12 @@ public class SeedFinderTest {
 			AntColonySystem acs = (AntColonySystem) sa;
 			int m = acs.getAnts();
 			int s = acs.getSeed();
+			ACOParams p = acs.getParams();
+
 			os.write("{\"name\": \"" + sa.getClass().getName() + "\"," +
-					"\"seed\": " + s + ", \"ants\": " + m + "}");
+					"\"seed\": " + s + ", \"ants\": " + m + ", \"params\":{" +
+					"\"alpha\": " + p.getALPHA() + "," +
+					"\"beta\": " + p.getBeta() + "}}");
 		} else {
 			os.write("{\"name\": \"" + sa.getClass().getName() + "\"," +
 					"\"seed\": " + sa.getSeed() + "}");
@@ -136,49 +145,6 @@ public class SeedFinderTest {
 		os.write("{\"name\": \"" + ra.getClass().getName() + "\"," +
 				"\"seed\": " + ra.getSeed() + "}");
 	}
-
-	/*@Test
-	public static void ch130SA(int seed) {
-		try {
-			TSPData data = loadProblem("ch130");
-			File f = new File("/tmp/tsp-130-sa_" + GIT_COMMIT + ".json");
-
-			OutputStreamWriter ob = new OutputStreamWriter(
-					new BufferedOutputStream(new FileOutputStream(f, true)));
-					runProblem(data, ob,
-					(new CompositeRoutingAlgorithm())
-							.startWith(new RandomNearestNeighbour(seed, data))
-							.add(new TwoOpt(data))
-							.add(new SimulatedAnnealing(seed)
-									.setMode(SimulatedAnnealing.Mode.TwoOpt))
-			);
-			ob.flush();
-		} catch(IOException ex){
-
-		}
-	}*/
-/*
-	@Test
-	public static void ch130SA3O(int seed) {
-		try {
-			TSPData data = loadProblem("ch130");
-			File f = new File("/tmp/tsp-130-sa-3o_" + GIT_COMMIT + ".json");
-
-			OutputStreamWriter ob = new OutputStreamWriter(
-					new BufferedOutputStream(new FileOutputStream(f, true)));
-			runProblem(data,
-					ob,
-					(new CompositeRoutingAlgorithm())
-							.startWith(new RandomNearestNeighbour(seed, data))
-							.add(new TwoOpt(data))
-							.add(new SimulatedAnnealing(seed)
-									.setMode(SimulatedAnnealing.Mode.ThreeOpt))
-			);
-			ob.flush();
-		} catch(IOException ex){
-
-		}
-	}*/
 
 	@Test
 	public static void u1060SA(int seed) {
@@ -204,32 +170,8 @@ public class SeedFinderTest {
 		}
 	}
 
-	@Test
-	public static void u1060_ACS(int seed,
-								 int amount_ants,
-								 double alpha, double beta,
-								 double pd, double pe, double q0) {
-		try {
-			TSP tsp = new TSP();
-			TSPData data = loadProblem("u1060");
-			tsp.init(data);
-
-			File f = new File("/tmp/tsp-u1060-acs_" + GIT_COMMIT + ".json");
-
-			AntColonySystem acs =
-					new AntColonySystem(seed, amount_ants, data,
-							alpha, beta, pd, pe, q0);
-
-			OutputStreamWriter ob = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(f, true)));
-			runProblem(tsp, data, ob, (new CompositeRoutingAlgorithm()).startWith(acs));
-			ob.flush();
-		} catch(IOException ex){
-
-		}
-	}
-
 	private static ACSThunk runACS(String problem){
-			return (seed, ants) -> {
+			return (seed, ants, beta) -> {
 				try {
 					TSPData data = loadProblem(problem);
 					TSP tsp = new TSP();
@@ -241,7 +183,10 @@ public class SeedFinderTest {
 					CompositeRoutingAlgorithm cra =
 							(new CompositeRoutingAlgorithm());
 
-					cra.startWith(new AntColonySystem(seed, ants, data)
+					ACSParams params = new ACSParams();
+					params.setBeta(beta);
+
+					cra.startWith(new AntColonySystem(params, seed, ants, data)
 					.setSolutionImprover(new TwoOpt(data)));
 					cra.add(new TwoOpt(data));
 
@@ -252,11 +197,6 @@ public class SeedFinderTest {
 				}
 			};
 	}
-
-	/*@Test
-	public void ch130SA_SF() {
-		runThreaded(SeedFinderTest::ch130SA);
-	}*/
 
 	@Test
 	public void ch130ACS_SF() {

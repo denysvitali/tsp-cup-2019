@@ -6,4 +6,7 @@ public interface ACOParams {
 	double getPD();
 	double getPE();
 	double getQ0();
+
+	void setAlpha(double alpha);
+	void setBeta(double beta);
 }

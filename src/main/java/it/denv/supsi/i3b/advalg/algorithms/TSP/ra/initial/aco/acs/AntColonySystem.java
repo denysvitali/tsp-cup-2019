@@ -4,6 +4,7 @@ import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.ACOParams;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AcoType;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AntColony;
 
@@ -11,6 +12,10 @@ public class AntColonySystem extends RoutingAlgorithm {
 	private AntColony ac;
 	private int nr_ants = -1;
 
+	public AntColonySystem(ACSParams params, int seed, int amount_ants, TSPData data) {
+		this.nr_ants = amount_ants;
+		this.ac = new AntColony(AcoType.ACS, params, seed, amount_ants, data);
+	}
 
 	public AntColonySystem(int seed, int amount_ants, TSPData data) {
 		this.nr_ants = amount_ants;
@@ -46,5 +51,9 @@ public class AntColonySystem extends RoutingAlgorithm {
 
 	public int getAnts() {
 		return nr_ants;
+	}
+
+	public ACOParams getParams() {
+		return this.ac.getParams();
 	}
 }
