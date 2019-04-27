@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +48,7 @@ public class SeedFinderTest {
 	}
 
 	private interface Thunk { void apply(int seed); }
-	private interface ACSThunk { void apply(int seed, int nr_ants, double beta); }
+	private interface ACSThunk { void apply(int seed, int nr_ants, ACSParams params); }
 
 	private static TSPData loadProblem(String pName) throws IOException {
 		String filePath = Utils.getTestFile("/problems/" + pName + ".tsp");
@@ -62,7 +63,7 @@ public class SeedFinderTest {
 		ExecutorService exec =
 				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-		for(int i=0; i<10000; i++) {
+		for(int i=0; i<10000; i++){
 			int finalI = i;
 			exec.submit(() -> f.apply(finalI));
 		}
@@ -78,13 +79,19 @@ public class SeedFinderTest {
 		ExecutorService exec =
 		Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
+		Random r = new Random();
 		for (int i = 0; i < 30; i++) {
 			for(double beta = 1; beta < 10; beta+=0.1) {
 				for (int m = 1; m < 4; m++) {
-					int finalI = i;
-					int finalM = m;
-					double finalBeta = beta;
-					exec.submit(() -> f.apply(finalI, finalM, finalBeta));
+					for (double q0 = 0.5; q0 < 1; q0 += 0.05) {
+						int finalM = m;
+
+						ACSParams a = new ACSParams();
+						a.setBeta(beta);
+						a.setQ0(q0);
+
+						exec.submit(() -> f.apply(r.nextInt(), finalM, a));
+					}
 				}
 			}
 		}
@@ -134,7 +141,10 @@ public class SeedFinderTest {
 			os.write("{\"name\": \"" + sa.getClass().getName() + "\"," +
 					"\"seed\": " + s + ", \"ants\": " + m + ", \"params\":{" +
 					"\"alpha\": " + p.getALPHA() + "," +
-					"\"beta\": " + p.getBeta() + "}}");
+					"\"beta\": " + p.getBeta() + "," +
+					"\"q0\": " + p.getQ0() + "," +
+					"\"PD\": " + p.getPD() + "," +
+					"\"PE\": " + p.getPE() +"}}");
 		} else {
 			os.write("{\"name\": \"" + sa.getClass().getName() + "\"," +
 					"\"seed\": " + sa.getSeed() + "}");
@@ -171,7 +181,7 @@ public class SeedFinderTest {
 	}
 
 	private static ACSThunk runACS(String problem){
-			return (seed, ants, beta) -> {
+			return (seed, ants, acsParams) -> {
 				try {
 					TSPData data = loadProblem(problem);
 					TSP tsp = new TSP();
@@ -183,14 +193,12 @@ public class SeedFinderTest {
 					CompositeRoutingAlgorithm cra =
 							(new CompositeRoutingAlgorithm());
 
-					ACSParams params = new ACSParams();
-					params.setBeta(beta);
 
 					System.out.println(String.format("Run ACS w/ %d ants, " +
-							"B = %.2f, Seed = %d",
-							ants, beta, seed));
+							"ACSParams = %s, Seed = %d",
+							ants, acsParams, seed));
 
-					cra.startWith(new AntColonySystem(params, seed, ants, data)
+					cra.startWith(new AntColonySystem(acsParams, seed, ants, data)
 					.setSolutionImprover(new TwoOpt(data)));
 					cra.add(new TwoOpt(data));
 

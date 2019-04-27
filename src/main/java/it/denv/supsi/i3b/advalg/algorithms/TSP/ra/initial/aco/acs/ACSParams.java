@@ -63,4 +63,14 @@ public class ACSParams implements ACOParams {
 	public void setBeta(double beta) {
 		BETA = beta;
 	}
+
+	public void setQ0(double q0) {
+		this.q0 = q0;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Alpha=%.2f, Beta=%.2f, PD=%.2f, PE=%.2f, Q0=%.2f",
+				ALPHA, BETA, PD, PE, q0);
+	}
 }
