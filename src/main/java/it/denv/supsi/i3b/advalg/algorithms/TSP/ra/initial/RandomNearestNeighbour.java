@@ -8,10 +8,12 @@ import java.util.Random;
 public class RandomNearestNeighbour extends NearestNeighbour {
 	private Random r;
 	private int size = 10;
+	private int seed = -1;
 	private TSPData data;
 
 	public RandomNearestNeighbour(int seed, TSPData data){
 		super(data);
+		this.seed = seed;
 		this.r = new Random(seed);
 		this.data = data;
 		System.out.println(this.getClass().getName() + "'s seed is " +  seed);
@@ -39,5 +41,10 @@ public class RandomNearestNeighbour extends NearestNeighbour {
 	public void reset() {
 		super.reset();
 		this.candidator = new RNNCandidator(r, size, data);
+	}
+
+	@Override
+	public int getSeed() {
+		return this.seed;
 	}
 }
