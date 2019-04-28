@@ -6,13 +6,12 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
-import java.util.Arrays;
 import java.util.Random;
 
 
 public class SimulatedAnnealing implements ILS {
 
-	private static final int r = 100;
+	private static final int r = 1000;
 	private static final double START_TEMPERATURE = 100.0;
 	private int seed;
 	private Random random;
@@ -125,8 +124,9 @@ public class SimulatedAnnealing implements ILS {
 
 		// TODO: Change me
 		double max_runtime = 1000 * 60 * 2 + 1000 * 50; // 2min 50 sec
+		int iter = 0;
 
-		while (temperature > 0.2) {
+		while (temperature > 0.0001 && System.currentTimeMillis() <= max_runtime + start) {
 			for (int i = 0; i < r; i++) {
 				// 1. n = neighbour(current)
 
@@ -193,10 +193,13 @@ public class SimulatedAnnealing implements ILS {
 				break;
 			}
 
-			long now = System.currentTimeMillis();
 			RouteUtils.computePerformance(best, data);
 
-			temperature = START_TEMPERATURE * (1-(now - start)/max_runtime);
+			//temperature = START_TEMPERATURE * (1-(now - start)/max_runtime);
+			double alpha = 1 + 0.1 * Math.log(1 + iter);
+			temperature = START_TEMPERATURE / alpha;
+
+			iter++;
 			System.out.println("Temperature is " + temperature);
 		}
 
