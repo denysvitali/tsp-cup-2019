@@ -260,6 +260,11 @@ public class SeedFinderTest {
 		runThreaded(runSA("pr439"));
 	}
 
+	@Test
+	public void fl1577SA_SF() {
+		runThreaded(runSA("fl1577"));
+	}
+
 	private Thunk runSA(String problem) {
 			return (seed)-> {
 				try {
