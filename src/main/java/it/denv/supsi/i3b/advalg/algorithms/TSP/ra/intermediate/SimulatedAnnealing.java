@@ -196,7 +196,7 @@ public class SimulatedAnnealing implements ILS {
 			RouteUtils.computePerformance(best, data);
 
 			//temperature = START_TEMPERATURE * (1-(now - start)/max_runtime);
-			double alpha = 1 + 0.1 * Math.log(1 + iter);
+			double alpha = 1 * Math.log(1 + iter);
 			temperature = START_TEMPERATURE / alpha;
 
 			iter++;

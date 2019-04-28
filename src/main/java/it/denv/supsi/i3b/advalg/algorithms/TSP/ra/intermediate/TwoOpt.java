@@ -74,7 +74,6 @@ public class TwoOpt implements ILS {
 		while(improvement){
 			int best_i = -1;
 			int best_j = -1;
-			int best_improvement = Integer.MAX_VALUE;
 
 			improvement = false;
 			for(int i=0; i < n - 3; i++){
@@ -87,6 +86,10 @@ public class TwoOpt implements ILS {
 						improvement = true;
 						break;
 					}
+				}
+
+				if(improvement){
+					break;
 				}
 			}
 
