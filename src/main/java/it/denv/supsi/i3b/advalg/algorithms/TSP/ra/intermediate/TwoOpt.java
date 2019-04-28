@@ -82,10 +82,10 @@ public class TwoOpt implements ILS {
 					int delta = -d[path[i]][path[i+1]] - d[path[k]][path[k+1]]
 							+ d[path[i]][path[k]] + d[path[i+1]][path[k+1]];
 					if(delta < 0){
-						best_improvement = delta;
 						best_i = i+1;
 						best_j = k;
 						improvement = true;
+						break;
 					}
 				}
 			}
