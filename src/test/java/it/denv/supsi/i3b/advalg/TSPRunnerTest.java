@@ -17,6 +17,7 @@ import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,6 +54,15 @@ public class TSPRunnerTest {
 		//ch130_SA_DB(1);
 	}
 
+
+	@Test
+	public void ch130_SA() throws IOException {
+		int r = new Random().nextInt();
+		System.out.println("Seed is " + r);
+		ch130_SA_DB(r);
+		System.out.println("Seed is " + r);
+	}
+
 	private void ch130_SA_DB(int seed) throws IOException {
 		TSPData data = getProblemData("ch130");
 		TSP tsp = new TSP();
@@ -60,11 +70,11 @@ public class TSPRunnerTest {
 
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new RandomNearestNeighbour(seed, data))
-				.add(new SimulatedAnnealing()
+						.startWith(new NearestNeighbour(data))
+						.add(new TwoOpt(data))
+						.add(new SimulatedAnnealing()
 						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 		);
-
 		validateResult(tsp, r, data);
 	}
 
@@ -649,7 +659,7 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new GeneticAlgorithm(data))
+						.add(new SimulatedAnnealing())
 		);
 
 		String path = tsp.writeRoute(r);
@@ -1031,7 +1041,8 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new SimulatedAnnealing())
+						.add(new SimulatedAnnealing()
+								.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 		);
 
 		String path = tsp.writeRoute(r);

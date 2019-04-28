@@ -63,9 +63,9 @@ public class SeedFinderTest {
 		ExecutorService exec =
 				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
+		Random r = new Random();
 		for(int i=0; i<10000; i++){
-			int finalI = i;
-			exec.submit(() -> f.apply(finalI));
+			exec.submit(() -> f.apply(r.nextInt()));
 		}
 
 		try {
@@ -254,4 +254,35 @@ public class SeedFinderTest {
 	public void u1060SA_SF() {
 		runThreaded(SeedFinderTest::u1060SA);
 	}
-}
+
+	@Test
+	public void pr439SA_SF() {
+		runThreaded(runSA("pr439"));
+	}
+
+	private Thunk runSA(String problem) {
+			return (seed)-> {
+				try {
+					TSP tsp = new TSP();
+					TSPData data = loadProblem(problem);
+					tsp.init(data);
+
+					File f = new File("/tmp/tsp-" + problem + "-sa_" + GIT_COMMIT + ".json");
+
+					OutputStreamWriter ob = new OutputStreamWriter(
+							new BufferedOutputStream(new FileOutputStream(f, true)));
+					CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
+							.startWith(new RandomNearestNeighbour(seed, data))
+							.add(new TwoOpt(data))
+							.add(new SimulatedAnnealing(seed)
+									.setMode(SimulatedAnnealing.Mode.DoubleBridge))
+							.add(new TwoOpt(data));
+
+					runProblem(tsp, data, ob, cra);
+					ob.flush();
+				} catch(IOException ex){
+
+				}
+			};
+		}
+	}
