@@ -6,6 +6,8 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPSolution;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.ACOParams;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.ACSParams;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.ThreeOpt;
@@ -820,17 +822,26 @@ public class TSPRunnerTest {
 
 		TSP tsp = new TSP();
 		tsp.init(data);
+		ACSParams params = new ACSParams();
+
+		int seed = new Random().nextInt();
+
+		System.out.println("Seed is " + seed);
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(
 								new AntColonySystem(
-										2, data)
+										params,
+										seed,
+										3, data)
 										.setSolutionImprover(new TwoOpt(data)))
 				.add(new TwoOpt(data))
 		);
 
 		String path = tsp.writeRoute(r);
 		GnuPlotUtils.plot(path);
+		System.out.println("Seed is " + seed);
 		System.out.println("Route length: " + r.getLength());
 		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
