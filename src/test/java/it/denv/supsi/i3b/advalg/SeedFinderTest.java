@@ -216,6 +216,11 @@ public class SeedFinderTest {
 	}
 
 	@Test
+	public void ch130SA_SF() {
+		runThreaded(runSA("ch130"));
+	}
+
+	@Test
 	public void lin318ACS_SF() {
 		runACSThreaded(runACS("lin318"));
 	}
@@ -278,7 +283,6 @@ public class SeedFinderTest {
 							new BufferedOutputStream(new FileOutputStream(f, true)));
 					CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
 							.startWith(new RandomNearestNeighbour(seed, data))
-							.add(new TwoOpt(data))
 							.add(new SimulatedAnnealing(seed)
 									.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 							.add(new TwoOpt(data));

@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class SimulatedAnnealing implements ILS {
 
-	private static final int r = 1000;
+	private static final int r = 100;
 	private static final double START_TEMPERATURE = 100.0;
 	private int seed;
 	private Random random;
@@ -122,12 +122,23 @@ public class SimulatedAnnealing implements ILS {
 
 		double start = System.currentTimeMillis();
 
-		// TODO: Change me
 		double max_runtime = 1000 * 60 * 2 + 1000 * 50; // 2min 50 sec
 		int iter = 0;
 
-		while (temperature > 0.0001 && System.currentTimeMillis() <= max_runtime + start) {
-			for (int i = 0; i < r; i++) {
+		int originalLength = route.getLength();
+		double originalPercentage = 1 - data.getBestKnown() * 1.0 / originalLength;
+
+		double alpha = 0.98;
+		double sqrt_n = Math.sqrt(data.getDim());
+
+		int new_r = 800;
+		System.out.println("new_r = " + new_r);
+
+		while (temperature > 1E-10 && System.currentTimeMillis() <= max_runtime + start) {
+
+			double t_cool = Math.pow(alpha, iter);
+
+			for (int i = 0; i < new_r; i++) {
 				// 1. n = neighbour(current)
 
 				SwappablePath sp = null;
@@ -196,8 +207,14 @@ public class SimulatedAnnealing implements ILS {
 			RouteUtils.computePerformance(best, data);
 
 			//temperature = START_TEMPERATURE * (1-(now - start)/max_runtime);
-			double alpha = 1 + Math.log(1 + iter);
-			temperature = START_TEMPERATURE / alpha;
+			// temperature decreases as the performance does
+
+			//double percentage = 1 - data.getBestKnown() * 1.0 / best.getLength();
+
+
+			//double alpha = 1 + 1 * Math.log(1 + iter);
+			//double logval = Math.log(1 + originalPercentage / percentage * 2 + iter * 1.0);
+			temperature *= t_cool;
 
 			iter++;
 			System.out.println("Temperature is " + temperature);

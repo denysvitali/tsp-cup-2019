@@ -174,8 +174,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void fl1577() throws IOException {
-		fl1577_ACS(-1, 3);
-		//fl1577_SA(1);
+		//fl1577_ACS(-1, 3);
+		fl1577_SA(-1);
 	}
 
 	private void fl1577_ACS(int seed, int amount) throws IOException {
@@ -205,6 +205,12 @@ public class TSPRunnerTest {
 		TSP tsp = new TSP();
 		tsp.init(data);
 
+		if(seed == -1){
+			seed = new Random().nextInt();
+		}
+
+
+		System.out.println("Seed is " + seed);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(seed, data))
@@ -212,6 +218,9 @@ public class TSPRunnerTest {
 						.add(new SimulatedAnnealing(seed)
 						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 		);
+
+		System.out.println("Seed is " + seed);
+
 
 		validateResult(tsp, r, data);
 	}
@@ -298,7 +307,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void pcb442() throws IOException {
-		pcb442_ACS(3, 10);
+		//pcb442_ACS(3, 10);
+		pcb442SimAn();
 	}
 
 	private void pcb442_ACS(int seed, int amount) throws IOException {
@@ -1033,15 +1043,18 @@ public class TSPRunnerTest {
 		String filePath = Utils.getTestFile("/problems/pcb442.tsp");
 		assertNotNull(filePath);
 
+		int seed = (new Random()).nextInt();
+
+		System.out.println("Seed is " + seed);
+
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
 		TSP tsp = new TSP();
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new NearestNeighbour(data))
-						.add(new TwoOpt(data))
-						.add(new SimulatedAnnealing()
+						.startWith(new RandomNearestNeighbour(seed, data))
+						.add(new SimulatedAnnealing(seed)
 								.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 		);
 
