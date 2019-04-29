@@ -256,14 +256,43 @@ Successivamente dall'\mvar{E-Set} viene generato un'insieme $E_C$ nel modo segue
 \end{equation}
 dove $D$ è l'\mvar{E-Set}.
 
-Alternativamente, ed in modo equivalente, si può definire $E_C$ nel modo seguente:
+Dopo numerosi tentativi verso la strada del genetico con EAX, ho deciso di
+fermarmi in quanto non riuscivo ad ottenere un'implementazione valida.
+Purtroppo il poco tempo a mia disposizione ed una scarsa documentazione a riguardo
+dell'argomento mi hanno portato ad abbandonare questa strada a poche settimane dalla
+consegna. Sono però convinto che questa strada mi avrebbe portato
+ad ottimi risultati una volta implementata.
 
+L'algoritmo genetico con un crossover base ed inefficiente è però stata implementata
+in \href{https://github.com/denysvitali/tsp-cup-2019/tree/4ce199dcb53d31f20663dbe6c4eaf4bffd1222de}{\texttt{4ce199d}}.
+Senza una funzione di crossover efficiente, questo algoritmo porta a scarsi risultati.
+\subsubsection{Simulated Annealing}
+Sconsolato dai risultati ottenuti tramite ACO / GA + EAX, ho deciso di provare a migliorare
+il mio algoritmo di Simulated Annealing.
+
+Inizialmente la funzione (non deterministica) di scheduling della temperatura
+era definita nel modo seguente:
 \begin{equation}
-    E_C := (E_A \setminus (\mvar{E-set} \cap E_A)) \cup
-    (\mvar{E-Set} \cap E_B)
+    T = T_0 \cdot (1 - \dfrac{\text{now} - \text{start}}{\text{max\_runtime}})
+    , \quad \text{con} \quad T_0 = 100.0
 \end{equation}
 
-\subsubsection{Simulated Annealing}
+dove \textit{now} era un'indicazione del tempo corrente,
+ (in ms), \textit{start} il tempo di inizio (in ms) e \textit{max\_runtime}
+ il tempo massimo di run (definito come 2 min e 50 secondi).
+Sfortunatamente questa funzione non è deterministica in quanto dipende dal numero
+di operazioni effettuate in un dato lasso di tempo.
+Usando una funzione non deterministica per la generazione del valore di temperatura
+ottengo automaticamente un risultato non deterministico per ogni run.
+
+Questa problematica mi ha portato a cambiare la funzione di scheduling della
+temperatura nel modo seguente:
+
+\begin{equation}
+    T_{k+1} = T_k \cdot \alpha^{i}, \quad \text{con} \quad T_0 = 100.0
+\end{equation}
+
+dove $i$ è il numero di iterazioni, ed $\alpha$ un parametro impostato ad $\alpha = 0.98$.
 \pagebreak
 \section{Esecuzione}
 Per eseguire il solver è necessario utilizzare Maven ed utilizzare Java 11.
