@@ -52,8 +52,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void ch130() throws IOException {
-	  	//ch130_ACS(-1, 20);
-		ch130_SA_DB(1);
+	  	ch130_ACS(-1, 20);
+		//ch130_SA_DB(1);
 	}
 
 
@@ -107,8 +107,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void d198() throws IOException {
-		//d198_ACS(-1, 100);
-		d198_SA(-1);
+		d198_ACS(-1, 4);
+		//d198_SA(-1);
 	}
 
 	private void d198_SA(int seed) throws IOException {
@@ -124,9 +124,12 @@ public class TSPRunnerTest {
 			sa = new SimulatedAnnealing(seed);
 		}
 
+		sa.setMode(SimulatedAnnealing.Mode.DoubleBridge);
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
+						.add(new TwoOpt(data))
 				.add(sa)
 		);
 
@@ -168,10 +171,13 @@ public class TSPRunnerTest {
 		TSP tsp = new TSP();
 		tsp.init(data);
 
+		TwoOpt opt = new TwoOpt(data);
+		opt.setCandidate(true);
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new AntColonySystem(seed, amount, data)
-								.setSolutionImprover(new TwoOpt(data)))
+								.setSolutionImprover(opt))
 		);
 
 		validateResult(tsp, r, data);
@@ -179,8 +185,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void fl1577() throws IOException {
-		//fl1577_ACS(-1, 3);
-		fl1577_SA(-1);
+		fl1577_ACS(-1, 3);
+		//fl1577_SA(-1);
 	}
 
 	private void fl1577_ACS(int seed, int amount) throws IOException {
@@ -1187,7 +1193,8 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new SimulatedAnnealing())
+						.add(new SimulatedAnnealing()
+						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 		);
 
 		String path = tsp.writeRoute(r);
@@ -1215,7 +1222,7 @@ public class TSPRunnerTest {
 
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new NearestNeighbour(data))
+						.startWith(new RandomNearestNeighbour(data))
 						.add(candidateLessTwoOpt)
 						.add(new SimulatedAnnealing()
 								.setMode(SimulatedAnnealing.Mode.DoubleBridge))

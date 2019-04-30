@@ -11,8 +11,8 @@ import java.util.Random;
 
 public class SimulatedAnnealing implements ILS {
 
-	private static final int r = 100;
-	private static final double START_TEMPERATURE = 160.0;
+	private static final int r = 1000;
+	private static final double START_TEMPERATURE = 180.0;
 	private int seed;
 	private Random random;
 
@@ -108,124 +108,80 @@ public class SimulatedAnnealing implements ILS {
 
 		SwappablePath best = null;
 		SwappablePath current = route.getSP();
+		current.calculateDistance(data);
 
 		TwoOpt twoOpt = new TwoOpt(data);
-		twoOpt.setCandidate(true);
-		ThreeOpt threeOpt = null;
+		twoOpt.setCandidate(false);
 
-		switch(mode){
-			case TwoOpt:
-				break;
-			case ThreeOpt:
-				threeOpt = new ThreeOpt(data);
-				break;
-		}
+		int length = current.getPathArr().length;
+		int bestKnown = data.getBestKnown();
 
-		double start = System.currentTimeMillis();
+		double originalPerc = 1 - bestKnown*1.0 / current.getLength();
+		System.out.println(originalPerc);
 
-		double max_runtime = 1000 * 60 * 2 + 1000 * 50; // 2min 50 sec
+		RouteUtils.computePerformance(current, data);
+
 		int iter = 0;
+		double currentPerc = -1;
+		while(temperature > 1E-9){
 
-		int originalLength = route.getLength();
-		double originalPercentage = 1 - data.getBestKnown() * 1.0 / originalLength;
+			if(best == null){
+				currentPerc = originalPerc;
+			}
 
-		double alpha = 0.95;
-		double sqrt_n = Math.sqrt(data.getDim());
+			double alpha = 0.996;
 
-		int new_r = 100;
-		System.out.println("new_r = " + new_r);
+			for(int i=0; i<r; i++){
+				SwappablePath next = null;
 
-		while (temperature > 1E-10 && System.currentTimeMillis() <= max_runtime + start) {
-
-			//double t_cool = Math.pow(alpha, iter);
-			double t_cool = alpha;
-
-			for (int i = 0; i < new_r; i++) {
-				// 1. n = neighbour(current)
-
-				SwappablePath sp = null;
-				SwappablePath nextSP = null;
-
-				switch (mode) {
-					/*case TwoOpt:
-						int[] twoOptN;
-						do{
-							twoOptN = getRandomNumbers(2, data.getDim());
-						} while(twoOptN[0] == twoOptN[1] || twoOptN[0] > twoOptN[1]
-						|| twoOptN[0] == 0);
-
-						sp = new SwappablePath(current);
-						sp.twoOptSwap(twoOptN[0], twoOptN[1]);
-						break;
-
-					case ThreeOpt:
-						int[] threeOptN = getRandomOffsettedNumbers(3, data.getDim());
-						sp = current.threeOptSwap(threeOptN[0], threeOptN[1], threeOptN[2])
-								[random.nextInt(2)];
-						break;*/
-
+				switch(mode){
 					case DoubleBridge:
-						int[] dbN = getRandomOffsettedNumbers(4, data.getDim());
-						sp = current.doubleBridge(dbN);
+						next = current.doubleBridge(
+								getRandomOffsettedNumbers(4, length-1)
+						);
 						break;
 				}
 
-				assert(sp != null);
+				assert(next != null);
 
-				// improvedSP = local_opt(n)
+				next = twoOpt.improveSP(next);
+				next.calculateDistance(data);
 
-				nextSP = twoOpt.improveSP(new SwappablePath(sp));
-				assert(nextSP != null);
+				assert(next.getLength() != -1);
+				assert(current.getLength() != -1);
 
-				int nextLength = nextSP.calculateDistance(data);
-				int bestLength = (best != null ? best.getLength() : Integer.MAX_VALUE);
-				int currentLength = current.calculateDistance(data);
+				int delta = next.getLength() - current.getLength();
 
-				assert(bestLength != -1);
+				double x = random.nextDouble();
+				if(best == null){
+					best = current;
+				}
 
-				if(nextLength == data.getBestKnown()){
-					// Found our solution
-					best = nextSP;
+				if(best.getLength() == data.getBestKnown()) {
 					break;
 				}
 
-				double delta = nextLength - currentLength;
-				double x = random.nextDouble();
-
-				if (currentLength < nextLength) {
-					current = new SwappablePath(nextSP);
-
-					if (currentLength < bestLength) {
-						best = new SwappablePath(nextSP);
+				if(delta < 0){
+					current = next;
+					if(current.getLength() < best.getLength()){
+						best = current;
+						currentPerc = 1 - bestKnown * 1.0 / best.getLength();
+						iter = 0;
 					}
 				}
-				else if (delta == 0 || x < Math.exp(-delta / temperature)) {
-					current = new SwappablePath(nextSP);
+
+				if(x < Math.exp(-delta * 1.0/temperature)){
+					current = next;
 				}
 			}
 
-
-			if(best.getLength() == data.getBestKnown()){
-				break;
-			}
-
+			System.out.println("Temperature is " + temperature);
 			RouteUtils.computePerformance(best, data);
-
-			//temperature = START_TEMPERATURE * (1-(now - start)/max_runtime);
-			// temperature decreases as the performance does
-
-			//double percentage = 1 - data.getBestKnown() * 1.0 / best.getLength();
-
-
-			//double alpha = 1 + 1 * Math.log(1 + iter);
-			//double logval = Math.log(1 + originalPercentage / percentage * 2 + iter * 1.0);
-			temperature *= t_cool;
+			//temperature *= Math.pow(alpha, iter);
+			temperature *= alpha;
 
 			iter++;
-			System.out.println("Temperature is " + temperature);
 		}
-
-		System.out.println(seed);
 
 
 		return new Route(best, data);

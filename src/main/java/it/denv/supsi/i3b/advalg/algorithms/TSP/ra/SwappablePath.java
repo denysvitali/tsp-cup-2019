@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SwappablePath {
-	private int[] path;
+	private final int[] path;
 	private int length = -1;
 
 	public SwappablePath(SwappablePath sp){
@@ -21,25 +21,22 @@ public class SwappablePath {
 		this.path = path;
 	}
 
-	public void twoOptSwap(int i1, int k){
-		if(i1 == k){
-			return;
+	public SwappablePath twoOptSwap(int i, int j) {
+		if(j < i){
+			SwappablePath p = shift(j+1);
+			return p.twoOptSwap(i-j, path.length-1);
 		}
 
-		if(i1 < k){
-			while(i1 < k){
-				int temp = path[i1];
-				path[i1] = path[k];
-				path[k] = temp;
-				i1++; k--;
-			}
-		} else {
-			int offset = i1 - k;
-			shift(offset);
-			twoOptSwap(0, i1 - k);
+		int[] mPath = Arrays.copyOf(this.path, this.path.length);
+		System.arraycopy(path, 0, mPath, 0, mPath.length);
+
+		int r = 0;
+		for (int v = i; v <= j; v++) {
+			mPath[v] = this.path[j - r];
+			r++;
 		}
 
-		length = -1;
+		return new SwappablePath(mPath);
 	}
 
 	public SwappablePath[] threeOptSwap(int i, int j, int k){
@@ -92,8 +89,6 @@ public class SwappablePath {
 			second[a] = this.path[a];
 		}
 
-		length = -1;
-
 		return new SwappablePath[]{
 			new SwappablePath(first),
 			new SwappablePath(second),
@@ -136,8 +131,6 @@ public class SwappablePath {
 		pos += B - A;
 
 		System.arraycopy(path, D, fp, pos, path.length - D);
-		length = -1;
-
 		return new SwappablePath(fp);
 	}
 
@@ -146,10 +139,6 @@ public class SwappablePath {
 	}
 
 	public int calculateDistance(TSPData data) {
-		if(length != -1){
-			return length;
-		}
-
 		int[][] distances = data.getDistances();
 
 		int distance = 0;
@@ -160,9 +149,9 @@ public class SwappablePath {
 			distance += distances[a][b];
 		}
 
-		distance += distances[path.length-1][0];
+		distance += distances[path[path.length-1]][path[0]];
 
-		length = distance;
+		this.length = distance;
 		return distance;
 	}
 
@@ -173,24 +162,28 @@ public class SwappablePath {
 	public boolean isValid() {
 		Set<Integer> cities = new HashSet<>();
 
-		for (int i=0; i<path.length; i++) {
-			if(cities.contains(path[i])){
-				System.err.println(path[i] + " already visited!");
+		for (int value : path) {
+			if (cities.contains(value)) {
+				System.err.println(value + " already visited!");
 				return false;
 			}
-			cities.add(path[i]);
+			cities.add(value);
 		}
 
 		return true;
 	}
 
-	public void shift(int offset) {
+	public SwappablePath shift(int offset) {
 		int[] start = new int[offset];
+		int[] newPath = new int[path.length];
 
 		System.arraycopy(path, 0, start, 0, offset);
 		System.arraycopy(path, offset,
 				path, 0, path.length - offset);
-		System.arraycopy(start, 0, path,
+		System.arraycopy(start, 0, newPath,
 				path.length - offset, offset);
+		System.arraycopy(path, offset, newPath, offset, path.length - offset);
+
+		return new SwappablePath(newPath);
 	}
 }

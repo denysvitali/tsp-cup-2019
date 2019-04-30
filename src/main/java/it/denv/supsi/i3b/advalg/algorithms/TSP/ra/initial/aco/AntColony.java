@@ -205,7 +205,7 @@ public class AntColony {
 
 				int[] bestPath = globalBestS.getPathArr();
 				double deltaT = Math.pow(bestLength, -1);
-				for (int i = 0; i < bestPath.length; i++) {
+				for (int i = 0; i+1 < bestPath.length; i++) {
 					int p = bestPath[i];
 					int q = bestPath[i+1];
 

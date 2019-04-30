@@ -84,7 +84,7 @@ public class Ant {
 						double[] prob = new double[cl.length];
 						for (int l = 0; l < cl.length; l++) {
 							if (!visitedCities[cl[l]]) {
-								prob[l] += colony.getChoiceInfo(i, l);
+								prob[l] += colony.getChoiceInfo(i, cl[l]);
 								sum_prob += prob[l];
 							}
 						}

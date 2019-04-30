@@ -78,6 +78,8 @@ public class TwoOpt implements ILS {
 			int best_i = -1;
 			int best_j = -1;
 
+			path = sp.getPathArr();
+
 			improvement = false;
 
 			if(cl){
@@ -117,7 +119,8 @@ public class TwoOpt implements ILS {
 			} else {
 				for(int i=1; i < path.length; i++){
 					int best_delta = Integer.MAX_VALUE;
-					for(int j=i; j<path.length; j++){
+					for(int j=i+1; j<path.length; j++){
+
 						int delta = cg(path, i, j);
 						if (delta < 0 && delta < best_delta) {
 							best_i = i;
@@ -134,7 +137,7 @@ public class TwoOpt implements ILS {
 			}
 
 			if(improvement){
-				sp.twoOptSwap(best_i,best_j);
+				sp = sp.twoOptSwap(best_i,best_j);
 			}
 		}
 
@@ -150,6 +153,11 @@ public class TwoOpt implements ILS {
 
 			c_{i_{p-1}i}_{p} + c_{i_qi}
 		 */
+
+		int pn = p+1;
+		if(pn == c.length){
+			pn = 0;
+		}
 
 		int qn = q+1;
 		if(qn == c.length){

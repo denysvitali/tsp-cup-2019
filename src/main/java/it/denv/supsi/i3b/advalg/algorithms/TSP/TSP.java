@@ -103,7 +103,7 @@ public class TSP {
 			nn.sort(Edge::compareTo);
 			candidate_list.put(i,
 					nn.stream()
-					.limit(40)
+					.limit(80)
 					.collect(Collectors.toCollection(HashSet::new)));
 		}
 

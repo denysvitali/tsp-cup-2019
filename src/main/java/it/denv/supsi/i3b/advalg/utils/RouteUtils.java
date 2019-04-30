@@ -22,11 +22,11 @@ public class RouteUtils {
 		double perf = 1 - d.getBestKnown() * 1.0 / length;
 
 		System.out.println(String.format(
-				"Our path: %d \t Best: %d \t Perf: %f",
-				(int) length,
-				d.getBestKnown(),
-				perf * 100
-				)
+			"Our path: %d \t Best: %d \t Perf: %f",
+			(int) length,
+			d.getBestKnown(),
+			perf * 100
+			)
 		);
 	}
 }
