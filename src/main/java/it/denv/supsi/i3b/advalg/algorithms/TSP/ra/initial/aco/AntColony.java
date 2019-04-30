@@ -3,6 +3,7 @@ package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco;
 import it.denv.supsi.i3b.advalg.Route;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
@@ -30,7 +31,9 @@ public class AntColony {
 	private double tau0 = -1;
 
 	private Route globalBest = null;
+	private SwappablePath globalBestS = null;
 	private Route localBest = null;
+	private SwappablePath localBestS = null;
 
 	private ACOParams params;
 
@@ -139,12 +142,14 @@ public class AntColony {
 				for (Route route : routes) {
 					if (localBest == null || route.getLength() < localBest.getLength()) {
 						localBest = route;
+						localBestS = route.getSP();
 					}
 				}
 
 
 				if (globalBest == null || localBest.getLength() < globalBest.getLength()) {
 					globalBest = localBest;
+					globalBestS = localBestS;
 				}
 
 				if(runs % 100 == 0){
@@ -186,9 +191,6 @@ public class AntColony {
 
 		// Global Updating rule (4)
 		//timeTick();
-		double[][] pv = getPheromone();
-		double[][] ci = getChoiceInfo();
-		int[][] d = data.getDistances();
 
 		int bestLength = globalBest.getLength();
 
@@ -201,18 +203,32 @@ public class AntColony {
 					deposit pheromone.
 				 */
 
-				int[] bestPath = globalBest.getPath();
-				for (int i = 0; i < bestPath.length - 1; i++) {
-					double deltaT = Math.pow(bestLength, -1);
+				int[] bestPath = globalBestS.getPathArr();
+				double deltaT = Math.pow(bestLength, -1);
+				for (int i = 0; i < bestPath.length; i++) {
 					int p = bestPath[i];
 					int q = bestPath[i+1];
-					pv[p][q] = (1 - params.getPD()) * pv[p][q] + params.getPD() * deltaT;
-					pv[q][p] = pv[p][q];
 
-					ci[p][q] = pv[p][q] * Math.pow(1.0 / d[p][q], params.getBeta());
-					ci[q][p] = ci[p][q];
+					setPV_CI(p,q, deltaT);
 				}
+
+				int p = bestPath.length -1;
+				int q = bestPath[0];
+
+				setPV_CI(p,q, deltaT);
 		}
+	}
+
+	private void setPV_CI(int p, int q, double deltaT) {
+		double[][] pv = getPheromone();
+		double[][] ci = getChoiceInfo();
+		int[][] d = data.getDistances();
+
+		pv[p][q] = (1 - params.getPD()) * pv[p][q] + params.getPD() * deltaT;
+		pv[q][p] = pv[p][q];
+
+		ci[p][q] = pv[p][q] * Math.pow(1.0 / d[p][q], params.getBeta());
+		ci[q][p] = ci[p][q];
 	}
 
 	double[][] getChoiceInfo() {

@@ -11,9 +11,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.spanningtree.SpanningTree;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TSP {
@@ -87,7 +85,7 @@ public class TSP {
 		data.setDistances(distances);
 
 		// Calculate HM<Integer, TS>
-		HashMap<Integer, ArrayList<Edge<Integer>>> candidate_list = new HashMap<>();
+		HashMap<Integer, Set<Edge<Integer>>> candidate_list = new HashMap<>();
 		TreeSet<Edge<Integer>> edges = new TreeSet<>();
 
 		long s1 = System.currentTimeMillis();
@@ -105,8 +103,8 @@ public class TSP {
 			nn.sort(Edge::compareTo);
 			candidate_list.put(i,
 					nn.stream()
-							.limit(35)
-							.collect(Collectors.toCollection(ArrayList::new)));
+					.limit(40)
+					.collect(Collectors.toCollection(HashSet::new)));
 		}
 
 		/*

@@ -10,17 +10,36 @@ public class SwappablePath {
 	private int[] path;
 	private int length = -1;
 
+	public SwappablePath(SwappablePath sp){
+		this.path = new int[sp.path.length];
+
+		this.length = sp.length;
+		System.arraycopy(sp.path, 0, this.path, 0, sp.path.length);
+	}
+
 	public SwappablePath(int[] path){
 		this.path = path;
 	}
 
 	public void twoOptSwap(int i1, int k){
-		while(i1 < k){
-			int temp = path[i1];
-			path[i1] = path[k];
-			path[k] = temp;
-			i1++; k--;
+		if(i1 == k){
+			return;
 		}
+
+		if(i1 < k){
+			while(i1 < k){
+				int temp = path[i1];
+				path[i1] = path[k];
+				path[k] = temp;
+				i1++; k--;
+			}
+		} else {
+			int offset = i1 - k;
+			shift(offset);
+			twoOptSwap(0, i1 - k);
+		}
+
+		length = -1;
 	}
 
 	public SwappablePath[] threeOptSwap(int i, int j, int k){
@@ -73,6 +92,8 @@ public class SwappablePath {
 			second[a] = this.path[a];
 		}
 
+		length = -1;
+
 		return new SwappablePath[]{
 			new SwappablePath(first),
 			new SwappablePath(second),
@@ -115,6 +136,7 @@ public class SwappablePath {
 		pos += B - A;
 
 		System.arraycopy(path, D, fp, pos, path.length - D);
+		length = -1;
 
 		return new SwappablePath(fp);
 	}
@@ -137,6 +159,9 @@ public class SwappablePath {
 
 			distance += distances[a][b];
 		}
+
+		distance += distances[path.length-1][0];
+
 		length = distance;
 		return distance;
 	}
@@ -148,7 +173,7 @@ public class SwappablePath {
 	public boolean isValid() {
 		Set<Integer> cities = new HashSet<>();
 
-		for (int i=0; i<path.length-1; i++) {
+		for (int i=0; i<path.length; i++) {
 			if(cities.contains(path[i])){
 				System.err.println(path[i] + " already visited!");
 				return false;
@@ -156,6 +181,16 @@ public class SwappablePath {
 			cities.add(path[i]);
 		}
 
-		return path[0] == path[path.length-1];
+		return true;
+	}
+
+	public void shift(int offset) {
+		int[] start = new int[offset];
+
+		System.arraycopy(path, 0, start, 0, offset);
+		System.arraycopy(path, offset,
+				path, 0, path.length - offset);
+		System.arraycopy(start, 0, path,
+				path.length - offset, offset);
 	}
 }

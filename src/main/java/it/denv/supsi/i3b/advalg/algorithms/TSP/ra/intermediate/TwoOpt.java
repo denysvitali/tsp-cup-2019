@@ -5,10 +5,14 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.City;
+
+import java.util.List;
 
 public class TwoOpt implements ILS {
 
 	private TSPData data = null;
+	private boolean cl = false;
 
 	public TwoOpt(TSPData data){
 		this.data = data;
@@ -30,6 +34,10 @@ public class TwoOpt implements ILS {
 		this.data = data;
 	}
 
+	public void setCandidate(boolean cl){
+		this.cl = cl;
+	}
+
 	public Route improve(Route r){
 
 		/*
@@ -48,11 +56,7 @@ public class TwoOpt implements ILS {
 				(2.2) If no improving move could be found, then declare failure.
 			end of 2-opt
 		 */
-
-		int[] path = r.getPath();
-
-		SwappablePath sp = new SwappablePath(path);
-		sp = improveSP(sp);
+		SwappablePath sp = improveSP(r.getSP());
 		return new Route(sp, data);
 	}
 
@@ -68,7 +72,6 @@ public class TwoOpt implements ILS {
 
 		int n = sp.getPathArr().length - 1;
 		assert(n > 4);
-		int[][] d = data.getDistances();
 
 		boolean improvement = true;
 		while(improvement){
@@ -76,20 +79,57 @@ public class TwoOpt implements ILS {
 			int best_j = -1;
 
 			improvement = false;
-			for(int i=0; i < n - 3; i++){
-				for(int k = i + 2; k <= n-1; k++){
-					int delta = -d[path[i]][path[i+1]] - d[path[k]][path[k+1]]
-							+ d[path[i]][path[k]] + d[path[i+1]][path[k+1]];
-					if(delta < 0){
-						best_i = i+1;
-						best_j = k;
-						improvement = true;
+
+			if(cl){
+				for(int i=1; i < path.length; i++){
+					int[] c = data.getCL(path[i]);
+					int best_delta = Integer.MAX_VALUE;
+
+					for(int a : c){
+						int k = -1;
+						for(int j = 0; j<path.length; j++){
+							if(a == path[j]){
+								k=j;
+							}
+						}
+
+						int p = i;
+						int q = k;
+
+						if(p>=q){
+							continue;
+						}
+
+
+						int delta = cg(path, p, q);
+						if (delta < 0 && delta < best_delta) {
+							best_i = p;
+							best_j = q;
+							best_delta = delta;
+							improvement = true;
+						}
+					}
+
+					if(improvement){
 						break;
 					}
 				}
+			} else {
+				for(int i=1; i < path.length; i++){
+					int best_delta = Integer.MAX_VALUE;
+					for(int j=i; j<path.length; j++){
+						int delta = cg(path, i, j);
+						if (delta < 0 && delta < best_delta) {
+							best_i = i;
+							best_j = j;
+							best_delta = delta;
+							improvement = true;
+						}
+					}
 
-				if(improvement){
-					break;
+					if(improvement){
+						break;
+					}
 				}
 			}
 
@@ -111,8 +151,13 @@ public class TwoOpt implements ILS {
 			c_{i_{p-1}i}_{p} + c_{i_qi}
 		 */
 
-		int d1 = d[c[p-1]][c[q]] + d[c[p]][c[q+1]]; // before swap
-		int d2 = d[c[p-1]][c[p]] + d[c[q]][c[q+1]]; // after swap
+		int qn = q+1;
+		if(qn == c.length){
+			qn = 0;
+		}
+
+		int d1 = d[c[p-1]][c[q]] + d[c[p]][c[qn]];
+		int d2 = d[c[p-1]][c[p]] + d[c[q]][c[qn]];
 
 		return d1 - d2;
 	}

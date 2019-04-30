@@ -15,7 +15,8 @@ public class Route {
 	private TSPData data;
 	private int length = -1;
 
-	int[][] incidenceMat = null;
+	private int[][] incidenceMat = null;
+	private SwappablePath sp = null;
 
 	/*
 		A Route is a complete Hamiltonian cycle,
@@ -36,7 +37,10 @@ public class Route {
 		}
 
 		this.data = data;
-		this.path = sp.getPathArr();
+		int[] patharr = sp.getPathArr();
+		this.path = new int[patharr.length + 1];
+		System.arraycopy(patharr, 0, this.path, 0, patharr.length);
+		this.path[patharr.length] = patharr[0];
 	}
 
 	public Route(int[] path, int length, TSPData data){
@@ -57,16 +61,20 @@ public class Route {
 		return path;
 	}
 
+	public SwappablePath toSwappable(){
+		// Our path is [A, B, C, A]
+		// SP is [A,B,C] (avoids redundancy)
+
+		int[] sp = Arrays.copyOf(path, path.length-1);
+		return new SwappablePath(sp);
+	}
+
 	private void calculateLength(){
 		length = getSP().calculateDistance(data);
 	}
 
 	public void setPath(int[] new_path){
 		path = new_path;
-	}
-
-	public SwappablePath getSP(){
-		return new SwappablePath(getPath());
 	}
 
 	public ArrayList<Coordinate> getCoords(){
@@ -90,6 +98,14 @@ public class Route {
 
 	public boolean isValid() {
 		return getSP().isValid();
+	}
+
+	public SwappablePath getSP() {
+		if(sp == null){
+			sp = toSwappable();
+		}
+
+		return sp;
 	}
 
 	private void genMatrix(){

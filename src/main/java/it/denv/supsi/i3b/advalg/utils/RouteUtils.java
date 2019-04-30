@@ -18,12 +18,12 @@ public class RouteUtils {
 	}
 
 	public static void computePerformance(SwappablePath sp, TSPData d){
-		sp.calculateDistance(d);
-		double perf = 1 - d.getBestKnown() * 1.0 / sp.getLength();
+		double length = sp.calculateDistance(d);
+		double perf = 1 - d.getBestKnown() * 1.0 / length;
 
 		System.out.println(String.format(
 				"Our path: %d \t Best: %d \t Perf: %f",
-				sp.getLength(),
+				(int) length,
 				d.getBestKnown(),
 				perf * 100
 				)

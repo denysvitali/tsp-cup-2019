@@ -52,8 +52,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void ch130() throws IOException {
-	  	ch130_ACS(-1, 20);
-		//ch130_SA_DB(1);
+	  	//ch130_ACS(-1, 20);
+		ch130_SA_DB(1);
 	}
 
 
@@ -70,10 +70,13 @@ public class TSPRunnerTest {
 		TSP tsp = new TSP();
 		tsp.init(data);
 
+		TwoOpt twoOpt = new TwoOpt(data);
+		twoOpt.setCandidate(false);
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
-						.add(new TwoOpt(data))
+						.add(twoOpt)
 						.add(new SimulatedAnnealing()
 						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 		);
@@ -467,14 +470,17 @@ public class TSPRunnerTest {
 		TSPData data = loader.load();
 
 		TSP tsp = new TSP();
+		TwoOpt twoOpt = new TwoOpt(data);
+		twoOpt.setCandidate(true);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
-						.add(new TwoOpt(data))
+						.add(twoOpt)
 		);
 
 		String path = tsp.writeRoute(r);
 
+		assertTrue(r.isValid());
 		GnuPlotUtils.plot(path);
 		System.out.println("Route length: " + r.getLength());
 
@@ -980,7 +986,8 @@ public class TSPRunnerTest {
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
 						.add(new TwoOpt(data))
-						.add(new SimulatedAnnealing())
+						.add(new SimulatedAnnealing()
+						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 		);
 
 		String path = tsp.writeRoute(r);
@@ -1203,11 +1210,15 @@ public class TSPRunnerTest {
 		TSPData data = loader.load();
 
 		TSP tsp = new TSP();
+		TwoOpt candidateLessTwoOpt = new TwoOpt(data);
+		candidateLessTwoOpt.setCandidate(false);
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new RandomNearestNeighbour(data))
-						.add(new TwoOpt(data))
-						.add(new SimulatedAnnealing().setMode(SimulatedAnnealing.Mode.TwoOpt))
+						.startWith(new NearestNeighbour(data))
+						.add(candidateLessTwoOpt)
+						.add(new SimulatedAnnealing()
+								.setMode(SimulatedAnnealing.Mode.DoubleBridge))
 		);
 
 		String path = tsp.writeRoute(r);

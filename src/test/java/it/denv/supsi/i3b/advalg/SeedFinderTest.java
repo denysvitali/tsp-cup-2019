@@ -41,21 +41,26 @@ public class SeedFinderTest {
 			}).getInputStream();
 
 			GIT_COMMIT = new String(is.readAllBytes(), StandardCharsets.UTF_8)
-					.replace("\n","");
+					.replace("\n", "");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private interface Thunk { void apply(int seed); }
-	private interface ACSThunk { void apply(int seed, int nr_ants, ACSParams params); }
+	private interface Thunk {
+		void apply(int seed);
+	}
+
+	private interface ACSThunk {
+		void apply(int seed, int nr_ants, ACSParams params);
+	}
 
 	private static TSPData loadProblem(String pName) throws IOException {
 		String filePath = Utils.getTestFile("/problems/" + pName + ".tsp");
 		assertNotNull(filePath);
 
 		TSPLoader loader = new TSPLoader(filePath);
-		TSPData d =	loader.load();
+		TSPData d = loader.load();
 		return d;
 	}
 
@@ -64,7 +69,7 @@ public class SeedFinderTest {
 				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 		Random r = new Random();
-		for(int i=0; i<10000; i++){
+		for (int i = 0; i < 10000; i++) {
 			exec.submit(() -> f.apply(r.nextInt()));
 		}
 
@@ -77,21 +82,17 @@ public class SeedFinderTest {
 
 	private static void runACSThreaded(ACSThunk f) {
 		ExecutorService exec =
-		Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 		Random r = new Random();
 		for (int i = 0; i < 30; i++) {
-			for(double beta = 1; beta < 10; beta+=0.1) {
-				for (int m = 1; m < 4; m++) {
-					for (double q0 = 0.5; q0 < 1; q0 += 0.05) {
-						int finalM = m;
+			for (double q0 = 0.99; q0 > 0.2; q0 -= 0.1) {
+				for (double beta = 2; beta < 10; beta += 0.1) {
+					ACSParams a = new ACSParams();
+					a.setBeta(beta);
+					a.setQ0(q0);
 
-						ACSParams a = new ACSParams();
-						a.setBeta(beta);
-						a.setQ0(q0);
-
-						exec.submit(() -> f.apply(r.nextInt(), finalM, a));
-					}
+					exec.submit(() -> f.apply(r.nextInt(), 3, a));
 				}
 			}
 		}
@@ -117,7 +118,7 @@ public class SeedFinderTest {
 		);
 
 		printAlgorithm(os, alg.getSa());
-		for(ILS ILS : alg.getIas()){
+		for (ILS ILS : alg.getIas()) {
 			os.write(",");
 			printAlgorithm(os, ILS);
 		}
@@ -127,12 +128,12 @@ public class SeedFinderTest {
 		perf *= 100;
 
 		os.write(",\"rl\": " + r.getLength() + ", \"bk\": " + data.getBestKnown()
-	+ ", \"perf\": " + perf + "}");
+				+ ", \"perf\": " + perf + "}");
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
 	private static void printAlgorithm(OutputStreamWriter os, RoutingAlgorithm sa) throws IOException {
-		if(sa instanceof AntColonySystem){
+		if (sa instanceof AntColonySystem) {
 			AntColonySystem acs = (AntColonySystem) sa;
 			int m = acs.getAnts();
 			int s = acs.getSeed();
@@ -144,7 +145,7 @@ public class SeedFinderTest {
 					"\"beta\": " + p.getBeta() + "," +
 					"\"q0\": " + p.getQ0() + "," +
 					"\"PD\": " + p.getPD() + "," +
-					"\"PE\": " + p.getPE() +"}}");
+					"\"PE\": " + p.getPE() + "}}");
 		} else {
 			os.write("{\"name\": \"" + sa.getClass().getName() + "\"," +
 					"\"seed\": " + sa.getSeed() + "}");
@@ -156,59 +157,63 @@ public class SeedFinderTest {
 				"\"seed\": " + ra.getSeed() + "}");
 	}
 
-	@Test
-	public static void u1060SA(int seed) {
-		try {
-			TSP tsp = new TSP();
-			TSPData data = loadProblem("u1060");
-			tsp.init(data);
+	private static ACSThunk runACS(String problem) {
+		return (seed, ants, acsParams) -> {
+			try {
+				TSPData data = loadProblem(problem);
+				TSP tsp = new TSP();
+				tsp.init(data);
+				File f = new File("/tmp/tsp-" + problem + "-acs_" + GIT_COMMIT + ".json");
 
-			File f = new File("/tmp/tsp-u1060-sa_" + GIT_COMMIT + ".json");
+				OutputStreamWriter ob = new OutputStreamWriter(
+						new BufferedOutputStream(new FileOutputStream(f, true)));
+				CompositeRoutingAlgorithm cra =
+						(new CompositeRoutingAlgorithm());
 
-			OutputStreamWriter ob = new OutputStreamWriter(
-					new BufferedOutputStream(new FileOutputStream(f, true)));
-			CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
-					.startWith(new RandomNearestNeighbour(seed, data))
-					.add(new TwoOpt(data))
-					.add(new SimulatedAnnealing(seed)
-							.setMode(SimulatedAnnealing.Mode.TwoOpt));
 
-			runProblem(tsp, data, ob, cra);
-			ob.flush();
-		} catch(IOException ex){
+				System.out.println(String.format("Run ACS w/ %d ants, " +
+								"ACSParams = %s, Seed = %d",
+						ants, acsParams, seed));
 
-		}
+				cra.startWith(new AntColonySystem(acsParams, seed, ants, data)
+						.setSolutionImprover(new TwoOpt(data)));
+				cra.add(new TwoOpt(data));
+
+				runProblem(tsp, data, ob, cra);
+				ob.flush();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		};
 	}
 
-	private static ACSThunk runACS(String problem){
-			return (seed, ants, acsParams) -> {
-				try {
-					TSPData data = loadProblem(problem);
-					TSP tsp = new TSP();
-					tsp.init(data);
-					File f = new File("/tmp/tsp-" + problem + "-acs_" + GIT_COMMIT + ".json");
 
-					OutputStreamWriter ob = new OutputStreamWriter(
-							new BufferedOutputStream(new FileOutputStream(f, true)));
-					CompositeRoutingAlgorithm cra =
-							(new CompositeRoutingAlgorithm());
+	private Thunk runSA(String problem) {
+		return (seed) -> {
+			try {
+				TSP tsp = new TSP();
+				TSPData data = loadProblem(problem);
+				tsp.init(data);
 
+				File f = new File("/tmp/tsp-" + problem + "-sa_" + GIT_COMMIT + ".json");
 
-					System.out.println(String.format("Run ACS w/ %d ants, " +
-							"ACSParams = %s, Seed = %d",
-							ants, acsParams, seed));
+				OutputStreamWriter ob = new OutputStreamWriter(
+						new BufferedOutputStream(new FileOutputStream(f, true)));
+				CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(seed, data))
+						.add(new SimulatedAnnealing(seed)
+								.setMode(SimulatedAnnealing.Mode.DoubleBridge))
+						.add(new TwoOpt(data));
 
-					cra.startWith(new AntColonySystem(acsParams, seed, ants, data)
-					.setSolutionImprover(new TwoOpt(data)));
-					cra.add(new TwoOpt(data));
+				runProblem(tsp, data, ob, cra);
+				ob.flush();
+			} catch (IOException ex) {
 
-					runProblem(tsp, data, ob, cra);
-					ob.flush();
-				} catch(IOException ex){
-					ex.printStackTrace();
-				}
-			};
+			}
+		};
 	}
+
+	// ch130
 
 	@Test
 	public void ch130ACS_SF() {
@@ -220,35 +225,7 @@ public class SeedFinderTest {
 		runThreaded(runSA("ch130"));
 	}
 
-	@Test
-	public void lin318ACS_SF() {
-		runACSThreaded(runACS("lin318"));
-	}
-
-	@Test
-	public void u1060ACS_SF() {
-		runACSThreaded(runACS("u1060"));
-	}
-
-	@Test
-	public void rat783ACS_SF() {
-		runACSThreaded(runACS("rat783"));
-	}
-
-	@Test
-	public void fl1577ACS_SF() {
-		runACSThreaded(runACS("fl1577"));
-	}
-
-	@Test
-	public void pr439ACS_SF() {
-		runACSThreaded(runACS("pr439"));
-	}
-
-	@Test
-	public void pcb442ACS_SF() {
-		runACSThreaded(runACS("pcb442"));
-	}
+	// d198
 
 	@Test
 	public void d198ACS_SF() {
@@ -256,13 +233,27 @@ public class SeedFinderTest {
 	}
 
 	@Test
-	public void u1060SA_SF() {
-		runThreaded(SeedFinderTest::u1060SA);
+	public void d198SA_SF() {
+		runThreaded(runSA("d198"));
+	}
+
+	// eil76
+
+	@Test
+	public void eil76ACS_SF() {
+		runACSThreaded(runACS("eil76"));
 	}
 
 	@Test
-	public void pr439SA_SF() {
-		runThreaded(runSA("pr439"));
+	public void eil76SA_SF() {
+		runThreaded(runSA("eil76"));
+	}
+
+	// fl1577
+
+	@Test
+	public void fl1577ACS_SF() {
+		runACSThreaded(runACS("fl1577"));
 	}
 
 	@Test
@@ -270,28 +261,77 @@ public class SeedFinderTest {
 		runThreaded(runSA("fl1577"));
 	}
 
-	private Thunk runSA(String problem) {
-			return (seed)-> {
-				try {
-					TSP tsp = new TSP();
-					TSPData data = loadProblem(problem);
-					tsp.init(data);
+	// kroA100
 
-					File f = new File("/tmp/tsp-" + problem + "-sa_" + GIT_COMMIT + ".json");
-
-					OutputStreamWriter ob = new OutputStreamWriter(
-							new BufferedOutputStream(new FileOutputStream(f, true)));
-					CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
-							.startWith(new RandomNearestNeighbour(seed, data))
-							.add(new SimulatedAnnealing(seed)
-									.setMode(SimulatedAnnealing.Mode.DoubleBridge))
-							.add(new TwoOpt(data));
-
-					runProblem(tsp, data, ob, cra);
-					ob.flush();
-				} catch(IOException ex){
-
-				}
-			};
-		}
+	@Test
+	public void kroA100ACS_SF() {
+		runACSThreaded(runACS("kroA100"));
 	}
+
+	@Test
+	public void kroA100SA_SF() {
+		runThreaded(runSA("kroA100"));
+	}
+
+	// lin318
+
+	@Test
+	public void lin318ACS_SF() {
+		runACSThreaded(runACS("lin318"));
+	}
+
+	@Test
+	public void lin318SA_SF() {
+		runThreaded(runSA("lin318"));
+	}
+
+	// pcb442
+
+	@Test
+	public void pcb442ACS_SF() {
+		runACSThreaded(runACS("pcb442"));
+	}
+
+	@Test
+	public void pcb442SA_SF() {
+		runThreaded(runSA("pcb442"));
+	}
+
+	// pr439
+
+	@Test
+	public void pr439ACS_SF() {
+		runACSThreaded(runACS("pr439"));
+	}
+
+	@Test
+	public void pr439SA_SF() {
+		runThreaded(runSA("pr439"));
+	}
+
+	// rat783
+
+	@Test
+	public void rat783ACS_SF() {
+		runACSThreaded(runACS("rat783"));
+	}
+
+	@Test
+	public void rat783SA_SF() {
+		runThreaded(runSA("rat783"));
+	}
+
+	// u1060
+
+	@Test
+	public void u1060ACS_SF() {
+		runACSThreaded(runACS("u1060"));
+	}
+
+	@Test
+	public void u1060SA_SF() {
+		runThreaded(runSA("u1060"));
+	}
+
+
+}

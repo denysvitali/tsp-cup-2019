@@ -12,7 +12,7 @@ import java.util.Random;
 public class SimulatedAnnealing implements ILS {
 
 	private static final int r = 100;
-	private static final double START_TEMPERATURE = 100.0;
+	private static final double START_TEMPERATURE = 160.0;
 	private int seed;
 	private Random random;
 
@@ -106,10 +106,11 @@ public class SimulatedAnnealing implements ILS {
 	public Route route(Route route, TSPData data) {
 		double temperature = START_TEMPERATURE;
 
-		SwappablePath best = route.getSP();
-		SwappablePath current = best;
+		SwappablePath best = null;
+		SwappablePath current = route.getSP();
 
 		TwoOpt twoOpt = new TwoOpt(data);
+		twoOpt.setCandidate(true);
 		ThreeOpt threeOpt = null;
 
 		switch(mode){
@@ -128,39 +129,40 @@ public class SimulatedAnnealing implements ILS {
 		int originalLength = route.getLength();
 		double originalPercentage = 1 - data.getBestKnown() * 1.0 / originalLength;
 
-		double alpha = 0.98;
+		double alpha = 0.95;
 		double sqrt_n = Math.sqrt(data.getDim());
 
-		int new_r = 800;
+		int new_r = 100;
 		System.out.println("new_r = " + new_r);
 
 		while (temperature > 1E-10 && System.currentTimeMillis() <= max_runtime + start) {
 
-			double t_cool = Math.pow(alpha, iter);
+			//double t_cool = Math.pow(alpha, iter);
+			double t_cool = alpha;
 
 			for (int i = 0; i < new_r; i++) {
 				// 1. n = neighbour(current)
 
 				SwappablePath sp = null;
-				SwappablePath improvedSP;
+				SwappablePath nextSP = null;
 
 				switch (mode) {
-					case TwoOpt:
+					/*case TwoOpt:
 						int[] twoOptN;
 						do{
 							twoOptN = getRandomNumbers(2, data.getDim());
 						} while(twoOptN[0] == twoOptN[1] || twoOptN[0] > twoOptN[1]
 						|| twoOptN[0] == 0);
 
-						sp = current;
-						current.twoOptSwap(twoOptN[0], twoOptN[1]);
+						sp = new SwappablePath(current);
+						sp.twoOptSwap(twoOptN[0], twoOptN[1]);
 						break;
 
 					case ThreeOpt:
 						int[] threeOptN = getRandomOffsettedNumbers(3, data.getDim());
 						sp = current.threeOptSwap(threeOptN[0], threeOptN[1], threeOptN[2])
 								[random.nextInt(2)];
-						break;
+						break;*/
 
 					case DoubleBridge:
 						int[] dbN = getRandomOffsettedNumbers(4, data.getDim());
@@ -172,30 +174,33 @@ public class SimulatedAnnealing implements ILS {
 
 				// improvedSP = local_opt(n)
 
-				improvedSP = twoOpt.improveSP(sp);
+				nextSP = twoOpt.improveSP(new SwappablePath(sp));
+				assert(nextSP != null);
 
-				assert(improvedSP != null);
+				int nextLength = nextSP.calculateDistance(data);
+				int bestLength = (best != null ? best.getLength() : Integer.MAX_VALUE);
+				int currentLength = current.calculateDistance(data);
 
-				int candidateLength = improvedSP.calculateDistance(data);
+				assert(bestLength != -1);
 
-				if(candidateLength == data.getBestKnown()){
+				if(nextLength == data.getBestKnown()){
 					// Found our solution
-					best = improvedSP;
+					best = nextSP;
 					break;
 				}
 
-
-				double delta = candidateLength - current.calculateDistance(data);
+				double delta = nextLength - currentLength;
 				double x = random.nextDouble();
 
-				if (candidateLength < current.calculateDistance(data)) {
-					current = improvedSP;
+				if (currentLength < nextLength) {
+					current = new SwappablePath(nextSP);
 
-					if (current.calculateDistance(data) < best.calculateDistance(data)) {
-						best = current;
+					if (currentLength < bestLength) {
+						best = new SwappablePath(nextSP);
 					}
-				} else if (delta < 0 || x < Math.exp(-delta / temperature)) {
-					current = improvedSP;
+				}
+				else if (delta == 0 || x < Math.exp(-delta / temperature)) {
+					current = new SwappablePath(nextSP);
 				}
 			}
 
