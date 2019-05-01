@@ -6,18 +6,45 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
 
+import java.util.Arrays;
 import java.util.Random;
 
 
 public class SimulatedAnnealing implements ILS {
 
-	private static final int r = 1000;
-	private static final double START_TEMPERATURE = 180.0;
+	private int r = 400;
+	private double alpha = 0.984018;
+
+	private double START_TEMPERATURE = 100.0;
 	private int seed;
 	private Random random;
 
+	public void setStartTemp(double temp) {
+		this.START_TEMPERATURE = temp;
+	}
+
+	public double getStartTemp() {
+		return START_TEMPERATURE;
+	}
+
+	public void setAlpha(double alpha) {
+		this.alpha = alpha;
+	}
+
+	public double getAlpha() {
+		return alpha;
+	}
+
+	public void setR(int r) {
+		this.r = r;
+	}
+
+	public int getR() {
+		return r;
+	}
+
 	public enum Mode {
-		TwoOpt, ThreeOpt, DoubleBridge
+		TwoOpt, ThreeOpt, DoubleBridge, RAND_CHOICE
 	}
 
 	private Mode mode = Mode.TwoOpt;
@@ -120,17 +147,15 @@ public class SimulatedAnnealing implements ILS {
 		System.out.println(originalPerc);
 
 		RouteUtils.computePerformance(current, data);
+		long target = System.currentTimeMillis() +
+				1000 * 60 * 2 + 1000 * 50; // 2 min, 50 sec
+		//double alpha = 1 - random.nextDouble() * 0.1 + 0.0001;
 
-		int iter = 0;
-		double currentPerc = -1;
-		while(temperature > 1E-9){
+		System.out.println("Alpha is " + alpha + ", r=" + r);
 
-			if(best == null){
-				currentPerc = originalPerc;
-			}
+		boolean end = false;
 
-			double alpha = 0.996;
-
+		while(temperature > 1E-9 && !end && System.currentTimeMillis() < target){
 			for(int i=0; i<r; i++){
 				SwappablePath next = null;
 
@@ -139,6 +164,25 @@ public class SimulatedAnnealing implements ILS {
 						next = current.doubleBridge(
 								getRandomOffsettedNumbers(4, length-1)
 						);
+						break;
+					case RAND_CHOICE:
+						if(random.nextBoolean()) {
+							int[] ij = getRandomNumbers(2, length - 1);
+							Arrays.sort(ij);
+							next = current.twoOptSwap(ij[0], ij[1]);
+
+							ij = getRandomNumbers(2, length - 1);
+							Arrays.sort(ij);
+
+							next = next.twoOptSwap(ij[0], ij[1]);
+						} else {
+							next = current.doubleBridge(
+									getRandomOffsettedNumbers(4, length-1)
+							);
+							next = next.doubleBridge(
+									getRandomOffsettedNumbers(4, length-1)
+							);
+						}
 						break;
 				}
 
@@ -158,6 +202,7 @@ public class SimulatedAnnealing implements ILS {
 				}
 
 				if(best.getLength() == data.getBestKnown()) {
+					end = true;
 					break;
 				}
 
@@ -165,8 +210,6 @@ public class SimulatedAnnealing implements ILS {
 					current = next;
 					if(current.getLength() < best.getLength()){
 						best = current;
-						currentPerc = 1 - bestKnown * 1.0 / best.getLength();
-						iter = 0;
 					}
 				}
 
@@ -178,10 +221,13 @@ public class SimulatedAnnealing implements ILS {
 			System.out.println("Temperature is " + temperature);
 			RouteUtils.computePerformance(best, data);
 			//temperature *= Math.pow(alpha, iter);
+
 			temperature *= alpha;
 
-			iter++;
+
 		}
+
+		System.out.println("Alpha is " + alpha + ", r=" + r);
 
 
 		return new Route(best, data);

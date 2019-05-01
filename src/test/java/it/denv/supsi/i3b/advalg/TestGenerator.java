@@ -28,7 +28,7 @@ public class TestGenerator {
 						"\n" +
 						"\t@Test\n" +
 						"\tpublic void " + e + "SA_SF() {\n" +
-						"\t\trunThreaded(runSA(\""+e+"\"));\n" +
+						"\t\trunSAThreaded(runSA(\""+e+"\"));\n" +
 						"\t}\n"))
 				.forEach(System.out::println);
 	}

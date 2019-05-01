@@ -1078,8 +1078,9 @@ public class TSPRunnerTest {
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(seed, data))
+						.add(new TwoOpt(data))
 						.add(new SimulatedAnnealing(seed)
-								.setMode(SimulatedAnnealing.Mode.DoubleBridge))
+								.setMode(SimulatedAnnealing.Mode.RAND_CHOICE))
 		);
 
 		String path = tsp.writeRoute(r);

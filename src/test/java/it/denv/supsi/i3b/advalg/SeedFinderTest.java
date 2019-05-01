@@ -51,6 +51,10 @@ public class SeedFinderTest {
 		void apply(int seed);
 	}
 
+	private interface SAThunk {
+		void apply(int seed, double alpha, int r, SimulatedAnnealing.Mode mode);
+	}
+
 	private interface ACSThunk {
 		void apply(int seed, int nr_ants, ACSParams params);
 	}
@@ -71,6 +75,32 @@ public class SeedFinderTest {
 		Random r = new Random();
 		for (int i = 0; i < 10000; i++) {
 			exec.submit(() -> f.apply(r.nextInt()));
+		}
+
+		try {
+			exec.awaitTermination(10, TimeUnit.HOURS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void runSAThreaded(SAThunk f) {
+		ExecutorService exec =
+				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+		Random r = new Random();
+		for (int i = 0; i < 100; i++) {
+			for(int iter = 100; iter < 500; iter += 100) {
+				for (double alpha = 0.984; alpha <= 0.999; alpha += 0.010) {
+					for (SimulatedAnnealing.Mode mode : SimulatedAnnealing.Mode.values()) {
+						double finalAlpha = alpha;
+						int finalI = i;
+						int finalIter = iter;
+
+						exec.submit(() -> f.apply(finalI, finalAlpha, finalIter, mode));
+					}
+				}
+			}
 		}
 
 		try {
@@ -153,8 +183,22 @@ public class SeedFinderTest {
 	}
 
 	private static void printAlgorithm(OutputStreamWriter os, ILS ra) throws IOException {
-		os.write("{\"name\": \"" + ra.getClass().getName() + "\"," +
-				"\"seed\": " + ra.getSeed() + "}");
+		if(ra instanceof SimulatedAnnealing){
+			SimulatedAnnealing sa = (SimulatedAnnealing) ra;
+
+			os.write("{\"name\": \"" + sa.getClass().getName() + "\"," +
+					"\"seed\": " + sa.getSeed() + ", " +
+					"\"mode\": \"" + sa.getMode() + "\"," +
+					"\"params\":{" +
+					"\"alpha\": " + sa.getAlpha() + "," +
+					"\"r\": " + sa.getR() + "," +
+					"\"start_temperature\": " + sa.getStartTemp() + "}}");
+
+
+		} else {
+			os.write("{\"name\": \"" + ra.getClass().getName() + "\"," +
+					"\"seed\": " + ra.getSeed() + "}");
+		}
 	}
 
 	private static ACSThunk runACS(String problem) {
@@ -188,8 +232,8 @@ public class SeedFinderTest {
 	}
 
 
-	private Thunk runSA(String problem) {
-		return (seed) -> {
+	private SAThunk runSA(String problem) {
+		return (seed, alpha, r, mode) -> {
 			try {
 				TSP tsp = new TSP();
 				TSPData data = loadProblem(problem);
@@ -201,8 +245,7 @@ public class SeedFinderTest {
 						new BufferedOutputStream(new FileOutputStream(f, true)));
 				CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(seed, data))
-						.add(new SimulatedAnnealing(seed)
-								.setMode(SimulatedAnnealing.Mode.DoubleBridge))
+						.add(new SimulatedAnnealing(seed).setMode(mode))
 						.add(new TwoOpt(data));
 
 				runProblem(tsp, data, ob, cra);
@@ -222,7 +265,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void ch130SA_SF() {
-		runThreaded(runSA("ch130"));
+		runSAThreaded(runSA("ch130"));
 	}
 
 	// d198
@@ -234,7 +277,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void d198SA_SF() {
-		runThreaded(runSA("d198"));
+		runSAThreaded(runSA("d198"));
 	}
 
 	// eil76
@@ -246,7 +289,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void eil76SA_SF() {
-		runThreaded(runSA("eil76"));
+		runSAThreaded(runSA("eil76"));
 	}
 
 	// fl1577
@@ -258,7 +301,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void fl1577SA_SF() {
-		runThreaded(runSA("fl1577"));
+		runSAThreaded(runSA("fl1577"));
 	}
 
 	// kroA100
@@ -270,7 +313,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void kroA100SA_SF() {
-		runThreaded(runSA("kroA100"));
+		runSAThreaded(runSA("kroA100"));
 	}
 
 	// lin318
@@ -282,7 +325,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void lin318SA_SF() {
-		runThreaded(runSA("lin318"));
+		runSAThreaded(runSA("lin318"));
 	}
 
 	// pcb442
@@ -294,7 +337,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void pcb442SA_SF() {
-		runThreaded(runSA("pcb442"));
+		runSAThreaded(runSA("pcb442"));
 	}
 
 	// pr439
@@ -306,7 +349,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void pr439SA_SF() {
-		runThreaded(runSA("pr439"));
+		runSAThreaded(runSA("pr439"));
 	}
 
 	// rat783
@@ -318,7 +361,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void rat783SA_SF() {
-		runThreaded(runSA("rat783"));
+		runSAThreaded(runSA("rat783"));
 	}
 
 	// u1060
@@ -330,7 +373,7 @@ public class SeedFinderTest {
 
 	@Test
 	public void u1060SA_SF() {
-		runThreaded(runSA("u1060"));
+		runSAThreaded(runSA("u1060"));
 	}
 
 
