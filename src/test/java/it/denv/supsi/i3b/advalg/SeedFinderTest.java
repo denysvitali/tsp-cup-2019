@@ -90,14 +90,14 @@ public class SeedFinderTest {
 
 		Random r = new Random();
 		for (int i = 0; i < 100; i++) {
+			int seed = r.nextInt();
 			for(int iter = 100; iter < 500; iter += 100) {
 				for (double alpha = 0.984; alpha <= 0.999; alpha += 0.010) {
 					for (SimulatedAnnealing.Mode mode : SimulatedAnnealing.Mode.values()) {
 						double finalAlpha = alpha;
-						int finalI = i;
 						int finalIter = iter;
 
-						exec.submit(() -> f.apply(finalI, finalAlpha, finalIter, mode));
+						exec.submit(() -> f.apply(seed, finalAlpha, finalIter, mode));
 					}
 				}
 			}
@@ -241,11 +241,16 @@ public class SeedFinderTest {
 
 				File f = new File("/tmp/tsp-" + problem + "-sa_" + GIT_COMMIT + ".json");
 
+				SimulatedAnnealing sa = new SimulatedAnnealing(seed);
+				sa.setAlpha(alpha);
+				sa.setR(r);
+
 				OutputStreamWriter ob = new OutputStreamWriter(
 						new BufferedOutputStream(new FileOutputStream(f, true)));
 				CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(seed, data))
-						.add(new SimulatedAnnealing(seed).setMode(mode))
+						.add(new TwoOpt(data))
+						.add(sa)
 						.add(new TwoOpt(data));
 
 				runProblem(tsp, data, ob, cra);
