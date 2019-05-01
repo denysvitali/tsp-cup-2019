@@ -244,6 +244,7 @@ public class SeedFinderTest {
 				SimulatedAnnealing sa = new SimulatedAnnealing(seed);
 				sa.setAlpha(alpha);
 				sa.setR(r);
+				sa.setMode(SimulatedAnnealing.Mode.RAND_CHOICE);
 
 				OutputStreamWriter ob = new OutputStreamWriter(
 						new BufferedOutputStream(new FileOutputStream(f, true)));

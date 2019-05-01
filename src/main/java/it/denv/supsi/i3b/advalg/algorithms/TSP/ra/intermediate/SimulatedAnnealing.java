@@ -229,7 +229,8 @@ public class SimulatedAnnealing implements ILS {
 
 		}
 
-		System.out.println("Alpha is " + alpha + ", r=" + r);
+		System.out.println("END! Alpha was " +
+				"" + alpha + ", r=" + r);
 
 
 		return new Route(best, data);
