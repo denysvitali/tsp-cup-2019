@@ -148,14 +148,14 @@ public class SimulatedAnnealing implements ILS {
 
 		RouteUtils.computePerformance(current, data);
 		long target = System.currentTimeMillis() +
-				1000 * 60 * 2 + 1000 * 50; // 2 min, 50 sec
+				1000 * 60 * 1; // 1 min
 		//double alpha = 1 - random.nextDouble() * 0.1 + 0.0001;
 
 		System.out.println("Alpha is " + alpha + ", r=" + r);
 
 		boolean end = false;
 
-		while(temperature > 1E-9 && !end && System.currentTimeMillis() < target){
+		while(temperature > 1E-9 && !end){
 			for(int i=0; i<r; i++){
 				SwappablePath next = null;
 
@@ -179,9 +179,6 @@ public class SimulatedAnnealing implements ILS {
 							next = current.doubleBridge(
 									getRandomOffsettedNumbers(4, length-1)
 							);
-							next = next.doubleBridge(
-									getRandomOffsettedNumbers(4, length-1)
-							);
 						}
 						break;
 				}
@@ -202,6 +199,11 @@ public class SimulatedAnnealing implements ILS {
 				}
 
 				if(best.getLength() == data.getBestKnown()) {
+					end = true;
+					break;
+				}
+
+				if(System.currentTimeMillis() >= target){
 					end = true;
 					break;
 				}
