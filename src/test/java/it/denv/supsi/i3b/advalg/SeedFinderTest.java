@@ -16,6 +16,10 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -30,8 +34,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SeedFinderTest {
 
 	private static String GIT_COMMIT;
+	private static boolean RUNNING_NODE = true;
+
+	private static URL postUrl;
+	private static String macAddr;
 
 	static {
+		try {
+			postUrl = new URL("http://ded1.denv.it:12538/api/v1/upload");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+
+		InetAddress ip;
+		try {
+			ip = InetAddress.getLocalHost();
+			NetworkInterface network;
+			network = NetworkInterface.getByInetAddress(ip);
+			byte[] mac;
+			mac = network.getHardwareAddress();
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < mac.length; i++) {
+				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+			}
+			macAddr = sb.toString();
+		} catch (SocketException | UnknownHostException e) {
+			e.printStackTrace();
+		}
+
 		try {
 			InputStream is = Runtime.getRuntime().exec(new String[]{
 					"git",
@@ -143,6 +173,7 @@ public class SeedFinderTest {
 
 
 		os.write("{\"problem\": \"" + data.getName() + "\"," +
+				"\"from\": \"" + macAddr + "\"," +
 				"\"time_elapsed\": " + (time_after - time_before) + "," +
 				"\"algorithms\": ["
 		);
@@ -239,23 +270,46 @@ public class SeedFinderTest {
 				TSPData data = loadProblem(problem);
 				tsp.init(data);
 
-				File f = new File("/tmp/tsp-" + problem + "-sa_" + GIT_COMMIT + ".json");
+				OutputStreamWriter ob;
+				ByteArrayOutputStream baos = null;
+
+				if(!RUNNING_NODE) {
+					File f = new File("/tmp/tsp-" + problem + "-sa_" + GIT_COMMIT + ".json");
+					ob = new OutputStreamWriter(
+							new BufferedOutputStream(new FileOutputStream(f, true)));
+				} else {
+					baos = new ByteArrayOutputStream();
+					ob = new OutputStreamWriter(baos);
+				}
 
 				SimulatedAnnealing sa = new SimulatedAnnealing(seed);
 				sa.setAlpha(alpha);
 				sa.setR(r);
 				sa.setMode(SimulatedAnnealing.Mode.RAND_CHOICE);
 
-				OutputStreamWriter ob = new OutputStreamWriter(
-						new BufferedOutputStream(new FileOutputStream(f, true)));
 				CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(seed, data))
 						.add(new TwoOpt(data))
 						.add(sa)
 						.add(new TwoOpt(data));
 
+
 				runProblem(tsp, data, ob, cra);
 				ob.flush();
+
+				if(RUNNING_NODE){
+					HttpURLConnection conn = (HttpURLConnection) postUrl.openConnection();
+					conn.setRequestMethod("POST");
+					conn.setDoOutput(true);
+					DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+
+					if(baos != null) {
+						wr.write(baos.toByteArray());
+						wr.flush();
+						wr.close();
+					}
+				}
+
 			} catch (IOException ex) {
 
 			}
