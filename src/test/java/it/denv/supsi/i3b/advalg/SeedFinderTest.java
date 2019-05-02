@@ -8,7 +8,6 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.ACOParams;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.AntColony;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.ACSParams;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
@@ -17,9 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.net.*;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -37,7 +33,7 @@ public class SeedFinderTest {
 	private static boolean RUNNING_NODE = true;
 
 	private static URL postUrl;
-	private static String macAddr;
+	private static String identifier;
 
 	static {
 		try {
@@ -46,19 +42,10 @@ public class SeedFinderTest {
 			e.printStackTrace();
 		}
 
-		InetAddress ip;
 		try {
-			ip = InetAddress.getLocalHost();
-			NetworkInterface network;
-			network = NetworkInterface.getByInetAddress(ip);
-			byte[] mac;
-			mac = network.getHardwareAddress();
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < mac.length; i++) {
-				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-			}
-			macAddr = sb.toString();
-		} catch (SocketException | UnknownHostException e) {
+			String ipAddr = InetAddress.getLocalHost().getHostAddress();
+			identifier = InetAddress.getLocalHost().getHostName() + "@" + ipAddr;
+		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
 
@@ -173,7 +160,7 @@ public class SeedFinderTest {
 
 
 		os.write("{\"problem\": \"" + data.getName() + "\"," +
-				"\"from\": \"" + macAddr + "\"," +
+				"\"from\": \"" + identifier + "\"," +
 				"\"time_elapsed\": " + (time_after - time_before) + "," +
 				"\"algorithms\": ["
 		);
