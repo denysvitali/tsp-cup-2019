@@ -92,7 +92,7 @@ public class SeedFinderTest {
 		for (int i = 0; i < 100; i++) {
 			int seed = r.nextInt();
 			for(int iter = 100; iter < 500; iter += 100) {
-				for (double alpha = 0.984; alpha <= 0.999; alpha += 0.010) {
+				for (double alpha = 0.950; alpha <= 0.999; alpha += 0.001) {
 					for (SimulatedAnnealing.Mode mode : SimulatedAnnealing.Mode.values()) {
 						double finalAlpha = alpha;
 						int finalIter = iter;
