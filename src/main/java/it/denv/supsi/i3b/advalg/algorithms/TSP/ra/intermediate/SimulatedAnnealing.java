@@ -148,7 +148,7 @@ public class SimulatedAnnealing implements ILS {
 
 		RouteUtils.computePerformance(current, data);
 		long target = System.currentTimeMillis() +
-				1000 * 60 * 1; // 1 min
+				1000 * 60 * 2 + 30 * 1000; // 2 min, 30 sec
 		//double alpha = 1 - random.nextDouble() * 0.1 + 0.0001;
 
 		System.out.println("Alpha is " + alpha + ", r=" + r);
