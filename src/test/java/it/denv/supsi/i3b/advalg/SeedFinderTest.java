@@ -295,6 +295,7 @@ public class SeedFinderTest {
 
 
 				runProblem(tsp, data, ob, cra);
+
 				ob.flush();
 
 				if(RUNNING_NODE){
@@ -308,6 +309,19 @@ public class SeedFinderTest {
 						wr.flush();
 						wr.close();
 					}
+
+					BufferedReader in = new BufferedReader(
+							new InputStreamReader(conn.getInputStream()));
+					String inputLine;
+					StringBuffer response = new StringBuffer();
+
+					while ((inputLine = in.readLine()) != null) {
+						response.append(inputLine);
+					}
+					in.close();
+
+					//print result
+					System.out.println(response.toString());
 				}
 
 			} catch (IOException ex) {
