@@ -69,7 +69,7 @@ public class SeedFinderTest {
 	}
 
 	private interface SAThunk {
-		void apply(int seed, double alpha, int r, SimulatedAnnealing.Mode mode);
+		void apply(int seed, double start_temp, double alpha, int r, SimulatedAnnealing.Mode mode);
 	}
 
 	private interface ACSThunk {
@@ -108,13 +108,19 @@ public class SeedFinderTest {
 		Random r = new Random();
 		for (int i = 0; i < 100; i++) {
 			int seed = r.nextInt();
-			for(int iter = 100; iter < 500; iter += 100) {
-				for (double alpha = 0.950; alpha <= 0.999; alpha += 0.001) {
-					for (SimulatedAnnealing.Mode mode : SimulatedAnnealing.Mode.values()) {
+			for(double temp = 80.0; temp < 200; temp += 0.5) {
+				for (int iter = 100; iter < 500; iter += 100) {
+					for (double alpha = 0.950; alpha <= 0.999; alpha += 0.001) {
 						double finalAlpha = alpha;
 						int finalIter = iter;
+						double startTemp = temp;
 
-						exec.submit(() -> f.apply(seed, finalAlpha, finalIter, mode));
+						exec.submit(() -> f.apply(seed,
+								startTemp,
+								finalAlpha,
+								finalIter,
+								SimulatedAnnealing.Mode.RAND_CHOICE)
+						);
 					}
 				}
 			}
@@ -251,7 +257,7 @@ public class SeedFinderTest {
 
 
 	private SAThunk runSA(String problem) {
-		return (seed, alpha, r, mode) -> {
+		return (seed, s_temp, alpha, r, mode) -> {
 			try {
 				TSP tsp = new TSP();
 				TSPData data = loadProblem(problem);
@@ -271,8 +277,9 @@ public class SeedFinderTest {
 
 				SimulatedAnnealing sa = new SimulatedAnnealing(seed);
 				sa.setAlpha(alpha);
+				sa.setStartTemp(s_temp);
 				sa.setR(r);
-				sa.setMode(SimulatedAnnealing.Mode.RAND_CHOICE);
+				sa.setMode(mode);
 
 				CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(seed, data))
