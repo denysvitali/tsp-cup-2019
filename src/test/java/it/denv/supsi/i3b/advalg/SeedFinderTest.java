@@ -95,7 +95,7 @@ public class SeedFinderTest {
 		}
 
 		try {
-			exec.awaitTermination(10, TimeUnit.HOURS);
+			exec.awaitTermination(10, TimeUnit.DAYS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -127,7 +127,7 @@ public class SeedFinderTest {
 		}
 
 		try {
-			exec.awaitTermination(10, TimeUnit.HOURS);
+			exec.awaitTermination(10, TimeUnit.DAYS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
