@@ -230,13 +230,13 @@ Seguendo alcuni consigli e direttive su alcuni libri e paper relativi all'argome
     \begin{center}
         \begin{tabular}{|l|l|l|}
             \hline
-            Parametro & Descrizione & Valore \\
+            Parametro     & Descrizione                 & Valore \\
             \hline
-            $\alpha$      & Importanza del feromone &  1    \\
-            $\beta$       & Importanza dell'euristica & 2    \\
-            $\rho$        & Deterioramento del feromone & 0.1  \\
-            $\varepsilon$ & Evaporazione del feromone & 0.1  \\
-            $q_0$         & Fattore di esplorazione & 0.98 \\
+            $\alpha$      & Importanza del feromone     & 1      \\
+            $\beta$       & Importanza dell'euristica   & 2      \\
+            $\rho$        & Deterioramento del feromone & 0.1    \\
+            $\varepsilon$ & Evaporazione del feromone   & 0.1    \\
+            $q_0$         & Fattore di esplorazione     & 0.98   \\
             \hline
         \end{tabular}
     \end{center}
@@ -278,8 +278,8 @@ era definita nel modo seguente:
 \end{equation}
 
 dove \textit{now} era un'indicazione del tempo corrente,
- (in ms), \textit{start} il tempo di inizio (in ms) e \textit{max\_runtime}
- il tempo massimo di run (definito come 2 min e 50 secondi).
+(in ms), \textit{start} il tempo di inizio (in ms) e \textit{max\_runtime}
+il tempo massimo di run (definito come 2 min e 50 secondi).
 Sfortunatamente questa funzione non è deterministica in quanto dipende dal numero
 di operazioni effettuate in un dato lasso di tempo.
 Usando una funzione non deterministica per la generazione del valore di temperatura
@@ -293,6 +293,56 @@ temperatura nel modo seguente:
 \end{equation}
 
 dove $i$ è il numero di iterazioni, ed $\alpha$ un parametro impostato ad $\alpha = 0.98$.
+\pagebreak
+
+A seguito di scarsi risultati usando anche questa formulazione, ho ritenuto più
+saggio utilizzare la formulazione standard e concentrarmi invece sul metodo
+di perturbazione utilizzato.
+
+Ho quindi utilizzato infine la seguente formula di scheduling della temperatura:
+\begin{equation}
+    T_{k+1} = T_k \cdot \alpha, \quad \text{con} \quad T_0 = [ 100.0, 200.0 ]
+\end{equation}
+
+\paragraph{Perturbazione} Nonostante le candidate lists (impostate ad una lunghezza
+di 80 per Nearest Neighbour) e l'algoritmo efficiente utilizzato, ottenevo mediamente
+scarsi risultati. Ho quindi implementato una versione personalizzata
+per la perturbazione. Inizialmente effettuavo una perturbazione random su quattro
+punti utilizzando la tecnica di Double Bridge. Ho migliorato questa tecnica per
+perturbare maggiormente il percorso inventando la perturbazione \texttt{RAND\_CHOICE}.
+
+\begin{code}
+    switch(mode){
+            case DoubleBridge:
+            next = current.doubleBridge(
+            getRandomOffsettedNumbers(4, length-1)
+            );
+            break;
+            case RAND_CHOICE:
+            if(random.nextBoolean()) {
+                    int[] ij = getRandomNumbers(2, length - 1);
+                    Arrays.sort(ij);
+                    next = current.twoOptSwap(ij[0], ij[1]);
+
+                    next = next.doubleBridge(
+                    getRandomOffsettedNumbers(4, length-1)
+                    );
+
+                } else {
+                    next = current.doubleBridge(
+                    getRandomOffsettedNumbers(4, length-1)
+                    );
+                }
+            break;
+        }
+\end{code}
+
+Casualmente, ogni qualvolta sia necessaria una perturbazione, viene scelta una
+variabile booleana che definisce se utilizzare Two Opt + Double Bridge oppure
+solamente Double Bridge.
+
+Mediante questa soluzione ottengo risultati migliori.
+
 \pagebreak
 \section{Esecuzione}
 Per eseguire il solver è necessario utilizzare Maven ed utilizzare Java 11.
@@ -316,6 +366,40 @@ La piattaforma utilizzata quale piattaforma di benchmarking è la seguente:
 \end{tabular}
 
 
+\subsection{Ricerca di Seed}
+Al fine di ottenere il seed che fornisse le migliori prestazioni possibili,
+ho sfruttato la potenza di calcolo a mia disposizione ed ho implementato un
+risolutore di problemi TSP parallelo, sfruttando 30 - 35 nodi, per un totale di 162 cores.
+
+Inoltre, per raccogliere i dati da tutte queste macchine, ho implementato un
+\href{https://github.com/denysvitali/tsp-node-server}{server HTTP scritto in Go} che
+si occupa di ricevere richieste HTTP dai nodi. Le macchine (per la maggior parte)
+sono state avviate con una versione del sistema operativo Alpine Linux
+personalizzato per contenere Java 12, Maven ed alcuni tool utili al fine di ottenere
+controllo remoto.
+
+Il server si connette ad un database PostgreSQL e registra i dati di tutte le istanze
+del TSP Solver eseguite. Al 3 Maggio 2019 il numero di risultati ottenuti ammontava
+a 27'776.
+
+Questa ricerca ha portato ad i seguenti risultati:
+\begin{table}[h]
+    \begin{tabular}{|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Problem} & \textbf{Seed} & \textbf{$\alpha$} & \textbf{$S_T$} & \textbf{$r$} & \textbf{Length} & \textbf{T[s]} & \textbf{Error Percentage} \\\hline
+        ch130            & -2129375319   & 0.982             & 80.5                          & 400          & 6110            & 0.046744592   & 0.00\%                      \\\hline                                                            %
+        d198             & -796751895    & 0.952             & 80                            & 100          & 15780           & 3.466862365   & 0.00\%                      \\\hline                                                               %
+        eil76            & 3             & 0.984018          & 100                           & 400          & 538             & 0.028927185   & 0.00\%                      \\\hline
+        fl1577           & -584050420    & 0.971             & 80                            & 100          & 22466           & 165.491784    & 0.98\%                      \\\hline                                                              %
+        kroA100          & 916773322     & 0.999             & 100                           & 300          & 21282           & 0.00270346    & 0.00\%                      \\\hline                                                        %
+        lin318           & -357553184    & 0.951             & 100                           & 100          & 42029           & 21.70859944   & 0.00\%                      \\\hline                                                             %
+        pcb442           & 1694800648    & 0.97              & 100                           & 100          & 50778           & 95.49048343   & 0.00\%                      \\\hline                                                           %
+        pr439            & -729289858    & 0.952             & 100                           & 100          & 107217          & 41.53711452   & 0.00\%                      \\\hline                                                       %
+        rat783           & 1032714840    & 0.956             & 80.5                          & 100          & 8811            & 150.5788728   & 0.06\%                      \\\hline                                                        %
+        u1060            & 269590158     & 0.978             & 80                            & 100          & 224439          & 152.1944992   & 0.15\%                      \\\hline
+    \end{tabular}
+    \caption{Risultati ottenuti}
+\end{table}
 
 \section{Conclusioni}
 
