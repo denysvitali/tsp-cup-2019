@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class SimulatedAnnealing implements ILS {
 
-	private int r = 400;
+	private int r = 100;
 	private double alpha = 0.984018;
 
 	private double START_TEMPERATURE = 100.0;
@@ -199,7 +199,6 @@ public class SimulatedAnnealing implements ILS {
 
 				int delta = next.getLength() - current.getLength();
 
-				double x = random.nextDouble();
 				if(best == null){
 					best = current;
 				}
@@ -221,12 +220,15 @@ public class SimulatedAnnealing implements ILS {
 					}
 				}
 
+				double x = random.nextDouble();
 				if(x < Math.exp(-delta * 1.0/temperature)){
 					current = next;
 				}
 			}
 
-			RouteUtils.computePerformance(best, data);
+			System.out.println("Temperature = " + temperature + "," +
+					" Best = " + best.getLength());
+			//RouteUtils.computePerformance(best, data);
 			//temperature *= Math.pow(alpha, iter);
 
 			temperature *= alpha;
