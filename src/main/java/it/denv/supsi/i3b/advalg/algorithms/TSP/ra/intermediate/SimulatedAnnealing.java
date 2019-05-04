@@ -226,12 +226,6 @@ public class SimulatedAnnealing implements ILS {
 					current = next;
 				}
 			}
-
-			System.out.println("Temperature = " + temperature + "," +
-					" Best = " + best.getLength());
-			//RouteUtils.computePerformance(best, data);
-			//temperature *= Math.pow(alpha, iter);
-
 			temperature *= alpha;
 
 

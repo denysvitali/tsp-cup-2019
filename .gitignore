@@ -88,3 +88,5 @@ target/
 .attach*
 
 *.log
+
+results/
