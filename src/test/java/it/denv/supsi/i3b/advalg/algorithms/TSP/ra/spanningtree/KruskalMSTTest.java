@@ -1,14 +1,13 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.spanningtree;
 
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+
 
 class KruskalMSTTest {
 

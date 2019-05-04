@@ -5,12 +5,13 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.TSP;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.ACSParams;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+
 
 class AntTest {
 

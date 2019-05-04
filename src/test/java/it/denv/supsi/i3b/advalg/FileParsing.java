@@ -4,12 +4,11 @@ import it.denv.supsi.i3b.advalg.algorithms.EdgeWeightType;
 import it.denv.supsi.i3b.advalg.algorithms.ProblemType;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.Assert.*;
 
 public class FileParsing {
 	private static String getTestFile(String fileName){

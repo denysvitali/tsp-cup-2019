@@ -6,26 +6,26 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPSolution;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.NearestNeighbour;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.ACOParams;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.ACSParams;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.ThreeOpt;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.GeneticAlgorithm;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.RandomNearestNeighbour;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.GeneticAlgorithm;
 import it.denv.supsi.i3b.advalg.utils.GnuPlotUtils;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 public class TSPRunnerTest {
 
-	private TSPData getProblemData(String problem) throws IOException {
+	private static TSPData getProblemData(String problem) throws IOException {
 		String filePath = Utils
 				.getTestFile("/problems/" + problem + ".tsp");
 		assertNotNull(filePath);
@@ -34,7 +34,7 @@ public class TSPRunnerTest {
 		return loader.load();
 	}
 
-	private void validateResult(TSP tsp, Route r, TSPData data) throws IOException {
+	private static void validateResult(TSP tsp, Route r, TSPData data) throws IOException {
 		int[] path = r.getPath();
 		assertEquals(path[0], path[path.length - 1]);
 
@@ -50,40 +50,8 @@ public class TSPRunnerTest {
 		Utils.checkTour(data.getFilePath(), sol_f, r.getLength());
 	}
 
-	@Test
-	public void ch130() throws IOException {
-	  	ch130_ACS(-1, 20);
-		//ch130_SA_DB(1);
-	}
 
-
-	@Test
-	public void ch130_SA() throws IOException {
-		int r = new Random().nextInt();
-		System.out.println("Seed is " + r);
-		ch130_SA_DB(r);
-		System.out.println("Seed is " + r);
-	}
-
-	private void ch130_SA_DB(int seed) throws IOException {
-		TSPData data = getProblemData("ch130");
-		TSP tsp = new TSP(50);
-		tsp.init(data);
-
-		TwoOpt twoOpt = new TwoOpt(data);
-		twoOpt.setCandidate(false);
-
-		Route r = tsp.run(data,
-				(new CompositeRoutingAlgorithm())
-						.startWith(new NearestNeighbour(data))
-						.add(twoOpt)
-						.add(new SimulatedAnnealing()
-						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
-		);
-		validateResult(tsp, r, data);
-	}
-
-	private void ch130_ACS(int seed, int amount) throws IOException {
+	private static void ch130_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("ch130");
 		TSP tsp = new TSP(20);
 		tsp.init(data);
@@ -106,12 +74,12 @@ public class TSPRunnerTest {
 	}
 
 	@Test
-	public void d198() throws IOException {
+	public void d198_OLD() throws IOException {
 		d198_ACS(-1, 4);
 		//d198_SA(-1);
 	}
 
-	private void d198_SA(int seed) throws IOException {
+	private static void d198_SA(int seed) throws IOException {
 		TSPData data = getProblemData("d198");
 		TSP tsp = new TSP(50);
 		tsp.init(data);
@@ -138,7 +106,7 @@ public class TSPRunnerTest {
 		validateResult(tsp, r, data);
 	}
 
-	private void d198_ACS(int seed, int amount) throws IOException {
+	private static void d198_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("d198");
 		TSP tsp = new TSP(50);
 		tsp.init(data);
@@ -162,11 +130,11 @@ public class TSPRunnerTest {
 	}
 
 	@Test
-	public void eil76() throws IOException {
+	public void eil76_OLD() throws IOException {
 		eil76_ACS(1, 8);
 	}
 
-	private void eil76_ACS(int seed, int amount) throws IOException {
+	private static void eil76_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("eil76");
 		TSP tsp = new TSP(20);
 		tsp.init(data);
@@ -184,12 +152,12 @@ public class TSPRunnerTest {
 	}
 
 	@Test
-	public void fl1577() throws IOException {
+	public void fl1577_OLD() throws IOException {
 		//fl1577_ACS(-1, 3);
 		fl1577_SA(-1);
 	}
 
-	private void fl1577_ACS(int seed, int amount) throws IOException {
+	private static void fl1577_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("fl1577");
 		TSP tsp = new TSP((int) (0.15 * data.getDim()));
 		tsp.init(data);
@@ -211,7 +179,7 @@ public class TSPRunnerTest {
 		validateResult(tsp, r, data);
 	}
 
-	private void fl1577_SA(int seed) throws IOException {
+	private static void fl1577_SA(int seed) throws IOException {
 		TSPData data = getProblemData("fl1577");
 		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		tsp.init(data);
@@ -237,12 +205,12 @@ public class TSPRunnerTest {
 	}
 
 	@Test
-	public void kroA100() throws IOException {
+	public void kroA100_OLD() throws IOException {
 		//kroA100_SA(1);
 		kroA100_ACS(1, 3);
 	}
 
-	private void kroA100_ACS(int seed, int amount) throws IOException {
+	private static void kroA100_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("kroA100");
 		TSP tsp = new TSP(50);
 		tsp.init(data);
@@ -256,7 +224,7 @@ public class TSPRunnerTest {
 		validateResult(tsp, r, data);
 	}
 
-	private void kroA100_SA(int seed) throws IOException {
+	private static void kroA100_SA(int seed) throws IOException {
 		TSPData data = getProblemData("kroA100");
 		TSP tsp = new TSP(50);
 		tsp.init(data);
@@ -273,7 +241,7 @@ public class TSPRunnerTest {
 	}
 
 	@Test
-	public void lin318() throws IOException {
+	public void lin318_OLD() throws IOException {
 		lin318_SA(1);
 		//lin318_ACS(-1, 3);
 	}
@@ -301,7 +269,7 @@ public class TSPRunnerTest {
 		return r;
 	}
 
-	private void lin318_SA(int seed) throws IOException {
+	private static void lin318_SA(int seed) throws IOException {
 		TSPData data = getProblemData("lin318");
 		TSP tsp = new TSP(50);
 		tsp.init(data);
@@ -318,12 +286,12 @@ public class TSPRunnerTest {
 	}
 
 	@Test
-	public void pcb442() throws IOException {
+	public void pcb442_OLD() throws IOException {
 		//pcb442_ACS(3, 3);
 		pcb442_SA(1);
 	}
 
-	private void pcb442_ACS(int seed, int amount) throws IOException {
+	private static void pcb442_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("pcb442");
 		TSP tsp = new TSP(80);
 		tsp.init(data);
@@ -342,7 +310,7 @@ public class TSPRunnerTest {
 		validateResult(tsp, r, data);
 	}
 
-	private void pcb442_SA(int seed) throws IOException {
+	private static void pcb442_SA(int seed) throws IOException {
 		TSPData data = getProblemData("pcb442");
 		TSP tsp = new TSP(10);
 		tsp.init(data);
@@ -360,12 +328,12 @@ public class TSPRunnerTest {
 
 
 	@Test
-	public void pr439() throws IOException {
+	public void pr439_OLD() throws IOException {
 		pr439_ACS(-1,12);
 		//pr439_SA(1);
 	}
 
-	private void pr439_ACS(int seed, int amount) throws IOException {
+	private static void pr439_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("pr439");
 		TSP tsp = new TSP(100);
 		tsp.init(data);
@@ -387,7 +355,7 @@ public class TSPRunnerTest {
 		validateResult(tsp, r, data);
 	}
 
-	private void pr439_SA(int seed) throws IOException {
+	private static void pr439_SA(int seed) throws IOException {
 		TSPData data = getProblemData("pr439");
 		TSP tsp = new TSP(100);
 		tsp.init(data);
@@ -404,12 +372,12 @@ public class TSPRunnerTest {
 	}
 
 	@Test
-	public void rat783() throws IOException {
+	public void rat783_OLD() throws IOException {
 		rat783_ACS(-1,3);
 		//rat783_SA(1);
 	}
 
-	private void rat783_ACS(int seed, int amount) throws IOException {
+	private static void rat783_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("rat783");
 		TSP tsp = new TSP(150);
 		tsp.init(data);
@@ -431,7 +399,7 @@ public class TSPRunnerTest {
 		validateResult(tsp, r, data);
 	}
 
-	private void rat783_SA(int seed) throws IOException {
+	private static void rat783_SA(int seed) throws IOException {
 		TSPData data = getProblemData("rat783");
 		TSP tsp = new TSP(150);
 		tsp.init(data);
@@ -865,7 +833,7 @@ public class TSPRunnerTest {
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
-	public void _fl1577() throws IOException {
+	public static void _fl1577() throws IOException {
 		String filePath = Utils.getTestFile("/problems/fl1577.tsp");
 		assertNotNull(filePath);
 
@@ -1244,6 +1212,127 @@ public class TSPRunnerTest {
 		RouteUtils.computePerformance(r, data);
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
+
+
+	/* Test w/ Seeds */
+	private static TSPSolution runProblem(TSP tsp,
+										  TSPData data,
+										  CompositeRoutingAlgorithm alg) {
+		long time_before = System.nanoTime();
+		Route r = tsp.run(data, alg);
+		long time_after = System.nanoTime();
+		assertTrue(r.getLength() >= data.getBestKnown());
+		System.out.println(data.getName() + " (" + r.getLength() + " / " +
+				data.getBestKnown() + ") - took " + (time_after - time_before) + "ns");
+
+		return new TSPSolution(data, r);
+	}
+
+
+	private static TSPSolution runR2S2(String problem, SimulatedAnnealing.Mode mode,
+			  int seed,
+			  double alpha,
+			  int r, double s_temp) {
+			try {
+				TSPData data = Utils.loadProblem(problem);
+				TSP tsp = new TSP((int) (data.getDim() * 0.15));
+				tsp.init(data);
+
+				SimulatedAnnealing sa = new SimulatedAnnealing(seed);
+				sa.setAlpha(alpha);
+				sa.setStartTemp(s_temp);
+				sa.setR(r);
+				sa.setMode(mode);
+
+				CompositeRoutingAlgorithm cra = (new CompositeRoutingAlgorithm())
+						.startWith(new RandomNearestNeighbour(seed, data))
+						.add(new TwoOpt(data))
+						.add(sa)
+						.add(new TwoOpt(data));
+
+
+				return runProblem(tsp, data, cra);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+
+			return null;
+	}
+
+	private static void writeTestResult(TSPSolution sol) {
+
+		if(sol == null){
+			System.err.println("Got a null result!");
+			return;
+		}
+
+		try {
+			sol.write(new File("results/" + sol.getName() + ".opt.tour"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// ch130
+
+	public static void ch130() {
+		writeTestResult(runR2S2("ch130",SimulatedAnnealing.Mode.RAND_CHOICE,-2129375319,0.982,400,80.5));
+	}
+
+	// d198
+
+	public static void d198() {
+		writeTestResult(runR2S2("d198",SimulatedAnnealing.Mode.RAND_CHOICE,-796751895,0.961,100,80.0));
+	}
+
+	// eil76
+
+	public static void eil76() {
+		writeTestResult(runR2S2("eil76",SimulatedAnnealing.Mode.RAND_CHOICE,-1460045113,0.996,100,134.0));
+	}
+
+	// fl1577
+
+	public static void fl1577() {
+		writeTestResult(runR2S2("fl1577",SimulatedAnnealing.Mode.RAND_CHOICE,28586255,0.9,100,200.0));
+	}
+
+	// kroA100
+
+	public static void kroA100() {
+		writeTestResult(runR2S2("kroA100",SimulatedAnnealing.Mode.RAND_CHOICE,916773322,0.999,100,300));
+	}
+
+	// lin318
+
+	public static void lin318() {
+		writeTestResult(runR2S2("lin318",SimulatedAnnealing.Mode.RAND_CHOICE,-357553184,0.951,100,100));
+	}
+
+	// pcb442
+
+	public static void pcb442() {
+		writeTestResult(runR2S2("pcb442",SimulatedAnnealing.Mode.RAND_CHOICE,2079608716,0.954,100,80.0));
+	}
+
+	// pr439
+
+	public static void pr439() {
+		runR2S2("pr439",SimulatedAnnealing.Mode.RAND_CHOICE,-729289858,0.952,100,100);
+	}
+
+	// rat783
+
+	public static void rat783() {
+		writeTestResult(runR2S2("rat783",SimulatedAnnealing.Mode.RAND_CHOICE,1032714840,0.956,100,80.5));
+	}
+
+	// u1060
+
+	public static void u1060() {
+		writeTestResult(runR2S2("u1060",SimulatedAnnealing.Mode.RAND_CHOICE,269590158,0.978,100,80.0));
+	}
+
 
 
 }

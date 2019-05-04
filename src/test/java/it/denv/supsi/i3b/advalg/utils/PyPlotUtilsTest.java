@@ -4,11 +4,10 @@ import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.ABCycle;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.ABEdge;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

@@ -8,11 +8,11 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.ra.TestShuffler;
 import it.denv.supsi.i3b.advalg.utils.RouteUtils;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 class TwoOptTest {
 

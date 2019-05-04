@@ -1,11 +1,11 @@
 package it.denv.supsi.i3b.advalg.ra.to;
 
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.SwappablePath;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.Assert.assertArrayEquals;
 
 public class SwappablePathTest {
 	@Test

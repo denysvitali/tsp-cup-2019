@@ -20,6 +20,10 @@ public class TSPSolution {
 		r = route;
 	}
 
+	public String getName() {
+		return outName;
+	}
+
 	public void write(File f) throws IOException{
 		FileWriter fw = new FileWriter(f);
 

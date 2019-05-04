@@ -138,7 +138,7 @@ public class SimulatedAnnealing implements ILS {
 		current.calculateDistance(data);
 
 		TwoOpt twoOpt = new TwoOpt(data);
-		twoOpt.setCandidate(true);
+		twoOpt.setCandidate(false);
 
 		int length = current.getPathArr().length;
 		int bestKnown = data.getBestKnown();
@@ -199,6 +199,8 @@ public class SimulatedAnnealing implements ILS {
 
 				int delta = next.getLength() - current.getLength();
 
+				double x = random.nextDouble();
+
 				if(best == null){
 					best = current;
 				}
@@ -220,7 +222,6 @@ public class SimulatedAnnealing implements ILS {
 					}
 				}
 
-				double x = random.nextDouble();
 				if(x < Math.exp(-delta * 1.0/temperature)){
 					current = next;
 				}

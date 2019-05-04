@@ -1,12 +1,5 @@
 package it.denv.supsi.i3b.advalg.ra.ga;
 
-import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.Individual;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.Population;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-
 public class PopulationTest {
 	/*@Test
 	public void testCrossover() {

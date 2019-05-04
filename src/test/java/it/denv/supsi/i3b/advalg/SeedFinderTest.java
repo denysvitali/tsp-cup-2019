@@ -2,7 +2,6 @@ package it.denv.supsi.i3b.advalg;
 
 import it.denv.supsi.i3b.advalg.algorithms.TSP.TSP;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
-import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPLoader;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.CompositeRoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.ILS;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
@@ -12,7 +11,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.ACSParams;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.initial.aco.acs.AntColonySystem;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.SimulatedAnnealing;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.TwoOpt;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.io.*;
 import java.net.*;
@@ -22,9 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.Assert.assertTrue;
 
 
 public class SeedFinderTest {
@@ -74,15 +71,6 @@ public class SeedFinderTest {
 
 	private interface ACSThunk {
 		void apply(int seed, int nr_ants, ACSParams params);
-	}
-
-	private static TSPData loadProblem(String pName) throws IOException {
-		String filePath = Utils.getTestFile("/problems/" + pName + ".tsp");
-		assertNotNull(filePath);
-
-		TSPLoader loader = new TSPLoader(filePath);
-		TSPData d = loader.load();
-		return d;
 	}
 
 	private static void runThreaded(Thunk f) {
@@ -242,7 +230,7 @@ public class SeedFinderTest {
 	private static ACSThunk runACS(String problem) {
 		return (seed, ants, acsParams) -> {
 			try {
-				TSPData data = loadProblem(problem);
+				TSPData data = Utils.loadProblem(problem);
 				TSP tsp = new TSP((int) (data.getDim() * 0.15));
 				tsp.init(data);
 
@@ -309,7 +297,7 @@ public class SeedFinderTest {
 	private SAThunk runSA(String problem) {
 		return (seed, s_temp, alpha, r, mode) -> {
 			try {
-				TSPData data = loadProblem(problem);
+				TSPData data = Utils.loadProblem(problem);
 				TSP tsp = new TSP((int) (data.getDim() * 0.15));
 				tsp.init(data);
 

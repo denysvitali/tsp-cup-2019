@@ -1,8 +1,8 @@
 package it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
