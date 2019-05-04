@@ -169,6 +169,7 @@ public class SeedFinderTest {
 
 		os.write("{\"problem\": \"" + data.getName() + "\"," +
 				"\"from\": \"" + identifier + "\"," +
+				"\"commit\": \"" + GIT_COMMIT + "\"," +
 				"\"time_elapsed\": " + (time_after - time_before) + "," +
 				"\"algorithms\": ["
 		);
