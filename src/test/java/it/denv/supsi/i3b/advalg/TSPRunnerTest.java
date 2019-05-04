@@ -1235,7 +1235,7 @@ public class TSPRunnerTest {
 			  int r, double s_temp) {
 			try {
 				TSPData data = Utils.loadProblem(problem);
-				TSP tsp = new TSP((int) (data.getDim() * 0.15));
+				TSP tsp = new TSP(40);
 				tsp.init(data);
 
 				SimulatedAnnealing sa = new SimulatedAnnealing(seed);
