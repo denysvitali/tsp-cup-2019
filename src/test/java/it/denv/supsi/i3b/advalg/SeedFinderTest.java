@@ -108,9 +108,9 @@ public class SeedFinderTest {
 		Random r = new Random();
 		for (int i = 0; i < 100; i++) {
 			int seed = r.nextInt();
-			for(double temp = 80.0; temp < 200; temp += 0.5) {
+			for(double temp = 200; temp > 20; temp -= 5) {
 				for (int iter = 100; iter < 500; iter += 100) {
-					for (double alpha = 0.950; alpha <= 0.999; alpha += 0.001) {
+					for (double alpha = 0.90; alpha <= 0.99; alpha += 0.01) {
 						double finalAlpha = alpha;
 						int finalIter = iter;
 						double startTemp = temp;
