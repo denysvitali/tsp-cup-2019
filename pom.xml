@@ -59,7 +59,6 @@
           <perCoreThreadCount>true</perCoreThreadCount>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
-
       </plugin>
     </plugins>
   </build>
