@@ -173,10 +173,10 @@ public class SeedFinderTest {
 				"\"algorithms\": ["
 		);
 
-		printAlgorithm(os, alg.getSa());
+		printAlgorithm(os, tsp, alg.getSa());
 		for (ILS ILS : alg.getIas()) {
 			os.write(",");
-			printAlgorithm(os, ILS);
+			printAlgorithm(os, tsp, ILS);
 		}
 		os.write("]");
 
@@ -188,7 +188,7 @@ public class SeedFinderTest {
 		assertTrue(r.getLength() >= data.getBestKnown());
 	}
 
-	private static void printAlgorithm(OutputStreamWriter os, RoutingAlgorithm sa) throws IOException {
+	private static void printAlgorithm(OutputStreamWriter os, TSP tsp, RoutingAlgorithm sa) throws IOException {
 		if (sa instanceof AntColonySystem) {
 			AntColonySystem acs = (AntColonySystem) sa;
 			int m = acs.getAnts();
@@ -196,6 +196,12 @@ public class SeedFinderTest {
 			ACOParams p = acs.getParams();
 
 			os.write("{\"name\": \"" + sa.getClass().getName() + "\"," +
+					"\"commit\": \"" + GIT_COMMIT + "\"," +
+					"\"solutionImprover\": ");
+
+			printAlgorithm(os, tsp, acs.getSolutionImprover());
+
+			os.write("," +
 					"\"seed\": " + s + ", \"ants\": " + m + ", \"params\":{" +
 					"\"alpha\": " + p.getALPHA() + "," +
 					"\"beta\": " + p.getBeta() + "," +
@@ -208,7 +214,7 @@ public class SeedFinderTest {
 		}
 	}
 
-	private static void printAlgorithm(OutputStreamWriter os, ILS ra) throws IOException {
+	private static void printAlgorithm(OutputStreamWriter os, TSP tsp, ILS ra) throws IOException {
 		if(ra instanceof SimulatedAnnealing){
 			SimulatedAnnealing sa = (SimulatedAnnealing) ra;
 
@@ -221,6 +227,16 @@ public class SeedFinderTest {
 					"\"start_temperature\": " + sa.getStartTemp() + "}}");
 
 
+		} else if (ra instanceof TwoOpt) {
+			TwoOpt twoOpt = (TwoOpt) ra;
+			os.write("{\"name\": \"" + ra.getClass().getName() + "\"," +
+					"\"seed\": " + ra.getSeed() + ", \"params\":" +
+					"{" +
+					"\"candidates\": " + twoOpt.getCandidates() + "," +
+					"\"candidates_size\":" + tsp.getCandidatesSize() +
+					"}}");
+
+
 		} else {
 			os.write("{\"name\": \"" + ra.getClass().getName() + "\"," +
 					"\"seed\": " + ra.getSeed() + "}");
@@ -231,12 +247,19 @@ public class SeedFinderTest {
 		return (seed, ants, acsParams) -> {
 			try {
 				TSPData data = loadProblem(problem);
-				TSP tsp = new TSP();
+				TSP tsp = new TSP((int) (data.getDim() * 0.15));
 				tsp.init(data);
-				File f = new File("/tmp/tsp-" + problem + "-acs_" + GIT_COMMIT + ".json");
 
-				OutputStreamWriter ob = new OutputStreamWriter(
-						new BufferedOutputStream(new FileOutputStream(f, true)));
+				OutputStreamWriter ob;
+				ByteArrayOutputStream baos = null;
+				if(!RUNNING_NODE) {
+					File f = new File("/tmp/tsp-" + problem + "-acs_" + GIT_COMMIT + ".json");
+					ob = new OutputStreamWriter(
+							new BufferedOutputStream(new FileOutputStream(f, true)));
+				} else {
+					baos = new ByteArrayOutputStream();
+					ob = new OutputStreamWriter(baos);
+				}
 				CompositeRoutingAlgorithm cra =
 						(new CompositeRoutingAlgorithm());
 
@@ -245,12 +268,41 @@ public class SeedFinderTest {
 								"ACSParams = %s, Seed = %d",
 						ants, acsParams, seed));
 
+				TwoOpt twoOpt = new TwoOpt(data);
+				twoOpt.setCandidate(true);
+
 				cra.startWith(new AntColonySystem(acsParams, seed, ants, data)
-						.setSolutionImprover(new TwoOpt(data)));
+						.setSolutionImprover(twoOpt));
 				cra.add(new TwoOpt(data));
 
 				runProblem(tsp, data, ob, cra);
 				ob.flush();
+
+				if(RUNNING_NODE){
+					HttpURLConnection conn = (HttpURLConnection) postUrl.openConnection();
+					conn.setRequestMethod("POST");
+					conn.setDoOutput(true);
+					DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+
+					if(baos != null) {
+						wr.write(baos.toByteArray());
+						wr.flush();
+						wr.close();
+					}
+
+					BufferedReader in = new BufferedReader(
+							new InputStreamReader(conn.getInputStream()));
+					String inputLine;
+					StringBuilder response = new StringBuilder();
+
+					while ((inputLine = in.readLine()) != null) {
+						response.append(inputLine);
+					}
+					in.close();
+
+					//print result
+					System.out.println(response.toString());
+				}
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
@@ -261,8 +313,8 @@ public class SeedFinderTest {
 	private SAThunk runSA(String problem) {
 		return (seed, s_temp, alpha, r, mode) -> {
 			try {
-				TSP tsp = new TSP();
 				TSPData data = loadProblem(problem);
+				TSP tsp = new TSP((int) (data.getDim() * 0.15));
 				tsp.init(data);
 
 				OutputStreamWriter ob;
@@ -309,7 +361,7 @@ public class SeedFinderTest {
 					BufferedReader in = new BufferedReader(
 							new InputStreamReader(conn.getInputStream()));
 					String inputLine;
-					StringBuffer response = new StringBuffer();
+					StringBuilder response = new StringBuilder();
 
 					while ((inputLine = in.readLine()) != null) {
 						response.append(inputLine);

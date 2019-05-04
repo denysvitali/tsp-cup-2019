@@ -56,4 +56,8 @@ public class AntColonySystem extends RoutingAlgorithm {
 	public ACOParams getParams() {
 		return this.ac.getParams();
 	}
+
+	public ILS getSolutionImprover() {
+		return this.ac.getSolutionImprover();
+	}
 }

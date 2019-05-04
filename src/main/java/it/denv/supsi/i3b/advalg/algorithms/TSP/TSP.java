@@ -15,8 +15,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TSP {
-	public TSP(){
 
+	private int CANDIDATES_SIZE = 80;
+
+	public TSP(int candidates_size){
+		this.CANDIDATES_SIZE = candidates_size;
+	}
+
+	public void setCandidatesSize(int CANDIDATES_SIZE) {
+		this.CANDIDATES_SIZE = CANDIDATES_SIZE;
+	}
+
+	public int getCandidatesSize() {
+		return CANDIDATES_SIZE;
 	}
 
 	public Route run(TSPData data, RoutingAlgorithm ra){
@@ -103,7 +114,7 @@ public class TSP {
 			nn.sort(Edge::compareTo);
 			candidate_list.put(i,
 					nn.stream()
-					.limit(80)
+					.limit(CANDIDATES_SIZE)
 					.collect(Collectors.toCollection(HashSet::new)));
 		}
 

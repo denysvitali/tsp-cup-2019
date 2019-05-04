@@ -21,7 +21,7 @@ class TwoOptTest {
 		TSPLoader loader = new TSPLoader(
 				Utils.getTestFile("/problems/eil76.tsp"));
 		TSPData data = loader.load();
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(20);
 
 		Route r2 = tsp.run(data, new CompositeRoutingAlgorithm()
 				.startWith(

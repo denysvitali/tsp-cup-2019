@@ -276,4 +276,8 @@ public class AntColony {
 	public ACOParams getParams() {
 		return params;
 	}
+
+	public ILS getSolutionImprover() {
+		return ILS;
+	}
 }

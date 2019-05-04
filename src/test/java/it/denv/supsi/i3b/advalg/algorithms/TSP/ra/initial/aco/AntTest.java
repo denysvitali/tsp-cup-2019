@@ -33,7 +33,7 @@ class AntTest {
 		TSPLoader tspLoader = new TSPLoader(
 				Utils.getTestFile("/problems/eil76.tsp"));
 		TSPData data = tspLoader.load();
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(20);
 		tsp.init(data);
 		Ant a = new Ant(new AntColony(AcoType.ACS, ACSParams.getInstance(),
 				0, 1, data));

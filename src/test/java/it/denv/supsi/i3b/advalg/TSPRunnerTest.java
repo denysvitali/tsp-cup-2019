@@ -67,7 +67,7 @@ public class TSPRunnerTest {
 
 	private void ch130_SA_DB(int seed) throws IOException {
 		TSPData data = getProblemData("ch130");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(50);
 		tsp.init(data);
 
 		TwoOpt twoOpt = new TwoOpt(data);
@@ -85,7 +85,7 @@ public class TSPRunnerTest {
 
 	private void ch130_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("ch130");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(20);
 		tsp.init(data);
 
 		AntColonySystem acs;
@@ -113,7 +113,7 @@ public class TSPRunnerTest {
 
 	private void d198_SA(int seed) throws IOException {
 		TSPData data = getProblemData("d198");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(50);
 		tsp.init(data);
 
 		SimulatedAnnealing sa;
@@ -140,7 +140,7 @@ public class TSPRunnerTest {
 
 	private void d198_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("d198");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(50);
 		tsp.init(data);
 
 		AntColonySystem acs;
@@ -168,7 +168,7 @@ public class TSPRunnerTest {
 
 	private void eil76_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("eil76");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(20);
 		tsp.init(data);
 
 		TwoOpt opt = new TwoOpt(data);
@@ -191,7 +191,7 @@ public class TSPRunnerTest {
 
 	private void fl1577_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("fl1577");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (0.15 * data.getDim()));
 		tsp.init(data);
 
 		AntColonySystem acs;
@@ -213,7 +213,7 @@ public class TSPRunnerTest {
 
 	private void fl1577_SA(int seed) throws IOException {
 		TSPData data = getProblemData("fl1577");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		tsp.init(data);
 
 		if(seed == -1){
@@ -243,7 +243,7 @@ public class TSPRunnerTest {
 
 	private void kroA100_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("kroA100");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(50);
 		tsp.init(data);
 
 		Route r = tsp.run(data,
@@ -257,7 +257,7 @@ public class TSPRunnerTest {
 
 	private void kroA100_SA(int seed) throws IOException {
 		TSPData data = getProblemData("kroA100");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(50);
 		tsp.init(data);
 
 		Route r = tsp.run(data,
@@ -279,7 +279,7 @@ public class TSPRunnerTest {
 
 	protected Route lin318_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("lin318");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(50);
 		tsp.init(data);
 
 		AntColonySystem acs;
@@ -302,7 +302,7 @@ public class TSPRunnerTest {
 
 	private void lin318_SA(int seed) throws IOException {
 		TSPData data = getProblemData("lin318");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(50);
 		tsp.init(data);
 
 		Route r = tsp.run(data,
@@ -324,7 +324,7 @@ public class TSPRunnerTest {
 
 	private void pcb442_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("pcb442");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(80);
 		tsp.init(data);
 
 		Route r = tsp.run(data,
@@ -338,7 +338,7 @@ public class TSPRunnerTest {
 
 	private void pcb442_SA(int seed) throws IOException {
 		TSPData data = getProblemData("pcb442");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(80);
 		tsp.init(data);
 
 		Route r = tsp.run(data,
@@ -361,7 +361,7 @@ public class TSPRunnerTest {
 
 	private void pr439_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("pr439");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(100);
 		tsp.init(data);
 
 		AntColonySystem acs;
@@ -383,7 +383,7 @@ public class TSPRunnerTest {
 
 	private void pr439_SA(int seed) throws IOException {
 		TSPData data = getProblemData("pr439");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(100);
 		tsp.init(data);
 
 		Route r = tsp.run(data,
@@ -405,7 +405,7 @@ public class TSPRunnerTest {
 
 	private void rat783_ACS(int seed, int amount) throws IOException {
 		TSPData data = getProblemData("rat783");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(150);
 		tsp.init(data);
 
 		AntColonySystem acs;
@@ -427,7 +427,7 @@ public class TSPRunnerTest {
 
 	private void rat783_SA(int seed) throws IOException {
 		TSPData data = getProblemData("rat783");
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(150);
 		tsp.init(data);
 
 		Route r = tsp.run(data,
@@ -450,7 +450,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(2);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
@@ -475,7 +475,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(20);
 		TwoOpt twoOpt = new TwoOpt(data);
 		twoOpt.setCandidate(true);
 		Route r = tsp.run(data,
@@ -501,7 +501,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(20);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -524,7 +524,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(20);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -550,7 +550,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(20);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
@@ -575,7 +575,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(80);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
@@ -601,7 +601,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP(20);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
@@ -628,7 +628,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -653,7 +653,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -678,7 +678,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -703,7 +703,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -730,7 +730,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -755,7 +755,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm()
 						.startWith(new NearestNeighbour(data))
@@ -781,7 +781,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		tsp.init(data);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
@@ -806,7 +806,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		tsp.init(data);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
@@ -832,7 +832,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		tsp.init(data);
 		ACSParams params = new ACSParams();
 
@@ -866,7 +866,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		tsp.init(data);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
@@ -892,7 +892,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		tsp.init(data);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
@@ -919,7 +919,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -941,7 +941,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -963,7 +963,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -987,7 +987,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
@@ -1015,7 +1015,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
@@ -1043,7 +1043,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
@@ -1074,7 +1074,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(seed, data))
@@ -1111,7 +1111,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
@@ -1139,7 +1139,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(data))
@@ -1165,7 +1165,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -1189,7 +1189,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new NearestNeighbour(data))
@@ -1217,7 +1217,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP();
+		TSP tsp = new TSP((int) (data.getDim() * 0.15));
 		TwoOpt candidateLessTwoOpt = new TwoOpt(data);
 		candidateLessTwoOpt.setCandidate(false);
 

@@ -169,4 +169,8 @@ public class TwoOpt implements ILS {
 
 		return d1 - d2;
 	}
+
+	public boolean getCandidates() {
+		return cl;
+	}
 }
