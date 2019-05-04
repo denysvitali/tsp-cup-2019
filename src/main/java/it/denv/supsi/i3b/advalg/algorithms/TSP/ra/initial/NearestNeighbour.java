@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 
 public class NearestNeighbour extends RoutingAlgorithm {
 	protected TSPData data;
-	private LinkedList<Edge<Integer>> tour = new LinkedList<>();
-	protected Candidator<Integer> candidator;
+	private LinkedList<Edge> tour = new LinkedList<>();
+	protected Candidator candidator;
 
 	public NearestNeighbour(TSPData data) {
 		this.data = data;
@@ -26,9 +26,9 @@ public class NearestNeighbour extends RoutingAlgorithm {
 		this.data = data;
 		this.candidator.setStartNode(startNode);
 
-		ArrayList<Edge<Integer>> candidates = candidator.getCandidates(startNode);
+		ArrayList<Edge> candidates = candidator.getCandidates(startNode);
 		do {
-			Edge<Integer> candidate = candidates.get(0);
+			Edge candidate = candidates.get(0);
 			tour.add(candidate);
 			candidator.addVisited(candidate);
 			candidates = candidator.getCandidates(candidate.getV());
@@ -37,7 +37,7 @@ public class NearestNeighbour extends RoutingAlgorithm {
 
 		int last = tour.getLast().getV();
 
-		tour.add(new Edge<>(last, startNode,
+		tour.add(new Edge(last, startNode,
 				data.getDistances()[last][startNode]));
 
 		ArrayList<Integer> arr = tour.stream()

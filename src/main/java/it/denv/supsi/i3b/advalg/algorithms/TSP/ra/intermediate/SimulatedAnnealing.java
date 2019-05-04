@@ -165,6 +165,12 @@ public class SimulatedAnnealing implements ILS {
 								getRandomOffsettedNumbers(4, length-1)
 						);
 						break;
+
+					case TwoOpt:
+						int[] ij_to = getRandomNumbers(2, length - 1);
+						Arrays.sort(ij_to);
+						next = current.twoOptSwap(ij_to[0], ij_to[1]);
+						break;
 					case RAND_CHOICE:
 						if(random.nextBoolean()) {
 							int[] ij = getRandomNumbers(2, length - 1);

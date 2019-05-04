@@ -185,8 +185,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void fl1577() throws IOException {
-		fl1577_ACS(-1, 3);
-		//fl1577_SA(-1);
+		//fl1577_ACS(-1, 3);
+		fl1577_SA(-1);
 	}
 
 	private void fl1577_ACS(int seed, int amount) throws IOException {
@@ -227,7 +227,7 @@ public class TSPRunnerTest {
 						.startWith(new RandomNearestNeighbour(seed, data))
 						.add(new TwoOpt(data))
 						.add(new SimulatedAnnealing(seed)
-						.setMode(SimulatedAnnealing.Mode.DoubleBridge))
+						.setMode(SimulatedAnnealing.Mode.TwoOpt))
 		);
 
 		System.out.println("Seed is " + seed);
@@ -273,8 +273,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void lin318() throws IOException {
-		//lin318_SA(1);
-		lin318_ACS(-1, 3);
+		lin318_SA(1);
+		//lin318_ACS(-1, 3);
 	}
 
 	protected Route lin318_ACS(int seed, int amount) throws IOException {

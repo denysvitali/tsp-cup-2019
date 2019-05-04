@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class ThreeOpt implements ILS {
 
 	private TSPData data = null;
-	private ArrayList<Candidator<Integer>> candidators = new ArrayList<>();
+	private ArrayList<Candidator> candidators = new ArrayList<>();
 
 	public ThreeOpt(TSPData data){
 		this.data = data;

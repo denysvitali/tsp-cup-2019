@@ -7,6 +7,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.RoutingAlgorithm;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.spanningtree.KruskalMST;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.spanningtree.SpanningTree;
+import it.denv.supsi.i3b.advalg.utils.PyPlotUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class TSP {
 
-	private int CANDIDATES_SIZE = 80;
+	private int CANDIDATES_SIZE;
 
 	public TSP(int candidates_size){
 		this.CANDIDATES_SIZE = candidates_size;
@@ -74,17 +75,6 @@ public class TSP {
 		return distances;
 	}
 
-	// Thanks @MrRobospoccio
-
-	public static void printDistanceMatrix(int size, int[][] distMatrix){
-		for(int i = 0; i < size; i++){
-			for (int j = 0; j < size; j++){
-				System.out.print(distMatrix[i][j] + "\t");
-			}
-			System.out.println(" ");
-		}
-	}
-
 	public void init(TSPData data) {
 
 		if(data.getInit()){
@@ -96,22 +86,21 @@ public class TSP {
 		data.setDistances(distances);
 
 		// Calculate HM<Integer, TS>
-		HashMap<Integer, Set<Edge<Integer>>> candidate_list = new HashMap<>();
-		TreeSet<Edge<Integer>> edges = new TreeSet<>();
+		HashMap<Integer, Set<Edge>> candidate_list = new HashMap<>();
+		TreeSet<Edge> edges = new TreeSet<>();
 
 		long s1 = System.currentTimeMillis();
 
+		int all = 0;
 		for(int i=0; i<distances.length; i++){
-			ArrayList<Edge<Integer>> nn = new ArrayList<>();
-			for(int j=0; j<distances.length; j++){
-				if(i == j){
-					continue;
-				}
-				Edge<Integer> e = new Edge<>(i, j, distances[i][j]);
-				nn.add(e);
+			ArrayList<Edge> nn = new ArrayList<>();
+			for(int j=i+1; j<distances.length; j++){
+				Edge e = new Edge(i, j, distances[i][j]);
 				edges.add(e);
+				nn.add(e);
+				all++;
 			}
-			nn.sort(Edge::compareTo);
+			nn.sort(Comparator.comparing(Edge::getWeight));
 			candidate_list.put(i,
 					nn.stream()
 					.limit(CANDIDATES_SIZE)
@@ -123,9 +112,19 @@ public class TSP {
 		 	node in the MST.
 		 */
 
-		SpanningTree st = KruskalMST.compute(edges);
+		SpanningTree st = KruskalMST.compute(data.getDim(), new ArrayList<>(edges));
 
-		for(Edge<Integer> e : st.getEdges()){
+
+		/*try {
+			PyPlotUtils.plotST(st, data);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.exit(1);*/
+
+
+		for(Edge e : st.getEdges()){
 			candidate_list.get(e.getU()).add(e);
 			candidate_list.get(e.getV()).add(e.invert());
 		}

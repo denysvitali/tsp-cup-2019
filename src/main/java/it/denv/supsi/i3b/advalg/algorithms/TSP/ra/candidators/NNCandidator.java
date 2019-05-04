@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class NNCandidator implements Candidator<Integer> {
+public class NNCandidator implements Candidator {
 
 	private int size;
 	private TSPData data;
@@ -31,17 +31,17 @@ public class NNCandidator implements Candidator<Integer> {
 	}
 
 	@Override
-	public ArrayList<Edge<Integer>> getCandidates(int startNode) {
+	public ArrayList<Edge> getCandidates(int startNode) {
 		return unvisitedNodes.stream()
 				.filter(e->e!=startNode)
-				.map(e -> new Edge<>(startNode, e, data.getDistances()[startNode][e]))
+				.map(e -> new Edge(startNode, e, data.getDistances()[startNode][e]))
 				.sorted()
 				.limit(size)
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	@Override
-	public void addVisited(Edge<Integer> candidate) {
+	public void addVisited(Edge candidate) {
 		tabuList.add(candidate.getU());
 		unvisitedNodes.remove(candidate.getU());
 	}

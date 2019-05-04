@@ -20,7 +20,7 @@ public class TSPData {
 	protected int best_known = 0;
 	HashMap<Integer, Coordinate> coordinates = new HashMap<>();
 	private HashMap<Integer, int[]> nearest = new HashMap<>();
-	protected ArrayList<Edge<Integer>> edges = new ArrayList<>();
+	protected ArrayList<Edge> edges = new ArrayList<>();
 	private boolean init = false;
 
 
@@ -83,11 +83,11 @@ public class TSPData {
 		this.nearest = nearest;
 	}
 
-	public ArrayList<Edge<Integer>> getEdges() {
+	public ArrayList<Edge> getEdges() {
 		return this.edges;
 	}
 
-	public void setEdges(ArrayList<Edge<Integer>> edges) {
+	public void setEdges(ArrayList<Edge> edges) {
 		this.edges = edges;
 	}
 

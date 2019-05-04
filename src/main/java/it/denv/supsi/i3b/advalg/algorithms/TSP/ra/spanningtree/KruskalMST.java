@@ -4,6 +4,7 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Queue;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ public class KruskalMST implements SpanningTreeSearch {
 		@param edges	TreeSet containing the edges of a complete graph.
 	 */
 
-	public static SpanningTree compute(TreeSet<Edge<Integer>> edges){
+	public static SpanningTree compute(int nodes, ArrayList<Edge> edges){
 		/*
 			1. 	Sort all the edges in non-decreasing order of their weight.
 			2. 	Pick the smallest edge.
@@ -25,33 +26,36 @@ public class KruskalMST implements SpanningTreeSearch {
 		 */
 
 		HashMap<Integer, Integer> cpmapper = new HashMap<>();
-		ArrayList<Edge<Integer>> mst = new ArrayList<>();
+		ArrayList<Edge> mst = new ArrayList<>();
 
-		for(Edge<Integer> e : edges){
-			int st_u = findSubtree(cpmapper, e.getU());
-			int st_v = findSubtree(cpmapper, e.getV());
+		int[] parent = new int[nodes];
+		for(int i=0; i<nodes; i++){
+			parent[i] = -1;
+		}
+
+		for(Edge e : edges){
+			int st_u = findSubtree(parent, e.getU());
+			int st_v = findSubtree(parent, e.getV());
 
 			if(st_u != st_v){
 				mst.add(e);
-
-				if(cpmapper.containsKey(e.getV())){
-					cpmapper.put(e.getU(), e.getV());
-				} else {
-					cpmapper.put(e.getV(), e.getU());
-				}
+				union(parent, st_u, st_v);
 			}
 		}
 
 		return new SpanningTree(mst);
 	}
 
-	private static int findSubtree(HashMap<Integer, Integer> cpmapper,
-								   int e) {
-		if(cpmapper.get(e) != null){
-			return findSubtree(cpmapper, cpmapper.get(e));
+	private static void union(int[] parent, int st_u, int st_v) {
+		parent[st_v] = st_u;
+	}
+
+	private static int findSubtree(int[] nodes, int e) {
+		if(nodes[e] == -1){
+			return e;
 		}
 
-		return e;
+		return findSubtree(nodes, nodes[e]);
 	}
 
 

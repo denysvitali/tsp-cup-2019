@@ -4,13 +4,10 @@ import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Candidator;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class RNNCandidator implements Candidator<Integer> {
+public class RNNCandidator implements Candidator {
 
 	private int size;
 	private int seed = -1;
@@ -60,11 +57,11 @@ public class RNNCandidator implements Candidator<Integer> {
 	}
 
 	@Override
-	public ArrayList<Edge<Integer>> getCandidates(int startNode) {
-		ArrayList<Edge<Integer>> result = unvisitedNodes.stream()
+	public ArrayList<Edge> getCandidates(int startNode) {
+		ArrayList<Edge> result = unvisitedNodes.stream()
 				.filter(e->e!=startNode)
-				.map(e -> new Edge<>(startNode, e, data.getDistances()[startNode][e]))
-				.sorted()
+				.map(e -> new Edge(startNode, e, data.getDistances()[startNode][e]))
+				.sorted(Comparator.comparing(Edge::getWeight))
 				.limit(size)
 				.collect(Collectors.toCollection(ArrayList::new));
 		Collections.shuffle(result);
@@ -72,7 +69,7 @@ public class RNNCandidator implements Candidator<Integer> {
 	}
 
 	@Override
-	public void addVisited(Edge<Integer> candidate) {
+	public void addVisited(Edge candidate) {
 		tabuList.add(candidate.getU());
 		unvisitedNodes.remove(candidate.getU());
 	}

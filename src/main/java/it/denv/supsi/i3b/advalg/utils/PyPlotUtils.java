@@ -2,9 +2,11 @@ package it.denv.supsi.i3b.advalg.utils;
 
 import it.denv.supsi.i3b.advalg.algorithms.Coordinate;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.io.TSPData;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.Edge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.ABCycle;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.ABEdge;
 import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.intermediate.genetic.eax.EAXGraph;
+import it.denv.supsi.i3b.advalg.algorithms.TSP.ra.spanningtree.SpanningTree;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -38,21 +40,7 @@ public class PyPlotUtils {
 			}
 
 			for(String pf : plotFiles){
-				String plotPy = PyPlotUtils.class.getResource("/scripts/plot.py").getPath();
-				Process p = Runtime.getRuntime().exec(
-						new String[]{
-								"python",
-								plotPy,
-								pf
-						}
-				);
-
-				InputStream err = p.getErrorStream();
-
-				p.onExit().join();
-
-				String errStr = new String(err.readAllBytes());
-				System.out.println(errStr);
+				plotWithPlotly(pf);
 			}
 
 		} catch(IOException ex){
@@ -64,5 +52,48 @@ public class PyPlotUtils {
 		ArrayList<ABCycle> cycles = new ArrayList<>();
 		cycles.add(intermediateSol);
 		plotABCycles(cycles, data);
+	}
+
+	public static void plotST(SpanningTree st, TSPData data) throws IOException {
+		ArrayList<Coordinate> coords = new ArrayList<>(
+				data.getCoordinates().values());
+
+		String f = File.createTempFile("tsp-plot-st", ".dat").getPath();
+
+		OutputStreamWriter os = new OutputStreamWriter(new FileOutputStream(f));
+
+		for(Edge e : st.getEdges()){
+			Coordinate coord = coords.get(e.getU());
+			Coordinate coord2 = coords.get(e.getV());
+			os.write(
+					String.format(
+							"%f %f %f %f\n",
+							coord.getX(),
+							coord.getY(),
+							coord2.getX(),
+							coord2.getY()
+					)
+			);
+		}
+		os.flush();
+		plotWithPlotly(f);
+	}
+
+	private static void plotWithPlotly(String file) throws IOException {
+		String plotPy = PyPlotUtils.class.getResource("/scripts/plot.py").getPath();
+		Process p = Runtime.getRuntime().exec(
+				new String[]{
+						"python",
+						plotPy,
+						file
+				}
+		);
+
+		InputStream err = p.getErrorStream();
+
+		p.onExit().join();
+
+		String errStr = new String(err.readAllBytes());
+		System.out.println(errStr);
 	}
 }
