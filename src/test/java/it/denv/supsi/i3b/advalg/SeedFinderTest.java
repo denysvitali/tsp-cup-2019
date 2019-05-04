@@ -110,17 +110,19 @@ public class SeedFinderTest {
 			int seed = r.nextInt();
 			for(double temp = 200; temp > 20; temp -= 5) {
 				for (int iter = 100; iter < 500; iter += 100) {
-					for (double alpha = 0.90; alpha <= 0.99; alpha += 0.01) {
+					for (double alpha = 0.1; alpha <= 0.99; alpha += 0.01) {
 						double finalAlpha = alpha;
 						int finalIter = iter;
 						double startTemp = temp;
 
-						exec.submit(() -> f.apply(seed,
-								startTemp,
-								finalAlpha,
-								finalIter,
-								SimulatedAnnealing.Mode.RAND_CHOICE)
-						);
+						for(SimulatedAnnealing.Mode m : SimulatedAnnealing.Mode.values()){
+							exec.submit(() -> f.apply(seed,
+									startTemp,
+									finalAlpha,
+									finalIter,
+									m)
+							);
+						}
 					}
 				}
 			}

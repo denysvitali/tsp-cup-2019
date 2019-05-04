@@ -138,7 +138,7 @@ public class SimulatedAnnealing implements ILS {
 		current.calculateDistance(data);
 
 		TwoOpt twoOpt = new TwoOpt(data);
-		twoOpt.setCandidate(false);
+		twoOpt.setCandidate(true);
 
 		int length = current.getPathArr().length;
 		int bestKnown = data.getBestKnown();
@@ -220,7 +220,6 @@ public class SimulatedAnnealing implements ILS {
 				}
 			}
 
-			System.out.println("Temperature is " + temperature);
 			RouteUtils.computePerformance(best, data);
 			//temperature *= Math.pow(alpha, iter);
 
@@ -230,7 +229,7 @@ public class SimulatedAnnealing implements ILS {
 		}
 
 		System.out.println("END! Alpha was " +
-				"" + alpha + ", r=" + r);
+				"" + alpha + ", r=" + r + ", T = " + temperature);
 
 
 		return new Route(best, data);
