@@ -57,7 +57,9 @@
           <parallel>all</parallel>
           <threadCount>1</threadCount>
           <perCoreThreadCount>true</perCoreThreadCount>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
+
       </plugin>
     </plugins>
   </build>
