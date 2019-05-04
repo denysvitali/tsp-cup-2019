@@ -238,7 +238,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void kroA100() throws IOException {
-		kroA100_SA(1);
+		//kroA100_SA(1);
+		kroA100_ACS(1, 3);
 	}
 
 	private void kroA100_ACS(int seed, int amount) throws IOException {
@@ -318,8 +319,8 @@ public class TSPRunnerTest {
 
 	@Test
 	public void pcb442() throws IOException {
-		//pcb442_ACS(3, 10);
-		pcb442SimAn();
+		//pcb442_ACS(3, 3);
+		pcb442_SA(1);
 	}
 
 	private void pcb442_ACS(int seed, int amount) throws IOException {
@@ -327,10 +328,15 @@ public class TSPRunnerTest {
 		TSP tsp = new TSP(80);
 		tsp.init(data);
 
+		TwoOpt si = new TwoOpt(data);
+		si.setCandidate(true);
+
+		AntColonySystem acs = new AntColonySystem(seed, amount, data);
+		acs.setSolutionImprover(si);
+
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
-						.startWith(new AntColonySystem(seed, amount, data)
-								.setSolutionImprover(new TwoOpt(data)))
+						.startWith(acs)
 		);
 
 		validateResult(tsp, r, data);
@@ -338,7 +344,7 @@ public class TSPRunnerTest {
 
 	private void pcb442_SA(int seed) throws IOException {
 		TSPData data = getProblemData("pcb442");
-		TSP tsp = new TSP(80);
+		TSP tsp = new TSP(10);
 		tsp.init(data);
 
 		Route r = tsp.run(data,
@@ -1074,7 +1080,7 @@ public class TSPRunnerTest {
 		TSPLoader loader = new TSPLoader(filePath);
 		TSPData data = loader.load();
 
-		TSP tsp = new TSP((int) (data.getDim() * 0.15));
+		TSP tsp = new TSP(10);
 		Route r = tsp.run(data,
 				(new CompositeRoutingAlgorithm())
 						.startWith(new RandomNearestNeighbour(seed, data))
