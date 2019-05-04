@@ -108,23 +108,23 @@ public class SeedFinderTest {
 		Random r = new Random();
 		for (int i = 0; i < 100; i++) {
 			int seed = r.nextInt();
-			for(double temp = 200; temp > 20; temp -= 5) {
-				for (int iter = 100; iter < 500; iter += 100) {
-					for (double alpha = 0.1; alpha <= 0.99; alpha += 0.01) {
-						double finalAlpha = alpha;
-						int finalIter = iter;
-						double startTemp = temp;
+			for (double alpha = 0.99; alpha >= 0.1; alpha -= 0.01) {
+				for(double temp = 200; temp > 20; temp -= 5) {
+					for (int iter = 100; iter < 500; iter += 100) {
+							double finalAlpha = alpha;
+							int finalIter = iter;
+							double startTemp = temp;
 
-						for(SimulatedAnnealing.Mode m : SimulatedAnnealing.Mode.values()){
-							exec.submit(() -> f.apply(seed,
-									startTemp,
-									finalAlpha,
-									finalIter,
-									m)
-							);
+							for(SimulatedAnnealing.Mode m : SimulatedAnnealing.Mode.values()){
+								exec.submit(() -> f.apply(seed,
+										startTemp,
+										finalAlpha,
+										finalIter,
+										m)
+								);
+							}
 						}
 					}
-				}
 			}
 		}
 
